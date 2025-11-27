@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.35826.135
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "enginevalidator", "enginevalidator\enginevalidator.csproj", "{051E03E3-7B35-45F9-AA45-F7F6F09E6043}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "enginevalidator", "enginevalidator.csproj", "{051E03E3-7B35-45F9-AA45-F7F6F09E6043}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -20,6 +20,6 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {E4F579A6-CCC0-4C64-B610-BFB86D6ABA9B}
+		SolutionGuid = {6744C07A-9BBD-43A3-83EC-109CDD489980}
 	EndGlobalSection
 EndGlobal
