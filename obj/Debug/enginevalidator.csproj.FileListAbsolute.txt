@@ -106,9 +106,9 @@ C:\Users\saul.sirin\source\repos\enginevalidator\engineValidador\bin\roslyn\vbc.
 C:\Users\saul.sirin\source\repos\enginevalidator\engineValidador\bin\roslyn\vbc.rsp
 C:\Users\saul.sirin\source\repos\enginevalidator\engineValidador\bin\roslyn\VBCSCompiler.exe
 C:\Users\saul.sirin\source\repos\enginevalidator\engineValidador\bin\roslyn\VBCSCompiler.exe.config
-C:\Users\saul.sirin\source\repos\enginevalidator\engineValidador\bin\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.xml
 C:\Users\saul.sirin\source\repos\enginevalidator\engineValidador\obj\Debug\enginevalidator.csproj.AssemblyReference.cache
 C:\Users\saul.sirin\source\repos\enginevalidator\engineValidador\obj\Debug\enginevalidator.csproj.CoreCompileInputs.cache
-C:\Users\saul.sirin\source\repos\enginevalidator\engineValidador\obj\Debug\enginevalidator.csproj.CopyComplete
 C:\Users\saul.sirin\source\repos\enginevalidator\engineValidador\obj\Debug\enginevalidator.dll
 C:\Users\saul.sirin\source\repos\enginevalidator\engineValidador\obj\Debug\enginevalidator.pdb
+C:\Users\saul.sirin\source\repos\enginevalidator\engineValidador\bin\enginevalidator.dll.config
+C:\Users\saul.sirin\source\repos\enginevalidator\engineValidador\obj\Debug\engineva.C690A800.Up2Date
