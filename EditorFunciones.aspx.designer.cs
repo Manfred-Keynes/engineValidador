@@ -78,33 +78,6 @@ namespace enginevalidator
         protected global::System.Web.UI.WebControls.Label lblExpresionLogica;
 
         /// <summary>
-        /// lblCantidadCampos control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Label lblCantidadCampos;
-
-        /// <summary>
-        /// ddlSegmentos control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.DropDownList ddlSegmentos;
-
-        /// <summary>
-        /// rptCampos control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Repeater rptCampos;
-
-        /// <summary>
         /// btnGuardar control.
         /// </summary>
         /// <remarks>
@@ -130,6 +103,33 @@ namespace enginevalidator
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.Button btnValidar;
+
+        /// <summary>
+        /// lblCantidadCampos control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label lblCantidadCampos;
+
+        /// <summary>
+        /// ddlSegmentos control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.DropDownList ddlSegmentos;
+
+        /// <summary>
+        /// rptCampos control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Repeater rptCampos;
 
         /// <summary>
         /// hfVariablesData control.

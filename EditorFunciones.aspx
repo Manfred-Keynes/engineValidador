@@ -680,18 +680,14 @@
 
         /* Layout de 2 columnas */
         .two-column-layout {
-            display: grid;
-            grid-template-columns: 360px 1fr;
-            gap: 20px;
-            height: 500px;
+            display: block;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 0 20px;
         }
 
         .palette-column {
-            background: var(--gray-50);
-            border-radius: var(--border-radius);
-            padding: 16px;
-            overflow-y: auto;
-            border: 1px solid var(--gray-200);
+            display: none; /* Ocultar la columna de paleta ya que ahora está en sidebar */
         }
 
         .drop-column {
@@ -1591,6 +1587,102 @@
             border-radius: 4px;
         }
 
+        /* ===== PANEL LATERAL DE RECURSOS (Campos + Operadores) - SIEMPRE VISIBLE ===== */
+        .resources-sidebar {
+            position: fixed;
+            left: 20px;
+            top: 120px;
+            width: 320px;
+            background: white;
+            border: 1px solid var(--gray-200);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-lg);
+            z-index: 99; /* Menor que funciones para no tapar */
+            max-height: calc(100vh - 140px);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .resources-sidebar-header {
+            padding: 16px;
+            border-bottom: 2px solid var(--gray-100);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+            border-radius: var(--border-radius) var(--border-radius) 0 0;
+        }
+
+        .resources-sidebar-header-left {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .resources-sidebar-header i {
+            color: #0284c7;
+            font-size: 18px;
+        }
+
+        .resources-sidebar-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--gray-900);
+        }
+
+        /* Sección dentro del panel de recursos */
+        .resources-section {
+            border-bottom: 1px solid var(--gray-200);
+        }
+
+        .resources-section:last-child {
+            border-bottom: none;
+        }
+
+        .resources-section-header {
+            padding: 12px 16px;
+            background: var(--gray-50);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--gray-700);
+            border-bottom: 1px solid var(--gray-200);
+        }
+
+        .resources-section-header i {
+            color: var(--primary);
+            font-size: 14px;
+        }
+
+        .resources-badge {
+            margin-left: auto;
+            background: #dbeafe;
+            color: #1e40af;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .resources-section-content {
+            padding: 12px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        /* Selector de segmento compacto */
+        .resources-segment-selector {
+            margin-bottom: 12px;
+        }
+
+        .resources-segment-selector .form-select-sm {
+            font-size: 12px;
+            padding: 4px 8px;
+        }
+
         /* Panel lateral fijo de funciones */
         .functions-sidebar {
             position: fixed;
@@ -1651,6 +1743,66 @@
         .functions-sidebar-content {
             overflow-y: auto;
             flex: 1;
+        }
+
+        /* Secciones dentro del sidebar derecho */
+        .sidebar-section {
+            border-bottom: 1px solid var(--gray-200);
+        }
+
+        .sidebar-section:last-child {
+            border-bottom: none;
+        }
+
+        .sidebar-section-header {
+            padding: 12px 16px;
+            background: var(--gray-50);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--gray-700);
+            border-bottom: 1px solid var(--gray-200);
+        }
+
+        .sidebar-section-header i {
+            color: var(--primary);
+            font-size: 14px;
+        }
+
+        .sidebar-badge {
+            margin-left: auto;
+            background: #dbeafe;
+            color: #1e40af;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .sidebar-section-content {
+            padding: 12px;
+            max-height: 250px;
+            overflow-y: auto;
+        }
+
+        /* Selector de segmento en sidebar */
+        .sidebar-segment-selector {
+            margin-bottom: 12px;
+        }
+
+        .sidebar-segment-selector .form-select-sm {
+            font-size: 12px;
+            padding: 4px 8px;
+        }
+
+        /* Separador visual */
+        .sidebar-separator {
+            height: 8px;
+            background: var(--gray-100);
+            border-top: 1px solid var(--gray-200);
+            border-bottom: 1px solid var(--gray-200);
         }
 
         .function-category-sidebar {
@@ -1964,102 +2116,6 @@
                 </div>
             </div>
 
-            <!-- Panel Derecho: Campos Disponibles -->
-            <div class="card">
-                <div class="card-title">
-                    Campos Disponibles
-                    <span class="badge badge-primary" style="float: right;">
-                        <asp:Label ID="lblCantidadCampos" runat="server" Text="0" /> campos
-                    </span>
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label">Segmento</label>
-                    <asp:DropDownList 
-                        ID="ddlSegmentos" 
-                        runat="server" 
-                        CssClass="form-select"
-                        AutoPostBack="True"
-                        OnSelectedIndexChanged="ddlSegmentos_SelectedIndexChanged">
-                    </asp:DropDownList>
-                </div>
-
-                <div class="field-list">
-                    <div class="fields-grid">
-                        <asp:Repeater ID="rptCampos" runat="server">
-                            <ItemTemplate>
-                                <div class="field-pill draggable-field-item" 
-                                     draggable="true" 
-                                     data-field='<%# Eval("Campo") %>'
-                                     title='<%# Eval("Descripcion") %>'
-                                     ondragstart="dragFieldStart(event)" 
-                                     ondragend="dragFieldEnd(event)">
-                                    <span class="field-pill-icon">📊</span>
-                                    <span class="field-pill-name"><%# Eval("Campo") %></span>
-                                </div>
-                            </ItemTemplate>
-                        </asp:Repeater>
-                    </div>
-                </div>
-
-                <div class="helper-text" style="margin-top: 12px;">
-                    <i class="fas fa-hand-pointer"></i>
-                    Arrastra un campo hacia la zona de expresión
-                </div>
-
-                <!-- Panel de operadores estático debajo del helper -->
-                <div class="operators-static-panel">
-                    <div class="operators-static-title">
-                        <i class="fas fa-calculator"></i>
-                        <span>Operadores</span>
-                    </div>
-                    <div class="operators-grid">
-                        <!-- Operadores Aritméticos -->
-                        <div class="op-pill draggable-operator-item" draggable="true" data-operator="+" ondragstart="dragOperatorStart(event)" ondragend="dragOperatorEnd(event)">
-                            <span class="op-pill-symbol">+</span>
-                            <span class="op-pill-name">Suma</span>
-                        </div>
-                        <div class="op-pill draggable-operator-item" draggable="true" data-operator="-" ondragstart="dragOperatorStart(event)" ondragend="dragOperatorEnd(event)">
-                            <span class="op-pill-symbol">−</span>
-                            <span class="op-pill-name">Resta</span>
-                        </div>
-                        <div class="op-pill draggable-operator-item" draggable="true" data-operator="*" ondragstart="dragOperatorStart(event)" ondragend="dragOperatorEnd(event)">
-                            <span class="op-pill-symbol">×</span>
-                            <span class="op-pill-name">Multiplicación</span>
-                        </div>
-                        <div class="op-pill draggable-operator-item" draggable="true" data-operator="/" ondragstart="dragOperatorStart(event)" ondragend="dragOperatorEnd(event)">
-                            <span class="op-pill-symbol">÷</span>
-                            <span class="op-pill-name">División</span>
-                        </div>
-                        
-                        <!-- Operadores de Comparación -->
-                        <div class="op-pill draggable-operator-item" draggable="true" data-operator=">" ondragstart="dragOperatorStart(event)" ondragend="dragOperatorEnd(event)">
-                            <span class="op-pill-symbol">&gt;</span>
-                            <span class="op-pill-name">Mayor que</span>
-                        </div>
-                        <div class="op-pill draggable-operator-item" draggable="true" data-operator="<" ondragstart="dragOperatorStart(event)" ondragend="dragOperatorEnd(event)">
-                            <span class="op-pill-symbol">&lt;</span>
-                            <span class="op-pill-name">Menor que</span>
-                        </div>
-                        <div class="op-pill draggable-operator-item" draggable="true" data-operator=">=" ondragstart="dragOperatorStart(event)" ondragend="dragOperatorEnd(event)">
-                            <span class="op-pill-symbol">≥</span>
-                            <span class="op-pill-name">Mayor o igual</span>
-                        </div>
-                        <div class="op-pill draggable-operator-item" draggable="true" data-operator="<=" ondragstart="dragOperatorStart(event)" ondragend="dragOperatorEnd(event)">
-                            <span class="op-pill-symbol">≤</span>
-                            <span class="op-pill-name">Menor o igual</span>
-                        </div>
-                        <div class="op-pill draggable-operator-item" draggable="true" data-operator="=" ondragstart="dragOperatorStart(event)" ondragend="dragOperatorEnd(event)">
-                            <span class="op-pill-symbol">=</span>
-                            <span class="op-pill-name">Igual</span>
-                        </div>
-                        <div class="op-pill draggable-operator-item" draggable="true" data-operator="!=" ondragstart="dragOperatorStart(event)" ondragend="dragOperatorEnd(event)">
-                            <span class="op-pill-symbol">≠</span>
-                            <span class="op-pill-name">Diferente</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
         </div>
 
         <!-- Action Bar -->
@@ -2089,13 +2145,118 @@
         </div>
     </div>
 
-    <!-- Panel lateral de funciones arrastrables -->
+    <!-- Panel lateral de Operadores (siempre visible) -->
+    <div class="resources-sidebar">
+        <!-- Header del panel -->
+        <div class="resources-sidebar-header">
+            <div class="resources-sidebar-header-left">
+                <i class="fas fa-calculator"></i>
+                <span class="resources-sidebar-title">Operadores</span>
+            </div>
+        </div>
+
+        <!-- Contenido de Operadores -->
+        <div class="resources-section-content">
+            <div class="operators-grid">
+                <!-- Operadores Aritméticos -->
+                <div class="op-pill draggable-operator-item" draggable="true" data-operator="+" ondragstart="dragOperatorStart(event)" ondragend="dragOperatorEnd(event)">
+                    <span class="op-pill-symbol">+</span>
+                    <span class="op-pill-name">Suma</span>
+                </div>
+                <div class="op-pill draggable-operator-item" draggable="true" data-operator="-" ondragstart="dragOperatorStart(event)" ondragend="dragOperatorEnd(event)">
+                    <span class="op-pill-symbol">−</span>
+                    <span class="op-pill-name">Resta</span>
+                </div>
+                <div class="op-pill draggable-operator-item" draggable="true" data-operator="*" ondragstart="dragOperatorStart(event)" ondragend="dragOperatorEnd(event)">
+                    <span class="op-pill-symbol">×</span>
+                    <span class="op-pill-name">Multiplicación</span>
+                </div>
+                <div class="op-pill draggable-operator-item" draggable="true" data-operator="/" ondragstart="dragOperatorStart(event)" ondragend="dragOperatorEnd(event)">
+                    <span class="op-pill-symbol">÷</span>
+                    <span class="op-pill-name">División</span>
+                </div>
+                
+                    <!-- Operadores de Comparación -->
+                    <div class="op-pill draggable-operator-item" draggable="true" data-operator=">" ondragstart="dragOperatorStart(event)" ondragend="dragOperatorEnd(event)">
+                        <span class="op-pill-symbol">&gt;</span>
+                        <span class="op-pill-name">Mayor que</span>
+                    </div>
+                    <div class="op-pill draggable-operator-item" draggable="true" data-operator="<" ondragstart="dragOperatorStart(event)" ondragend="dragOperatorEnd(event)">
+                        <span class="op-pill-symbol">&lt;</span>
+                        <span class="op-pill-name">Menor que</span>
+                    </div>
+                    <div class="op-pill draggable-operator-item" draggable="true" data-operator=">=" ondragstart="dragOperatorStart(event)" ondragend="dragOperatorEnd(event)">
+                        <span class="op-pill-symbol">≥</span>
+                        <span class="op-pill-name">Mayor o igual</span>
+                    </div>
+                    <div class="op-pill draggable-operator-item" draggable="true" data-operator="<=" ondragstart="dragOperatorStart(event)" ondragend="dragOperatorEnd(event)">
+                        <span class="op-pill-symbol">≤</span>
+                        <span class="op-pill-name">Menor o igual</span>
+                    </div>
+                    <div class="op-pill draggable-operator-item" draggable="true" data-operator="=" ondragstart="dragOperatorStart(event)" ondragend="dragOperatorEnd(event)">
+                        <span class="op-pill-symbol">=</span>
+                        <span class="op-pill-name">Igual</span>
+                    </div>
+                    <div class="op-pill draggable-operator-item" draggable="true" data-operator="!=" ondragstart="dragOperatorStart(event)" ondragend="dragOperatorEnd(event)">
+                        <span class="op-pill-symbol">≠</span>
+                        <span class="op-pill-name">Diferente</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Panel lateral de funciones y campos arrastrables -->
     <div class="functions-sidebar">
         <div class="functions-sidebar-header">
-            <i class="fas fa-function"></i>
-            <span class="functions-sidebar-title">Funciones Disponibles</span>
+            <i class="fas fa-layer-group"></i>
+            <span class="functions-sidebar-title">Componentes</span>
         </div>
         
+        <!-- Sección de Campos Disponibles -->
+        <div class="sidebar-section">
+            <div class="sidebar-section-header">
+                <i class="fas fa-database"></i>
+                <span>Campos Disponibles</span>
+                <span class="sidebar-badge">
+                    <asp:Label ID="lblCantidadCampos" runat="server" Text="0" />
+                </span>
+            </div>
+            <div class="sidebar-section-content">
+                <!-- Selector de segmento -->
+                <div class="sidebar-segment-selector">
+                    <asp:DropDownList 
+                        ID="ddlSegmentos" 
+                        runat="server" 
+                        CssClass="form-select form-select-sm"
+                        AutoPostBack="True"
+                        OnSelectedIndexChanged="ddlSegmentos_SelectedIndexChanged">
+                    </asp:DropDownList>
+                </div>
+
+                <!-- Pills de campos -->
+                <div class="fields-grid">
+                    <asp:Repeater ID="rptCampos" runat="server">
+                        <ItemTemplate>
+                            <div class="field-pill draggable-field-item" 
+                                 draggable="true" 
+                                 data-field='<%# Eval("Campo") %>'
+                                 title='<%# Eval("Descripcion") %>'
+                                 ondragstart="dragFieldStart(event)" 
+                                 ondragend="dragFieldEnd(event)">
+                                <span class="field-pill-icon">📊</span>
+                                <span class="field-pill-name"><%# Eval("Campo") %></span>
+                            </div>
+                        </ItemTemplate>
+                    </asp:Repeater>
+                </div>
+            </div>
+        </div>
+
+        <!-- Separador -->
+        <div class="sidebar-separator"></div>
+
+        <!-- Búsqueda de funciones -->
         <div class="functions-sidebar-search">
             <input type="text" placeholder="Buscar función..." onkeyup="filterSidebarFunctions(event)">
         </div>
@@ -2903,10 +3064,6 @@
                                 Componentes Disponibles
                             </div>
                             <div class="component-palette-items">
-                                <div class="component-palette-item" data-type="field" onclick="openFieldSelector(${variablesCounter})">
-                                    <i class="fas fa-database"></i>
-                                    Campo
-                                </div>
                                 <div class="component-palette-item" data-type="value" onclick="addValueComponent(${variablesCounter})">
                                     <i class="fas fa-hashtag"></i>
                                     Valor
