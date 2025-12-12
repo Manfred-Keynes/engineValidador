@@ -378,6 +378,20 @@
             color: var(--primary);
         }
 
+        /* Estilo del botón de funciones dentro de la paleta de componentes */
+        .component-palette-items .btn-function-menu {
+            padding: 6px 10px;
+            font-size: 12px;
+            background: #eff6ff;
+            border-color: #3b82f6;
+            color: #1e40af;
+        }
+
+        .component-palette-items .btn-function-menu:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
         /* Function menu dropdown dentro de card */
         .function-menu {
             position: absolute;
@@ -2204,81 +2218,6 @@
                     </div>
                 </div>
                 <div class="variable-card-body">
-                    <!-- Botón de Funciones dentro de cada variable -->
-                    <div class="function-menu-container">
-                        <button type="button" class="btn-function-menu" onclick="toggleFunctionMenu(event, ${variablesCounter})">
-                            <i class="fas fa-function"></i>
-                            <span>Funciones</span>
-                            <i class="fas fa-chevron-down" style="font-size: 10px; margin-left: 4px;"></i>
-                        </button>
-                        
-                        <!-- Menú de funciones -->
-                        <div class="function-menu" id="functionMenu${variablesCounter}">
-                            <div class="function-menu-header">
-                                <i class="fas fa-calculator"></i>
-                                <span>Funciones Disponibles</span>
-                            </div>
-                            <div class="function-menu-search">
-                                <i class="fas fa-search"></i>
-                                <input type="text" placeholder="Buscar función..." onkeyup="filterFunctions(${variablesCounter})">
-                            </div>
-                            <div class="function-menu-items">
-                                <div class="function-category">
-                                    <div class="function-category-title">Agregación</div>
-                                    <div class="function-item" onclick="insertFunction('Conteo')" data-keywords="conteo count contar">
-                                        <div class="function-item-name"><i class="fas fa-hashtag"></i>Conteo</div>
-                                        <div class="function-item-desc">Cuenta elementos en una colección</div>
-                                    </div>
-                                    <div class="function-item" onclick="insertFunction('Máximo')" data-keywords="maximo max mayor">
-                                        <div class="function-item-name"><i class="fas fa-arrow-up"></i>Máximo</div>
-                                        <div class="function-item-desc">Retorna el valor máximo</div>
-                                    </div>
-                                    <div class="function-item" onclick="insertFunction('Mínimo')" data-keywords="minimo min menor">
-                                        <div class="function-item-name"><i class="fas fa-arrow-down"></i>Mínimo</div>
-                                        <div class="function-item-desc">Retorna el valor mínimo</div>
-                                    </div>
-                                    <div class="function-item" onclick="insertFunction('Promedio')" data-keywords="promedio average media">
-                                        <div class="function-item-name"><i class="fas fa-chart-line"></i>Promedio</div>
-                                        <div class="function-item-desc">Calcula el promedio aritmético</div>
-                                    </div>
-                                    <div class="function-item" onclick="insertFunction('Suma')" data-keywords="suma sum total sumar">
-                                        <div class="function-item-name"><i class="fas fa-plus"></i>Suma</div>
-                                        <div class="function-item-desc">Suma todos los valores</div>
-                                    </div>
-                                </div>
-                                <div class="function-category">
-                                    <div class="function-category-title">Lógica</div>
-                                    <div class="function-item" onclick="insertFunction('Si entonces')" data-keywords="si if then entonces condicional">
-                                        <div class="function-item-name"><i class="fas fa-code-branch"></i>Si entonces</div>
-                                        <div class="function-item-desc">Evaluación condicional</div>
-                                    </div>
-                                </div>
-                                <div class="function-category">
-                                    <div class="function-category-title">Texto</div>
-                                    <div class="function-item" onclick="insertFunction('Conteo caracteres')" data-keywords="conteo caracteres length longitud">
-                                        <div class="function-item-name"><i class="fas fa-text-width"></i>Conteo caracteres</div>
-                                        <div class="function-item-desc">Cuenta caracteres en texto</div>
-                                    </div>
-                                    <div class="function-item" onclick="insertFunction('Expresión regular')" data-keywords="expresion regular regex pattern">
-                                        <div class="function-item-name"><i class="fas fa-code"></i>Expresión regular</div>
-                                        <div class="function-item-desc">Validación con regex</div>
-                                    </div>
-                                </div>
-                                <div class="function-category">
-                                    <div class="function-category-title">Fechas</div>
-                                    <div class="function-item" onclick="insertFunction('Calcular edad')" data-keywords="calcular edad age years años comparar mayor menor">
-                                        <div class="function-item-name"><i class="fas fa-birthday-cake"></i>Calcular edad</div>
-                                        <div class="function-item-desc">Calcula edad o evalúa si cumple condición (ej: edad > 18)</div>
-                                    </div>
-                                    <div class="function-item" onclick="insertFunction('Cualquier fecha')" data-keywords="cualquier fecha date any">
-                                        <div class="function-item-name"><i class="fas fa-calendar-alt"></i>Cualquier fecha</div>
-                                        <div class="function-item-desc">Operaciones con fechas</div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
                     <div class="variable-field">
                         <div class="variable-field-label">Nombre de la Variable</div>
                         <input type="text" class="variable-field-input" placeholder="Ej: EDAD" 
@@ -2322,10 +2261,81 @@
                                 Componentes Disponibles
                             </div>
                             <div class="component-palette-items">
-                                <div class="component-palette-item" data-type="function" onclick="openFunctionSelector(${variablesCounter})">
-                                    <i class="fas fa-function"></i>
-                                    Función
+                                <!-- Botón de Funciones con Menú Dropdown -->
+                                <div class="function-menu-container">
+                                    <button type="button" class="btn-function-menu" onclick="toggleFunctionMenu(event, ${variablesCounter})">
+                                        <i class="fas fa-function"></i>
+                                        <span>Funciones</span>
+                                        <i class="fas fa-chevron-down" style="font-size: 10px; margin-left: 4px;"></i>
+                                    </button>
+                                    
+                                    <!-- Menú de funciones -->
+                                    <div class="function-menu" id="functionMenu${variablesCounter}">
+                                        <div class="function-menu-header">
+                                            <i class="fas fa-calculator"></i>
+                                            <span>Funciones Disponibles</span>
+                                        </div>
+                                        <div class="function-menu-search">
+                                            <i class="fas fa-search"></i>
+                                            <input type="text" placeholder="Buscar función..." onkeyup="filterFunctions(${variablesCounter})">
+                                        </div>
+                                        <div class="function-menu-items">
+                                            <div class="function-category">
+                                                <div class="function-category-title">Agregación</div>
+                                                <div class="function-item" onclick="insertFunction('Conteo', ${variablesCounter})" data-keywords="conteo count contar">
+                                                    <div class="function-item-name"><i class="fas fa-hashtag"></i>Conteo</div>
+                                                    <div class="function-item-desc">Cuenta elementos en una colección</div>
+                                                </div>
+                                                <div class="function-item" onclick="insertFunction('Máximo', ${variablesCounter})" data-keywords="maximo max mayor">
+                                                    <div class="function-item-name"><i class="fas fa-arrow-up"></i>Máximo</div>
+                                                    <div class="function-item-desc">Retorna el valor máximo</div>
+                                                </div>
+                                                <div class="function-item" onclick="insertFunction('Mínimo', ${variablesCounter})" data-keywords="minimo min menor">
+                                                    <div class="function-item-name"><i class="fas fa-arrow-down"></i>Mínimo</div>
+                                                    <div class="function-item-desc">Retorna el valor mínimo</div>
+                                                </div>
+                                                <div class="function-item" onclick="insertFunction('Promedio', ${variablesCounter})" data-keywords="promedio average media">
+                                                    <div class="function-item-name"><i class="fas fa-chart-line"></i>Promedio</div>
+                                                    <div class="function-item-desc">Calcula el promedio aritmético</div>
+                                                </div>
+                                                <div class="function-item" onclick="insertFunction('Suma', ${variablesCounter})" data-keywords="suma sum total sumar">
+                                                    <div class="function-item-name"><i class="fas fa-plus"></i>Suma</div>
+                                                    <div class="function-item-desc">Suma todos los valores</div>
+                                                </div>
+                                            </div>
+                                            <div class="function-category">
+                                                <div class="function-category-title">Lógica</div>
+                                                <div class="function-item" onclick="insertFunction('Si entonces', ${variablesCounter})" data-keywords="si if then entonces condicional">
+                                                    <div class="function-item-name"><i class="fas fa-code-branch"></i>Si entonces</div>
+                                                    <div class="function-item-desc">Evaluación condicional</div>
+                                                </div>
+                                            </div>
+                                            <div class="function-category">
+                                                <div class="function-category-title">Texto</div>
+                                                <div class="function-item" onclick="insertFunction('Conteo caracteres', ${variablesCounter})" data-keywords="conteo caracteres length longitud">
+                                                    <div class="function-item-name"><i class="fas fa-text-width"></i>Conteo caracteres</div>
+                                                    <div class="function-item-desc">Cuenta caracteres en texto</div>
+                                                </div>
+                                                <div class="function-item" onclick="insertFunction('Expresión regular', ${variablesCounter})" data-keywords="expresion regular regex pattern">
+                                                    <div class="function-item-name"><i class="fas fa-code"></i>Expresión regular</div>
+                                                    <div class="function-item-desc">Validación con regex</div>
+                                                </div>
+                                            </div>
+                                            <div class="function-category">
+                                                <div class="function-category-title">Fechas</div>
+                                                <div class="function-item" onclick="insertFunction('Calcular edad', ${variablesCounter})" data-keywords="calcular edad age years años comparar mayor menor">
+                                                    <div class="function-item-name"><i class="fas fa-birthday-cake"></i>Calcular edad</div>
+                                                    <div class="function-item-desc">Calcula edad o evalúa si cumple condición (ej: edad &gt; 18)</div>
+                                                </div>
+                                                <div class="function-item" onclick="insertFunction('Cualquier fecha', ${variablesCounter})" data-keywords="cualquier fecha date any">
+                                                    <div class="function-item-name"><i class="fas fa-calendar-alt"></i>Cualquier fecha</div>
+                                                    <div class="function-item-desc">Operaciones con fechas</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
+                                
                                 <div class="component-palette-item" data-type="field" onclick="openFieldSelector(${variablesCounter})">
                                     <i class="fas fa-database"></i>
                                     Campo
@@ -2740,7 +2750,21 @@
         }
 
         // Función legacy para compatibilidad con menú de funciones
-        function insertFunction(functionName) {
+        function insertFunction(functionName, varId) {
+            // Si se proporciona varId, establecer el contexto del constructor visual
+            if (varId) {
+                const builder = document.getElementById('exprBuilder' + varId);
+                if (builder) {
+                    // Crear input temporal para establecer contexto
+                    const tempInput = document.createElement('textarea');
+                    tempInput.style.display = 'none';
+                    builder.appendChild(tempInput);
+
+                    activeInput = tempInput;
+                    activeInput.varId = varId;
+                }
+            }
+
             if (!activeInput) {
                 alert('Por favor, haga clic en un campo de expresión antes de seleccionar una función.');
                 return;
