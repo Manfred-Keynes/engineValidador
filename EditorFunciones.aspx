@@ -4071,5 +4071,38 @@
             const event = new Event('input', { bubbles: true });
             input.dispatchEvent(event);
         }
+
+        // ===== PREVENIR DROPS FUERA DE ZONAS VÁLIDAS =====
+
+        // Prevenir drop en cualquier lugar del documento por defecto
+        document.addEventListener('dragover', function (e) {
+            // Solo permitir dragover si NO estamos arrastrando funciones/operadores
+            // O si estamos sobre una zona válida
+            if (draggedFunctionName || draggedOperator) {
+                const target = e.target;
+                const isValidZone = target.closest('.expression-builder') ||
+                    target.closest('.drop-zone');
+
+                if (!isValidZone) {
+                    // No permitir drop en este elemento
+                    e.dataTransfer.effectAllowed = 'none';
+                    e.dataTransfer.dropEffect = 'none';
+                }
+            }
+        }, false);
+
+        // Prevenir drop en todo el documento excepto zonas válidas
+        document.addEventListener('drop', function (e) {
+            const target = e.target;
+            const isValidZone = target.closest('.expression-builder') ||
+                target.closest('.drop-zone');
+
+            if (!isValidZone && (draggedFunctionName || draggedOperator)) {
+                // Prevenir el drop en elementos no válidos
+                e.preventDefault();
+                e.stopPropagation();
+                return false;
+            }
+        }, false);
     </script>
 </asp:Content>
