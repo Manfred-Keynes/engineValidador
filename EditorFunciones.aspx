@@ -1712,6 +1712,141 @@
         .functions-sidebar-hint i {
             color: #3b82f6;
         }
+
+        /* Panel lateral de operadores */
+        .operators-sidebar {
+            position: fixed;
+            right: 360px; /* A la izquierda del panel de funciones */
+            top: 120px;
+            width: 280px;
+            background: white;
+            border: 1px solid var(--gray-200);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-lg);
+            z-index: 100;
+            max-height: calc(100vh - 140px);
+            display: none;
+            flex-direction: column;
+            transition: opacity 0.3s ease-in-out;
+        }
+
+        .operators-sidebar-header {
+            padding: 16px;
+            border-bottom: 2px solid var(--gray-100);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #fef3c7;
+            border-radius: var(--border-radius) var(--border-radius) 0 0;
+        }
+
+        .operators-sidebar-header-left {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .operators-sidebar-header i {
+            color: #f59e0b;
+            font-size: 18px;
+        }
+
+        .operators-sidebar-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--gray-900);
+        }
+
+        .operators-sidebar-close {
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: white;
+            border: 1px solid var(--gray-300);
+            border-radius: 4px;
+            cursor: pointer;
+            color: var(--gray-600);
+            transition: all 0.2s;
+        }
+
+        .operators-sidebar-close:hover {
+            background: var(--gray-100);
+            color: var(--gray-900);
+        }
+
+        .operators-sidebar-content {
+            padding: 16px;
+            overflow-y: auto;
+            flex: 1;
+        }
+
+        .operators-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .draggable-operator-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            padding: 16px 12px;
+            background: white;
+            border: 2px solid #fbbf24;
+            border-radius: var(--border-radius-sm);
+            cursor: grab;
+            transition: all 0.2s;
+            min-height: 80px;
+        }
+
+        .draggable-operator-item:active {
+            cursor: grabbing;
+        }
+
+        .draggable-operator-item:hover {
+            border-color: #f59e0b;
+            background: #fef3c7;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(245, 158, 11, 0.2);
+        }
+
+        .draggable-operator-item.dragging {
+            opacity: 0.5;
+            transform: scale(0.95);
+        }
+
+        .draggable-operator-symbol {
+            font-size: 24px;
+            font-weight: 700;
+            color: #92400e;
+            font-family: 'Courier New', monospace;
+        }
+
+        .draggable-operator-name {
+            font-size: 11px;
+            font-weight: 600;
+            color: #92400e;
+            text-align: center;
+        }
+
+        .operators-sidebar-hint {
+            padding: 12px 16px;
+            background: #fef3c7;
+            border-top: 1px solid #fde68a;
+            font-size: 11px;
+            color: #92400e;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .operators-sidebar-hint i {
+            color: #f59e0b;
+        }
     </style>
 </asp:Content>
 
@@ -1921,7 +2056,7 @@
         <div class="functions-sidebar-content">
             <div class="function-category-sidebar">
                 <div class="function-category-sidebar-title">Agregación</div>
-                <div class="draggable-function-item" draggable="true" data-function="Conteo" ondragstart="dragFunctionStart(event)">
+                <div class="draggable-function-item" draggable="true" data-function="Conteo" ondragstart="dragFunctionStart(event)" ondragend="dragFunctionEnd(event)">
                     <div class="draggable-function-icon"><i class="fas fa-hashtag"></i></div>
                     <div class="draggable-function-content">
                         <div class="draggable-function-name">Conteo</div>
@@ -1929,7 +2064,7 @@
                     </div>
                     <div class="drag-handle"><i class="fas fa-grip-vertical"></i></div>
                 </div>
-                <div class="draggable-function-item" draggable="true" data-function="Máximo" ondragstart="dragFunctionStart(event)">
+                <div class="draggable-function-item" draggable="true" data-function="Máximo" ondragstart="dragFunctionStart(event)" ondragend="dragFunctionEnd(event)">
                     <div class="draggable-function-icon"><i class="fas fa-arrow-up"></i></div>
                     <div class="draggable-function-content">
                         <div class="draggable-function-name">Máximo</div>
@@ -1937,7 +2072,7 @@
                     </div>
                     <div class="drag-handle"><i class="fas fa-grip-vertical"></i></div>
                 </div>
-                <div class="draggable-function-item" draggable="true" data-function="Mínimo" ondragstart="dragFunctionStart(event)">
+                <div class="draggable-function-item" draggable="true" data-function="Mínimo" ondragstart="dragFunctionStart(event)" ondragend="dragFunctionEnd(event)">
                     <div class="draggable-function-icon"><i class="fas fa-arrow-down"></i></div>
                     <div class="draggable-function-content">
                         <div class="draggable-function-name">Mínimo</div>
@@ -1945,7 +2080,7 @@
                     </div>
                     <div class="drag-handle"><i class="fas fa-grip-vertical"></i></div>
                 </div>
-                <div class="draggable-function-item" draggable="true" data-function="Promedio" ondragstart="dragFunctionStart(event)">
+                <div class="draggable-function-item" draggable="true" data-function="Promedio" ondragstart="dragFunctionStart(event)" ondragend="dragFunctionEnd(event)">
                     <div class="draggable-function-icon"><i class="fas fa-chart-line"></i></div>
                     <div class="draggable-function-content">
                         <div class="draggable-function-name">Promedio</div>
@@ -1953,7 +2088,7 @@
                     </div>
                     <div class="drag-handle"><i class="fas fa-grip-vertical"></i></div>
                 </div>
-                <div class="draggable-function-item" draggable="true" data-function="Suma" ondragstart="dragFunctionStart(event)">
+                <div class="draggable-function-item" draggable="true" data-function="Suma" ondragstart="dragFunctionStart(event)" ondragend="dragFunctionEnd(event)">
                     <div class="draggable-function-icon"><i class="fas fa-plus"></i></div>
                     <div class="draggable-function-content">
                         <div class="draggable-function-name">Suma</div>
@@ -1965,7 +2100,7 @@
 
             <div class="function-category-sidebar">
                 <div class="function-category-sidebar-title">Lógica</div>
-                <div class="draggable-function-item" draggable="true" data-function="Si entonces" ondragstart="dragFunctionStart(event)">
+                <div class="draggable-function-item" draggable="true" data-function="Si entonces" ondragstart="dragFunctionStart(event)" ondragend="dragFunctionEnd(event)">
                     <div class="draggable-function-icon"><i class="fas fa-code-branch"></i></div>
                     <div class="draggable-function-content">
                         <div class="draggable-function-name">Si entonces</div>
@@ -1977,7 +2112,7 @@
 
             <div class="function-category-sidebar">
                 <div class="function-category-sidebar-title">Texto</div>
-                <div class="draggable-function-item" draggable="true" data-function="Conteo caracteres" ondragstart="dragFunctionStart(event)">
+                <div class="draggable-function-item" draggable="true" data-function="Conteo caracteres" ondragstart="dragFunctionStart(event)" ondragend="dragFunctionEnd(event)">
                     <div class="draggable-function-icon"><i class="fas fa-text-width"></i></div>
                     <div class="draggable-function-content">
                         <div class="draggable-function-name">Conteo caracteres</div>
@@ -1985,7 +2120,7 @@
                     </div>
                     <div class="drag-handle"><i class="fas fa-grip-vertical"></i></div>
                 </div>
-                <div class="draggable-function-item" draggable="true" data-function="Expresión regular" ondragstart="dragFunctionStart(event)">
+                <div class="draggable-function-item" draggable="true" data-function="Expresión regular" ondragstart="dragFunctionStart(event)" ondragend="dragFunctionEnd(event)">
                     <div class="draggable-function-icon"><i class="fas fa-code"></i></div>
                     <div class="draggable-function-content">
                         <div class="draggable-function-name">Expresión regular</div>
@@ -1997,7 +2132,7 @@
 
             <div class="function-category-sidebar">
                 <div class="function-category-sidebar-title">Fechas</div>
-                <div class="draggable-function-item" draggable="true" data-function="Calcular edad" ondragstart="dragFunctionStart(event)">
+                <div class="draggable-function-item" draggable="true" data-function="Calcular edad" ondragstart="dragFunctionStart(event)" ondragend="dragFunctionEnd(event)">
                     <div class="draggable-function-icon"><i class="fas fa-birthday-cake"></i></div>
                     <div class="draggable-function-content">
                         <div class="draggable-function-name">Calcular edad</div>
@@ -2005,7 +2140,7 @@
                     </div>
                     <div class="drag-handle"><i class="fas fa-grip-vertical"></i></div>
                 </div>
-                <div class="draggable-function-item" draggable="true" data-function="Cualquier fecha" ondragstart="dragFunctionStart(event)">
+                <div class="draggable-function-item" draggable="true" data-function="Cualquier fecha" ondragstart="dragFunctionStart(event)" ondragend="dragFunctionEnd(event)">
                     <div class="draggable-function-icon"><i class="fas fa-calendar-alt"></i></div>
                     <div class="draggable-function-content">
                         <div class="draggable-function-name">Cualquier fecha</div>
@@ -2019,6 +2154,72 @@
         <div class="functions-sidebar-hint">
             <i class="fas fa-hand-pointer"></i>
             <span>Arrastra una función hacia la zona de expresión</span>
+        </div>
+    </div>
+
+    <!-- Panel lateral de operadores arrastrables -->
+    <div class="operators-sidebar">
+        <div class="operators-sidebar-header">
+            <div class="operators-sidebar-header-left">
+                <i class="fas fa-calculator"></i>
+                <span class="operators-sidebar-title">Operadores</span>
+            </div>
+            <div class="operators-sidebar-close" onclick="closeOperatorsSidebar()">
+                <i class="fas fa-times"></i>
+            </div>
+        </div>
+        
+        <div class="operators-sidebar-content">
+            <div class="operators-grid">
+                <!-- Operadores Aritméticos -->
+                <div class="draggable-operator-item" draggable="true" data-operator="+" ondragstart="dragOperatorStart(event)" ondragend="dragOperatorEnd(event)">
+                    <div class="draggable-operator-symbol">+</div>
+                    <div class="draggable-operator-name">Suma</div>
+                </div>
+                <div class="draggable-operator-item" draggable="true" data-operator="-" ondragstart="dragOperatorStart(event)" ondragend="dragOperatorEnd(event)">
+                    <div class="draggable-operator-symbol">−</div>
+                    <div class="draggable-operator-name">Resta</div>
+                </div>
+                <div class="draggable-operator-item" draggable="true" data-operator="*" ondragstart="dragOperatorStart(event)" ondragend="dragOperatorEnd(event)">
+                    <div class="draggable-operator-symbol">×</div>
+                    <div class="draggable-operator-name">Multiplicación</div>
+                </div>
+                <div class="draggable-operator-item" draggable="true" data-operator="/" ondragstart="dragOperatorStart(event)" ondragend="dragOperatorEnd(event)">
+                    <div class="draggable-operator-symbol">÷</div>
+                    <div class="draggable-operator-name">División</div>
+                </div>
+                
+                <!-- Operadores de Comparación -->
+                <div class="draggable-operator-item" draggable="true" data-operator=">" ondragstart="dragOperatorStart(event)" ondragend="dragOperatorEnd(event)">
+                    <div class="draggable-operator-symbol">&gt;</div>
+                    <div class="draggable-operator-name">Mayor que</div>
+                </div>
+                <div class="draggable-operator-item" draggable="true" data-operator="<" ondragstart="dragOperatorStart(event)" ondragend="dragOperatorEnd(event)">
+                    <div class="draggable-operator-symbol">&lt;</div>
+                    <div class="draggable-operator-name">Menor que</div>
+                </div>
+                <div class="draggable-operator-item" draggable="true" data-operator=">=" ondragstart="dragOperatorStart(event)" ondragend="dragOperatorEnd(event)">
+                    <div class="draggable-operator-symbol">≥</div>
+                    <div class="draggable-operator-name">Mayor o igual</div>
+                </div>
+                <div class="draggable-operator-item" draggable="true" data-operator="<=" ondragstart="dragOperatorStart(event)" ondragend="dragOperatorEnd(event)">
+                    <div class="draggable-operator-symbol">≤</div>
+                    <div class="draggable-operator-name">Menor o igual</div>
+                </div>
+                <div class="draggable-operator-item" draggable="true" data-operator="=" ondragstart="dragOperatorStart(event)" ondragend="dragOperatorEnd(event)">
+                    <div class="draggable-operator-symbol">=</div>
+                    <div class="draggable-operator-name">Igual</div>
+                </div>
+                <div class="draggable-operator-item" draggable="true" data-operator="!=" ondragstart="dragOperatorStart(event)" ondragend="dragOperatorEnd(event)">
+                    <div class="draggable-operator-symbol">≠</div>
+                    <div class="draggable-operator-name">Diferente</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="operators-sidebar-hint">
+            <i class="fas fa-hand-pointer"></i>
+            <span>Arrastra un operador hacia la zona de expresión</span>
         </div>
     </div>
 
@@ -2036,7 +2237,108 @@
         let expressionComponents = {}; // Almacena componentes por variable: {varId: [components]}
         let componentCounter = 0;
         let draggedFunctionName = null; // Para almacenar qué función se está arrastrando
+        let draggedOperator = null; // Para almacenar qué operador se está arrastrando
         let targetVarId = null; // Para almacenar a qué variable se soltó
+
+        // ===== DRAG & DROP DE OPERADORES DESDE SIDEBAR =====
+
+        function dragOperatorStart(event) {
+            const operatorSymbol = event.target.closest('.draggable-operator-item').getAttribute('data-operator');
+            draggedOperator = operatorSymbol;
+            event.dataTransfer.effectAllowed = 'copy';
+            event.dataTransfer.setData('text/plain', operatorSymbol);
+            event.target.closest('.draggable-operator-item').classList.add('dragging');
+        }
+
+        function dragOperatorEnd(event) {
+            // Limpiar estado visual cuando termina el drag (soltado en cualquier lugar)
+            event.target.closest('.draggable-operator-item').classList.remove('dragging');
+            draggedOperator = null;
+        }
+
+        function allowOperatorDrop(event, varId) {
+            event.preventDefault();
+            event.currentTarget.classList.add('drag-over');
+            targetVarId = varId;
+        }
+
+        function dragOperatorLeave(event) {
+            event.currentTarget.classList.remove('drag-over');
+        }
+
+        function dropOperator(event, varId) {
+            event.preventDefault();
+            event.currentTarget.classList.remove('drag-over');
+
+            // Remover clase dragging
+            document.querySelectorAll('.draggable-operator-item.dragging').forEach(item => {
+                item.classList.remove('dragging');
+            });
+
+            if (!draggedOperator) return;
+
+            // Agregar operador directamente al constructor visual
+            addExprComponent(varId, 'operator', draggedOperator, `<span class="expr-value">${draggedOperator}</span>`);
+
+            // Limpiar
+            draggedOperator = null;
+            targetVarId = null;
+        }
+
+        // ===== FUNCIONES UNIFICADAS PARA MANEJAR TODOS LOS DROPS =====
+
+        function allowItemDrop(event, varId) {
+            event.preventDefault();
+            event.currentTarget.classList.add('drag-over');
+            targetVarId = varId;
+        }
+
+        function dragItemLeave(event) {
+            event.currentTarget.classList.remove('drag-over');
+        }
+
+        function dropItem(event, varId) {
+            event.preventDefault();
+            event.currentTarget.classList.remove('drag-over');
+
+            // Remover clase dragging de todos los items
+            document.querySelectorAll('.draggable-function-item.dragging, .draggable-operator-item.dragging').forEach(item => {
+                item.classList.remove('dragging');
+            });
+
+            // Manejar drop de función
+            if (draggedFunctionName) {
+                const builder = document.getElementById('exprBuilder' + varId);
+                if (builder) {
+                    const tempInput = document.createElement('textarea');
+                    tempInput.style.display = 'none';
+                    builder.appendChild(tempInput);
+
+                    activeInput = tempInput;
+                    activeInput.varId = varId;
+                }
+
+                openFunctionModal(draggedFunctionName, activeInput);
+                draggedFunctionName = null;
+                targetVarId = null;
+                return;
+            }
+
+            // Manejar drop de operador
+            if (draggedOperator) {
+                addExprComponent(varId, 'operator', draggedOperator, `<span class="expr-value">${draggedOperator}</span>`);
+                draggedOperator = null;
+                targetVarId = null;
+                return;
+            }
+        }
+
+        function closeOperatorsSidebar() {
+            const sidebar = document.querySelector('.operators-sidebar');
+            if (sidebar) {
+                sidebar.style.display = 'none';
+            }
+        }
 
         // ===== DRAG & DROP DE FUNCIONES DESDE SIDEBAR =====
 
@@ -2046,6 +2348,12 @@
             event.dataTransfer.effectAllowed = 'copy';
             event.dataTransfer.setData('text/plain', functionName);
             event.target.closest('.draggable-function-item').classList.add('dragging');
+        }
+
+        function dragFunctionEnd(event) {
+            // Limpiar estado visual cuando termina el drag (soltado en cualquier lugar)
+            event.target.closest('.draggable-function-item').classList.remove('dragging');
+            draggedFunctionName = null;
         }
 
         function allowFunctionDrop(event, varId) {
@@ -2179,35 +2487,17 @@
         }
 
         // Abrir selector de operadores
+        // Abrir panel lateral de operadores
         function openOperatorSelector(varId) {
-            const operators = [
-                { symbol: '+', name: 'Suma', emoji: '➕' },
-                { symbol: '-', name: 'Resta', emoji: '➖' },
-                { symbol: '*', name: 'Multiplicación', emoji: '✖️' },
-                { symbol: '/', name: 'División', emoji: '➗' },
-                { symbol: '>', name: 'Mayor que', emoji: '▶️' },
-                { symbol: '<', name: 'Menor que', emoji: '◀️' },
-                { symbol: '>=', name: 'Mayor o igual', emoji: '⏩' },
-                { symbol: '<=', name: 'Menor o igual', emoji: '⏪' },
-                { symbol: '=', name: 'Igual', emoji: '🟰' },
-                { symbol: '!=', name: 'Diferente', emoji: '≠' }
-            ];
+            const sidebar = document.querySelector('.operators-sidebar');
+            if (sidebar) {
+                sidebar.style.display = 'flex';
+            }
 
-            let opOptions = '🧮 SELECCIONAR OPERADOR\n\n';
-            opOptions += 'Operadores disponibles:\n\n';
-            operators.forEach((o, i) => {
-                opOptions += `  ${i + 1}. ${o.symbol.padEnd(3)} ${o.emoji} ${o.name}\n`;
-            });
-            opOptions += '\n💡 Ingrese el número del operador:';
-
-            const choice = prompt(opOptions);
-            if (choice) {
-                const opIndex = parseInt(choice) - 1;
-                if (opIndex >= 0 && opIndex < operators.length) {
-                    addExprComponent(varId, 'operator', operators[opIndex].symbol, `<span class="expr-value">${operators[opIndex].symbol}</span>`);
-                } else {
-                    alert('❌ Número inválido\n\nPor favor ingrese un número entre 1 y ' + operators.length);
-                }
+            // Ocultar panel de funciones si está abierto
+            const functionsSidebar = document.querySelector('.functions-sidebar');
+            if (functionsSidebar) {
+                functionsSidebar.style.display = 'none';
             }
         }
 
@@ -2282,13 +2572,21 @@
             const comp = expressionComponents[varId].find(c => c.id === compId);
             if (!comp) return;
 
-            // Construir mensaje de confirmación
+            // Tipos simples que NO requieren confirmación
+            const simpleTypes = ['operator', 'value', 'parenthesis'];
+
+            if (simpleTypes.includes(comp.type)) {
+                // Eliminar directamente sin confirmación
+                expressionComponents[varId] = expressionComponents[varId].filter(c => c.id !== compId);
+                renderExpression(varId);
+                updateExpressionPreview(varId);
+                return;
+            }
+
+            // Para funciones y campos, pedir confirmación
             const componentTypes = {
                 'function': '📅 Función',
-                'field': '📊 Campo',
-                'operator': '➕ Operador',
-                'value': '🔢 Valor',
-                'parenthesis': '() Paréntesis'
+                'field': '📊 Campo'
             };
 
             const typeLabel = componentTypes[comp.type] || comp.type;
@@ -2584,12 +2882,12 @@
                     <div class="variable-field">
                         <div class="variable-field-label">Expresión</div>
                         <div class="expression-builder" id="exprBuilder${variablesCounter}" 
-                             ondrop="dropFunction(event, ${variablesCounter})" 
-                             ondragover="allowFunctionDrop(event, ${variablesCounter})" 
-                             ondragleave="dragFunctionLeave(event)">
+                             ondrop="dropItem(event, ${variablesCounter})" 
+                             ondragover="allowItemDrop(event, ${variablesCounter})" 
+                             ondragleave="dragItemLeave(event)">
                             <div class="empty">
                                 <i class="fas fa-hand-pointer" style="margin-right: 8px;"></i>
-                                Arrastra funciones desde el panel lateral o usa los componentes
+                                Arrastra funciones u operadores o usa los componentes
                             </div>
                         </div>
                         
@@ -2602,10 +2900,6 @@
                                 <div class="component-palette-item" data-type="field" onclick="openFieldSelector(${variablesCounter})">
                                     <i class="fas fa-database"></i>
                                     Campo
-                                </div>
-                                <div class="component-palette-item" data-type="operator" onclick="openOperatorSelector(${variablesCounter})">
-                                    <i class="fas fa-calculator"></i>
-                                    Operador
                                 </div>
                                 <div class="component-palette-item" data-type="value" onclick="addValueComponent(${variablesCounter})">
                                     <i class="fas fa-hashtag"></i>
@@ -2690,16 +2984,20 @@
         // ACCORDION: Solo una variable abierta a la vez
         function toggleCard(id) {
             const card = document.getElementById('varCard' + id);
-            const sidebar = document.querySelector('.functions-sidebar');
+            const functionsSidebar = document.querySelector('.functions-sidebar');
+            const operatorsSidebar = document.querySelector('.operators-sidebar');
 
             // Si esta card ya está expandida, cerrarla
             if (card.classList.contains('expanded')) {
                 card.classList.remove('expanded');
                 currentExpandedCard = null;
 
-                // Ocultar panel lateral
-                if (sidebar) {
-                    sidebar.style.display = 'none';
+                // Ocultar ambos paneles laterales
+                if (functionsSidebar) {
+                    functionsSidebar.style.display = 'none';
+                }
+                if (operatorsSidebar) {
+                    operatorsSidebar.style.display = 'none';
                 }
                 return;
             }
@@ -2716,9 +3014,12 @@
             card.classList.add('expanded');
             currentExpandedCard = id;
 
-            // Mostrar panel lateral
-            if (sidebar) {
-                sidebar.style.display = 'flex';
+            // Mostrar ambos paneles laterales
+            if (functionsSidebar) {
+                functionsSidebar.style.display = 'flex';
+            }
+            if (operatorsSidebar) {
+                operatorsSidebar.style.display = 'flex';
             }
 
             // Scroll suave a la card expandida
@@ -2779,10 +3080,14 @@
                 if (currentExpandedCard === id) {
                     currentExpandedCard = null;
 
-                    // Ocultar panel lateral si se elimina la variable expandida
-                    const sidebar = document.querySelector('.functions-sidebar');
-                    if (sidebar) {
-                        sidebar.style.display = 'none';
+                    // Ocultar ambos paneles laterales si se elimina la variable expandida
+                    const functionsSidebar = document.querySelector('.functions-sidebar');
+                    const operatorsSidebar = document.querySelector('.operators-sidebar');
+                    if (functionsSidebar) {
+                        functionsSidebar.style.display = 'none';
+                    }
+                    if (operatorsSidebar) {
+                        operatorsSidebar.style.display = 'none';
                     }
                 }
 
