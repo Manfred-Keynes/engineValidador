@@ -1039,6 +1039,77 @@
             align-items: center;
         }
 
+        /* Input inline para captura de valores */
+        .inline-value-input {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 4px;
+            background: #fffbeb;
+            border: 2px solid #fbbf24;
+            border-radius: var(--border-radius-sm);
+            box-shadow: 0 4px 12px rgba(251, 191, 36, 0.3);
+            animation: slideIn 0.2s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .inline-value-input input {
+            border: 1px solid #fbbf24;
+            border-radius: 4px;
+            padding: 6px 10px;
+            font-size: 13px;
+            font-weight: 600;
+            font-family: 'Courier New', monospace;
+            width: 120px;
+            outline: none;
+            transition: all 0.2s;
+        }
+
+        .inline-value-input input:focus {
+            border-color: #f59e0b;
+            box-shadow: 0 0 0 3px rgba(251, 191, 36, 0.2);
+        }
+
+        .inline-value-input button {
+            padding: 6px 10px;
+            border: none;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .inline-value-input .btn-accept {
+            background: #10b981;
+            color: white;
+        }
+
+        .inline-value-input .btn-accept:hover {
+            background: #059669;
+            transform: translateY(-1px);
+        }
+
+        .inline-value-input .btn-cancel {
+            background: #ef4444;
+            color: white;
+        }
+
+        .inline-value-input .btn-cancel:hover {
+            background: #dc2626;
+            transform: translateY(-1px);
+        }
+
         .expr-component {
             display: inline-flex;
             align-items: center;
@@ -2670,11 +2741,95 @@
 
         // Agregar componente de valor
         function addValueComponent(varId) {
-            const value = prompt('🔢 INGRESAR VALOR\n\nIngrese el valor:\n\nEjemplos:\n  • Número: 18, 25, 100\n  • Texto: "APROBADO", "RECHAZADO"\n  • Decimal: 3.14, 0.5\n\n💡 Ingrese el valor:');
-            if (value !== null && value.trim() !== '') {
-                const displayValue = value.trim();
-                addExprComponent(varId, 'value', displayValue, `<i class="fas fa-hashtag expr-icon"></i><span class="expr-value">${displayValue}</span>`);
+            const builder = document.getElementById('exprBuilder' + varId);
+            if (!builder) return;
+
+            // Verificar si ya hay un input inline activo
+            const existingInput = builder.querySelector('.inline-value-input');
+            if (existingInput) {
+                existingInput.querySelector('input').focus();
+                return;
             }
+
+            // Remover la clase 'empty' si existe
+            const emptyDiv = builder.querySelector('.empty');
+            if (emptyDiv) {
+                emptyDiv.style.display = 'none';
+            }
+
+            // Crear el contenedor de componentes si no existe
+            let componentsContainer = builder.querySelector('.expression-components');
+            if (!componentsContainer) {
+                componentsContainer = document.createElement('div');
+                componentsContainer.className = 'expression-components';
+                builder.appendChild(componentsContainer);
+            }
+
+            // Crear el input inline
+            const inlineInputContainer = document.createElement('div');
+            inlineInputContainer.className = 'inline-value-input';
+
+            const inputField = document.createElement('input');
+            inputField.type = 'text';
+            inputField.placeholder = '18, "TEXTO", 3.14';
+            inputField.autocomplete = 'off';
+
+            const btnAccept = document.createElement('button');
+            btnAccept.className = 'btn-accept';
+            btnAccept.innerHTML = '✓';
+            btnAccept.title = 'Aceptar';
+
+            const btnCancel = document.createElement('button');
+            btnCancel.className = 'btn-cancel';
+            btnCancel.innerHTML = '✕';
+            btnCancel.title = 'Cancelar';
+
+            // Función para aceptar el valor
+            const acceptValue = () => {
+                const value = inputField.value.trim();
+                if (value !== '') {
+                    addExprComponent(varId, 'value', value, `<i class="fas fa-hashtag expr-icon"></i><span class="expr-value">${value}</span>`);
+                }
+                inlineInputContainer.remove();
+
+                // Mostrar empty si no hay componentes
+                if (!expressionComponents[varId] || expressionComponents[varId].length === 0) {
+                    if (emptyDiv) emptyDiv.style.display = 'flex';
+                }
+            };
+
+            // Función para cancelar
+            const cancelInput = () => {
+                inlineInputContainer.remove();
+
+                // Mostrar empty si no hay componentes
+                if (!expressionComponents[varId] || expressionComponents[varId].length === 0) {
+                    if (emptyDiv) emptyDiv.style.display = 'flex';
+                }
+            };
+
+            // Event listeners
+            btnAccept.onclick = acceptValue;
+            btnCancel.onclick = cancelInput;
+
+            inputField.onkeydown = (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    acceptValue();
+                } else if (e.key === 'Escape') {
+                    e.preventDefault();
+                    cancelInput();
+                }
+            };
+
+            // Ensamblar
+            inlineInputContainer.appendChild(inputField);
+            inlineInputContainer.appendChild(btnAccept);
+            inlineInputContainer.appendChild(btnCancel);
+            componentsContainer.appendChild(inlineInputContainer);
+
+            // Focus automático
+            setTimeout(() => inputField.focus(), 100);
         }
 
         // Agregar paréntesis
