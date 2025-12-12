@@ -1558,6 +1558,160 @@
             background: var(--gray-300);
             border-radius: 4px;
         }
+
+        /* Panel lateral fijo de funciones */
+        .functions-sidebar {
+            position: fixed;
+            right: 20px;
+            top: 120px;
+            width: 320px;
+            background: white;
+            border: 1px solid var(--gray-200);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-lg);
+            z-index: 100;
+            max-height: calc(100vh - 140px);
+            display: none; /* Oculto por defecto */
+            flex-direction: column;
+            transition: opacity 0.3s ease-in-out;
+        }
+
+        .functions-sidebar-header {
+            padding: 16px;
+            border-bottom: 2px solid var(--gray-100);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--gray-50);
+            border-radius: var(--border-radius) var(--border-radius) 0 0;
+        }
+
+        .functions-sidebar-header i {
+            color: var(--primary);
+            font-size: 18px;
+        }
+
+        .functions-sidebar-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--gray-900);
+        }
+
+        .functions-sidebar-search {
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--gray-200);
+        }
+
+        .functions-sidebar-search input {
+            width: 100%;
+            padding: 8px 12px 8px 36px;
+            border: 1px solid var(--gray-300);
+            border-radius: var(--border-radius-sm);
+            font-size: 13px;
+            background: white url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="gray" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>') no-repeat 10px center;
+        }
+
+        .functions-sidebar-search input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .functions-sidebar-content {
+            overflow-y: auto;
+            flex: 1;
+        }
+
+        .function-category-sidebar {
+            padding: 12px 16px 8px 16px;
+        }
+
+        .function-category-sidebar-title {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--gray-500);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 8px;
+        }
+
+        .draggable-function-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 12px;
+            margin-bottom: 6px;
+            background: white;
+            border: 2px solid var(--gray-200);
+            border-radius: var(--border-radius-sm);
+            cursor: grab;
+            transition: all 0.2s;
+        }
+
+        .draggable-function-item:active {
+            cursor: grabbing;
+        }
+
+        .draggable-function-item:hover {
+            border-color: var(--primary);
+            background: var(--primary-light);
+            transform: translateX(4px);
+        }
+
+        .draggable-function-item.dragging {
+            opacity: 0.5;
+            transform: scale(0.95);
+        }
+
+        .draggable-function-icon {
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--primary-light);
+            border-radius: 6px;
+            color: var(--primary);
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+
+        .draggable-function-content {
+            flex: 1;
+        }
+
+        .draggable-function-name {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--gray-900);
+            margin-bottom: 2px;
+        }
+
+        .draggable-function-desc {
+            font-size: 11px;
+            color: var(--gray-600);
+            line-height: 1.3;
+        }
+
+        .drag-handle {
+            color: var(--gray-400);
+            font-size: 16px;
+        }
+
+        /* Hint de arrastre */
+        .functions-sidebar-hint {
+            padding: 12px 16px;
+            background: #eff6ff;
+            border-top: 1px solid #dbeafe;
+            font-size: 11px;
+            color: #1e40af;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .functions-sidebar-hint i {
+            color: #3b82f6;
+        }
     </style>
 </asp:Content>
 
@@ -1753,6 +1907,121 @@
         </div>
     </div>
 
+    <!-- Panel lateral de funciones arrastrables -->
+    <div class="functions-sidebar">
+        <div class="functions-sidebar-header">
+            <i class="fas fa-function"></i>
+            <span class="functions-sidebar-title">Funciones Disponibles</span>
+        </div>
+        
+        <div class="functions-sidebar-search">
+            <input type="text" placeholder="Buscar función..." onkeyup="filterSidebarFunctions(event)">
+        </div>
+        
+        <div class="functions-sidebar-content">
+            <div class="function-category-sidebar">
+                <div class="function-category-sidebar-title">Agregación</div>
+                <div class="draggable-function-item" draggable="true" data-function="Conteo" ondragstart="dragFunctionStart(event)">
+                    <div class="draggable-function-icon"><i class="fas fa-hashtag"></i></div>
+                    <div class="draggable-function-content">
+                        <div class="draggable-function-name">Conteo</div>
+                        <div class="draggable-function-desc">Cuenta elementos en una colección</div>
+                    </div>
+                    <div class="drag-handle"><i class="fas fa-grip-vertical"></i></div>
+                </div>
+                <div class="draggable-function-item" draggable="true" data-function="Máximo" ondragstart="dragFunctionStart(event)">
+                    <div class="draggable-function-icon"><i class="fas fa-arrow-up"></i></div>
+                    <div class="draggable-function-content">
+                        <div class="draggable-function-name">Máximo</div>
+                        <div class="draggable-function-desc">Retorna el valor máximo</div>
+                    </div>
+                    <div class="drag-handle"><i class="fas fa-grip-vertical"></i></div>
+                </div>
+                <div class="draggable-function-item" draggable="true" data-function="Mínimo" ondragstart="dragFunctionStart(event)">
+                    <div class="draggable-function-icon"><i class="fas fa-arrow-down"></i></div>
+                    <div class="draggable-function-content">
+                        <div class="draggable-function-name">Mínimo</div>
+                        <div class="draggable-function-desc">Retorna el valor mínimo</div>
+                    </div>
+                    <div class="drag-handle"><i class="fas fa-grip-vertical"></i></div>
+                </div>
+                <div class="draggable-function-item" draggable="true" data-function="Promedio" ondragstart="dragFunctionStart(event)">
+                    <div class="draggable-function-icon"><i class="fas fa-chart-line"></i></div>
+                    <div class="draggable-function-content">
+                        <div class="draggable-function-name">Promedio</div>
+                        <div class="draggable-function-desc">Calcula el promedio aritmético</div>
+                    </div>
+                    <div class="drag-handle"><i class="fas fa-grip-vertical"></i></div>
+                </div>
+                <div class="draggable-function-item" draggable="true" data-function="Suma" ondragstart="dragFunctionStart(event)">
+                    <div class="draggable-function-icon"><i class="fas fa-plus"></i></div>
+                    <div class="draggable-function-content">
+                        <div class="draggable-function-name">Suma</div>
+                        <div class="draggable-function-desc">Suma todos los valores</div>
+                    </div>
+                    <div class="drag-handle"><i class="fas fa-grip-vertical"></i></div>
+                </div>
+            </div>
+
+            <div class="function-category-sidebar">
+                <div class="function-category-sidebar-title">Lógica</div>
+                <div class="draggable-function-item" draggable="true" data-function="Si entonces" ondragstart="dragFunctionStart(event)">
+                    <div class="draggable-function-icon"><i class="fas fa-code-branch"></i></div>
+                    <div class="draggable-function-content">
+                        <div class="draggable-function-name">Si entonces</div>
+                        <div class="draggable-function-desc">Evaluación condicional</div>
+                    </div>
+                    <div class="drag-handle"><i class="fas fa-grip-vertical"></i></div>
+                </div>
+            </div>
+
+            <div class="function-category-sidebar">
+                <div class="function-category-sidebar-title">Texto</div>
+                <div class="draggable-function-item" draggable="true" data-function="Conteo caracteres" ondragstart="dragFunctionStart(event)">
+                    <div class="draggable-function-icon"><i class="fas fa-text-width"></i></div>
+                    <div class="draggable-function-content">
+                        <div class="draggable-function-name">Conteo caracteres</div>
+                        <div class="draggable-function-desc">Cuenta caracteres en texto</div>
+                    </div>
+                    <div class="drag-handle"><i class="fas fa-grip-vertical"></i></div>
+                </div>
+                <div class="draggable-function-item" draggable="true" data-function="Expresión regular" ondragstart="dragFunctionStart(event)">
+                    <div class="draggable-function-icon"><i class="fas fa-code"></i></div>
+                    <div class="draggable-function-content">
+                        <div class="draggable-function-name">Expresión regular</div>
+                        <div class="draggable-function-desc">Validación con regex</div>
+                    </div>
+                    <div class="drag-handle"><i class="fas fa-grip-vertical"></i></div>
+                </div>
+            </div>
+
+            <div class="function-category-sidebar">
+                <div class="function-category-sidebar-title">Fechas</div>
+                <div class="draggable-function-item" draggable="true" data-function="Calcular edad" ondragstart="dragFunctionStart(event)">
+                    <div class="draggable-function-icon"><i class="fas fa-birthday-cake"></i></div>
+                    <div class="draggable-function-content">
+                        <div class="draggable-function-name">Calcular edad</div>
+                        <div class="draggable-function-desc">Calcula edad o evalúa condición</div>
+                    </div>
+                    <div class="drag-handle"><i class="fas fa-grip-vertical"></i></div>
+                </div>
+                <div class="draggable-function-item" draggable="true" data-function="Cualquier fecha" ondragstart="dragFunctionStart(event)">
+                    <div class="draggable-function-icon"><i class="fas fa-calendar-alt"></i></div>
+                    <div class="draggable-function-content">
+                        <div class="draggable-function-name">Cualquier fecha</div>
+                        <div class="draggable-function-desc">Operaciones con fechas</div>
+                    </div>
+                    <div class="drag-handle"><i class="fas fa-grip-vertical"></i></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="functions-sidebar-hint">
+            <i class="fas fa-hand-pointer"></i>
+            <span>Arrastra una función hacia la zona de expresión</span>
+        </div>
+    </div>
+
     <!-- Hidden field para almacenar datos de variables -->
     <asp:HiddenField ID="hfVariablesData" runat="server" />
 </asp:Content>
@@ -1766,6 +2035,75 @@
         let selectedAutocompleteIndex = -1;
         let expressionComponents = {}; // Almacena componentes por variable: {varId: [components]}
         let componentCounter = 0;
+        let draggedFunctionName = null; // Para almacenar qué función se está arrastrando
+        let targetVarId = null; // Para almacenar a qué variable se soltó
+
+        // ===== DRAG & DROP DE FUNCIONES DESDE SIDEBAR =====
+
+        function dragFunctionStart(event) {
+            const functionName = event.target.closest('.draggable-function-item').getAttribute('data-function');
+            draggedFunctionName = functionName;
+            event.dataTransfer.effectAllowed = 'copy';
+            event.dataTransfer.setData('text/plain', functionName);
+            event.target.closest('.draggable-function-item').classList.add('dragging');
+        }
+
+        function allowFunctionDrop(event, varId) {
+            event.preventDefault();
+            event.currentTarget.classList.add('drag-over');
+            targetVarId = varId;
+        }
+
+        function dragFunctionLeave(event) {
+            event.currentTarget.classList.remove('drag-over');
+        }
+
+        function dropFunction(event, varId) {
+            event.preventDefault();
+            event.currentTarget.classList.remove('drag-over');
+
+            // Remover clase dragging de todos los items
+            document.querySelectorAll('.draggable-function-item.dragging').forEach(item => {
+                item.classList.remove('dragging');
+            });
+
+            if (!draggedFunctionName) return;
+
+            // Establecer contexto para el constructor visual
+            const builder = document.getElementById('exprBuilder' + varId);
+            if (builder) {
+                const tempInput = document.createElement('textarea');
+                tempInput.style.display = 'none';
+                builder.appendChild(tempInput);
+
+                activeInput = tempInput;
+                activeInput.varId = varId;
+            }
+
+            // Abrir modal inmediatamente con la función
+            openFunctionModal(draggedFunctionName, activeInput);
+
+            // Limpiar
+            draggedFunctionName = null;
+            targetVarId = null;
+        }
+
+        // Filtrar funciones en sidebar
+        function filterSidebarFunctions(event) {
+            const query = event.target.value.toLowerCase();
+            const items = document.querySelectorAll('.draggable-function-item');
+
+            items.forEach(item => {
+                const name = item.querySelector('.draggable-function-name').textContent.toLowerCase();
+                const desc = item.querySelector('.draggable-function-desc').textContent.toLowerCase();
+
+                if (name.includes(query) || desc.includes(query)) {
+                    item.style.display = 'flex';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        }
 
         // Inicializar componentes de expresión para una variable
         function initExpressionComponents(varId) {
@@ -2246,12 +2584,12 @@
                     <div class="variable-field">
                         <div class="variable-field-label">Expresión</div>
                         <div class="expression-builder" id="exprBuilder${variablesCounter}" 
-                             ondrop="dropExprComponent(event, ${variablesCounter})" 
-                             ondragover="allowExprDrop(event)" 
-                             ondragleave="dragExprLeave(event)">
+                             ondrop="dropFunction(event, ${variablesCounter})" 
+                             ondragover="allowFunctionDrop(event, ${variablesCounter})" 
+                             ondragleave="dragFunctionLeave(event)">
                             <div class="empty">
-                                <i class="fas fa-puzzle-piece" style="margin-right: 8px;"></i>
-                                Arrastra componentes aquí para construir la expresión
+                                <i class="fas fa-hand-pointer" style="margin-right: 8px;"></i>
+                                Arrastra funciones desde el panel lateral o usa los componentes
                             </div>
                         </div>
                         
@@ -2261,81 +2599,6 @@
                                 Componentes Disponibles
                             </div>
                             <div class="component-palette-items">
-                                <!-- Botón de Funciones con Menú Dropdown -->
-                                <div class="function-menu-container">
-                                    <button type="button" class="btn-function-menu" onclick="toggleFunctionMenu(event, ${variablesCounter})">
-                                        <i class="fas fa-function"></i>
-                                        <span>Funciones</span>
-                                        <i class="fas fa-chevron-down" style="font-size: 10px; margin-left: 4px;"></i>
-                                    </button>
-                                    
-                                    <!-- Menú de funciones -->
-                                    <div class="function-menu" id="functionMenu${variablesCounter}">
-                                        <div class="function-menu-header">
-                                            <i class="fas fa-calculator"></i>
-                                            <span>Funciones Disponibles</span>
-                                        </div>
-                                        <div class="function-menu-search">
-                                            <i class="fas fa-search"></i>
-                                            <input type="text" placeholder="Buscar función..." onkeyup="filterFunctions(${variablesCounter})">
-                                        </div>
-                                        <div class="function-menu-items">
-                                            <div class="function-category">
-                                                <div class="function-category-title">Agregación</div>
-                                                <div class="function-item" onclick="insertFunction('Conteo', ${variablesCounter})" data-keywords="conteo count contar">
-                                                    <div class="function-item-name"><i class="fas fa-hashtag"></i>Conteo</div>
-                                                    <div class="function-item-desc">Cuenta elementos en una colección</div>
-                                                </div>
-                                                <div class="function-item" onclick="insertFunction('Máximo', ${variablesCounter})" data-keywords="maximo max mayor">
-                                                    <div class="function-item-name"><i class="fas fa-arrow-up"></i>Máximo</div>
-                                                    <div class="function-item-desc">Retorna el valor máximo</div>
-                                                </div>
-                                                <div class="function-item" onclick="insertFunction('Mínimo', ${variablesCounter})" data-keywords="minimo min menor">
-                                                    <div class="function-item-name"><i class="fas fa-arrow-down"></i>Mínimo</div>
-                                                    <div class="function-item-desc">Retorna el valor mínimo</div>
-                                                </div>
-                                                <div class="function-item" onclick="insertFunction('Promedio', ${variablesCounter})" data-keywords="promedio average media">
-                                                    <div class="function-item-name"><i class="fas fa-chart-line"></i>Promedio</div>
-                                                    <div class="function-item-desc">Calcula el promedio aritmético</div>
-                                                </div>
-                                                <div class="function-item" onclick="insertFunction('Suma', ${variablesCounter})" data-keywords="suma sum total sumar">
-                                                    <div class="function-item-name"><i class="fas fa-plus"></i>Suma</div>
-                                                    <div class="function-item-desc">Suma todos los valores</div>
-                                                </div>
-                                            </div>
-                                            <div class="function-category">
-                                                <div class="function-category-title">Lógica</div>
-                                                <div class="function-item" onclick="insertFunction('Si entonces', ${variablesCounter})" data-keywords="si if then entonces condicional">
-                                                    <div class="function-item-name"><i class="fas fa-code-branch"></i>Si entonces</div>
-                                                    <div class="function-item-desc">Evaluación condicional</div>
-                                                </div>
-                                            </div>
-                                            <div class="function-category">
-                                                <div class="function-category-title">Texto</div>
-                                                <div class="function-item" onclick="insertFunction('Conteo caracteres', ${variablesCounter})" data-keywords="conteo caracteres length longitud">
-                                                    <div class="function-item-name"><i class="fas fa-text-width"></i>Conteo caracteres</div>
-                                                    <div class="function-item-desc">Cuenta caracteres en texto</div>
-                                                </div>
-                                                <div class="function-item" onclick="insertFunction('Expresión regular', ${variablesCounter})" data-keywords="expresion regular regex pattern">
-                                                    <div class="function-item-name"><i class="fas fa-code"></i>Expresión regular</div>
-                                                    <div class="function-item-desc">Validación con regex</div>
-                                                </div>
-                                            </div>
-                                            <div class="function-category">
-                                                <div class="function-category-title">Fechas</div>
-                                                <div class="function-item" onclick="insertFunction('Calcular edad', ${variablesCounter})" data-keywords="calcular edad age years años comparar mayor menor">
-                                                    <div class="function-item-name"><i class="fas fa-birthday-cake"></i>Calcular edad</div>
-                                                    <div class="function-item-desc">Calcula edad o evalúa si cumple condición (ej: edad &gt; 18)</div>
-                                                </div>
-                                                <div class="function-item" onclick="insertFunction('Cualquier fecha', ${variablesCounter})" data-keywords="cualquier fecha date any">
-                                                    <div class="function-item-name"><i class="fas fa-calendar-alt"></i>Cualquier fecha</div>
-                                                    <div class="function-item-desc">Operaciones con fechas</div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                
                                 <div class="component-palette-item" data-type="field" onclick="openFieldSelector(${variablesCounter})">
                                     <i class="fas fa-database"></i>
                                     Campo
@@ -2427,11 +2690,17 @@
         // ACCORDION: Solo una variable abierta a la vez
         function toggleCard(id) {
             const card = document.getElementById('varCard' + id);
+            const sidebar = document.querySelector('.functions-sidebar');
 
             // Si esta card ya está expandida, cerrarla
             if (card.classList.contains('expanded')) {
                 card.classList.remove('expanded');
                 currentExpandedCard = null;
+
+                // Ocultar panel lateral
+                if (sidebar) {
+                    sidebar.style.display = 'none';
+                }
                 return;
             }
 
@@ -2446,6 +2715,11 @@
             // Expandir la nueva card
             card.classList.add('expanded');
             currentExpandedCard = id;
+
+            // Mostrar panel lateral
+            if (sidebar) {
+                sidebar.style.display = 'flex';
+            }
 
             // Scroll suave a la card expandida
             setTimeout(() => {
@@ -2504,6 +2778,12 @@
 
                 if (currentExpandedCard === id) {
                     currentExpandedCard = null;
+
+                    // Ocultar panel lateral si se elimina la variable expandida
+                    const sidebar = document.querySelector('.functions-sidebar');
+                    if (sidebar) {
+                        sidebar.style.display = 'none';
+                    }
                 }
 
                 // Limpiar componentes de expresión
