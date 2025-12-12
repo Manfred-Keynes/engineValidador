@@ -1372,38 +1372,70 @@
             border-radius: var(--border-radius-sm);
             max-height: 400px;
             overflow-y: auto;
+            padding: 12px;
         }
 
-        .field-list-header {
-            display: grid;
-            grid-template-columns: 1fr 2fr;
-            gap: 12px;
-            padding: 12px;
-            background: white;
-            border-bottom: 1px solid var(--gray-200);
-            font-size: 12px;
+        /* Grid de campos como pills */
+        .fields-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        /* Campo Pill - Estilo similar a operadores pero azul */
+        .field-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 10px;
+            font-size: 11px;
             font-weight: 600;
-            color: var(--gray-600);
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            position: sticky;
-            top: 0;
-            z-index: 10;
+            line-height: 1;
+            color: #1e40af;
+            background-color: #dbeafe;
+            border: none;
+            border-radius: 50rem;
+            cursor: grab;
+            transition: all 0.15s ease-in-out;
+            text-align: center;
+            white-space: nowrap;
+            vertical-align: baseline;
+        }
+
+        .field-pill:active {
+            cursor: grabbing;
+        }
+
+        .field-pill:hover {
+            background-color: #bfdbfe;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .field-pill.dragging {
+            opacity: 0.5;
+        }
+
+        /* Icono del campo */
+        .field-pill-icon {
+            font-size: 11px;
+            line-height: 1;
+        }
+
+        /* Nombre del campo */
+        .field-pill-name {
+            font-size: 11px;
+            font-weight: 600;
+            line-height: 1;
+        }
+
+        /* Mantener estilos antiguos por si se necesitan en otra parte */
+        .field-list-header {
+            display: none; /* Ocultar header de tabla */
         }
 
         .field-item {
-            display: grid;
-            grid-template-columns: 1fr 2fr;
-            gap: 12px;
-            padding: 10px 12px;
-            border-bottom: 1px solid var(--gray-200);
-            font-size: 13px;
-            transition: background 0.15s;
-            cursor: pointer;
-        }
-
-        .field-item:hover {
-            background: white;
+            display: none; /* Ocultar items de tabla */
         }
 
         .field-name {
@@ -1953,23 +1985,26 @@
                 </div>
 
                 <div class="field-list">
-                    <div class="field-list-header">
-                        <div>Campo</div>
-                        <div>Descripción</div>
+                    <div class="fields-grid">
+                        <asp:Repeater ID="rptCampos" runat="server">
+                            <ItemTemplate>
+                                <div class="field-pill draggable-field-item" 
+                                     draggable="true" 
+                                     data-field='<%# Eval("Campo") %>'
+                                     title='<%# Eval("Descripcion") %>'
+                                     ondragstart="dragFieldStart(event)" 
+                                     ondragend="dragFieldEnd(event)">
+                                    <span class="field-pill-icon">📊</span>
+                                    <span class="field-pill-name"><%# Eval("Campo") %></span>
+                                </div>
+                            </ItemTemplate>
+                        </asp:Repeater>
                     </div>
-                    <asp:Repeater ID="rptCampos" runat="server">
-                        <ItemTemplate>
-                            <div class="field-item" onclick="insertarCampo('<%# Eval("Campo") %>')">
-                                <div class="field-name"><%# Eval("Campo") %></div>
-                                <div class="field-description"><%# Eval("Descripcion") %></div>
-                            </div>
-                        </ItemTemplate>
-                    </asp:Repeater>
                 </div>
 
                 <div class="helper-text" style="margin-top: 12px;">
-                    <i class="fas fa-mouse-pointer"></i>
-                    Haga clic en un campo para insertarlo en la expresión
+                    <i class="fas fa-hand-pointer"></i>
+                    Arrastra un campo hacia la zona de expresión
                 </div>
 
                 <!-- Panel de operadores estático debajo del helper -->
@@ -2184,7 +2219,24 @@
         let componentCounter = 0;
         let draggedFunctionName = null; // Para almacenar qué función se está arrastrando
         let draggedOperator = null; // Para almacenar qué operador se está arrastrando
+        let draggedField = null; // Para almacenar qué campo se está arrastrando
         let targetVarId = null; // Para almacenar a qué variable se soltó
+
+        // ===== DRAG & DROP DE CAMPOS =====
+
+        function dragFieldStart(event) {
+            const fieldName = event.target.closest('.draggable-field-item').getAttribute('data-field');
+            draggedField = fieldName;
+            event.dataTransfer.effectAllowed = 'copy';
+            event.dataTransfer.setData('text/plain', fieldName);
+            event.target.closest('.draggable-field-item').classList.add('dragging');
+        }
+
+        function dragFieldEnd(event) {
+            // Limpiar estado visual cuando termina el drag
+            event.target.closest('.draggable-field-item').classList.remove('dragging');
+            draggedField = null;
+        }
 
         // ===== DRAG & DROP DE OPERADORES DESDE SIDEBAR =====
 
@@ -2248,9 +2300,17 @@
             event.currentTarget.classList.remove('drag-over');
 
             // Remover clase dragging de todos los items
-            document.querySelectorAll('.draggable-function-item.dragging, .draggable-operator-item.dragging').forEach(item => {
+            document.querySelectorAll('.draggable-function-item.dragging, .draggable-operator-item.dragging, .draggable-field-item.dragging').forEach(item => {
                 item.classList.remove('dragging');
             });
+
+            // Manejar drop de campo
+            if (draggedField) {
+                addExprComponent(varId, 'field', draggedField, `<i class="fas fa-database expr-icon"></i><span class="expr-value">${draggedField}</span>`);
+                draggedField = null;
+                targetVarId = null;
+                return;
+            }
 
             // Manejar drop de función
             if (draggedFunctionName) {
@@ -4011,9 +4071,8 @@
 
         // Prevenir drop en cualquier lugar del documento por defecto
         document.addEventListener('dragover', function (e) {
-            // Solo permitir dragover si NO estamos arrastrando funciones/operadores
-            // O si estamos sobre una zona válida
-            if (draggedFunctionName || draggedOperator) {
+            // Solo permitir dragover si estamos arrastrando algo
+            if (draggedFunctionName || draggedOperator || draggedField) {
                 const target = e.target;
                 const isValidZone = target.closest('.expression-builder') ||
                     target.closest('.drop-zone');
@@ -4032,7 +4091,7 @@
             const isValidZone = target.closest('.expression-builder') ||
                 target.closest('.drop-zone');
 
-            if (!isValidZone && (draggedFunctionName || draggedOperator)) {
+            if (!isValidZone && (draggedFunctionName || draggedOperator || draggedField)) {
                 // Prevenir el drop en elementos no válidos
                 e.preventDefault();
                 e.stopPropagation();
