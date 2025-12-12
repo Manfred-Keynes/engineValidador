@@ -1713,124 +1713,83 @@
             color: #3b82f6;
         }
 
-        /* Panel lateral de operadores */
-        .operators-sidebar {
-            position: fixed;
-            right: 360px; /* A la izquierda del panel de funciones */
-            top: 120px;
-            width: 280px;
+        /* Panel estático de operadores */
+        .operators-static-panel {
+            margin-top: 16px;
+            padding: 12px;
             background: white;
             border: 1px solid var(--gray-200);
             border-radius: var(--border-radius);
-            box-shadow: var(--shadow-lg);
-            z-index: 100;
-            max-height: calc(100vh - 140px);
-            display: none;
-            flex-direction: column;
-            transition: opacity 0.3s ease-in-out;
         }
 
-        .operators-sidebar-header {
-            padding: 16px;
-            border-bottom: 2px solid var(--gray-100);
+        .operators-static-title {
             display: flex;
             align-items: center;
-            justify-content: space-between;
-            background: #fef3c7;
-            border-radius: var(--border-radius) var(--border-radius) 0 0;
+            gap: 6px;
+            margin-bottom: 10px;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--gray-700);
         }
 
-        .operators-sidebar-header-left {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .operators-sidebar-header i {
+        .operators-static-title i {
             color: #f59e0b;
-            font-size: 18px;
-        }
-
-        .operators-sidebar-title {
             font-size: 14px;
-            font-weight: 700;
-            color: var(--gray-900);
-        }
-
-        .operators-sidebar-close {
-            width: 24px;
-            height: 24px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: white;
-            border: 1px solid var(--gray-300);
-            border-radius: 4px;
-            cursor: pointer;
-            color: var(--gray-600);
-            transition: all 0.2s;
-        }
-
-        .operators-sidebar-close:hover {
-            background: var(--gray-100);
-            color: var(--gray-900);
-        }
-
-        .operators-sidebar-content {
-            padding: 16px;
-            overflow-y: auto;
-            flex: 1;
         }
 
         .operators-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-        }
-
-        .draggable-operator-item {
             display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
+            flex-wrap: wrap;
             gap: 6px;
-            padding: 16px 12px;
-            background: white;
-            border: 2px solid #fbbf24;
-            border-radius: var(--border-radius-sm);
-            cursor: grab;
-            transition: all 0.2s;
-            min-height: 80px;
         }
 
-        .draggable-operator-item:active {
+        /* Operador Pill Badge - Estilo Bootstrap 5 */
+        .op-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 10px;
+            font-size: 11px;
+            font-weight: 600;
+            line-height: 1;
+            color: #92400e;
+            background-color: #fed7aa;
+            border: none;
+            border-radius: 50rem;
+            cursor: grab;
+            transition: all 0.15s ease-in-out;
+            text-align: center;
+            white-space: nowrap;
+            vertical-align: baseline;
+        }
+
+        .op-pill:active {
             cursor: grabbing;
         }
 
-        .draggable-operator-item:hover {
-            border-color: #f59e0b;
-            background: #fef3c7;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 6px rgba(245, 158, 11, 0.2);
+        .op-pill:hover {
+            background-color: #fdba74;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
 
-        .draggable-operator-item.dragging {
+        .op-pill.dragging {
             opacity: 0.5;
-            transform: scale(0.95);
         }
 
-        .draggable-operator-symbol {
-            font-size: 24px;
+        /* Símbolo del operador - inline con texto */
+        .op-pill-symbol {
+            font-size: 13px;
             font-weight: 700;
-            color: #92400e;
             font-family: 'Courier New', monospace;
+            line-height: 1;
         }
 
-        .draggable-operator-name {
+        /* Nombre del operador - inline con símbolo */
+        .op-pill-name {
             font-size: 11px;
             font-weight: 600;
-            color: #92400e;
-            text-align: center;
+            line-height: 1;
         }
 
         .operators-sidebar-hint {
@@ -2012,6 +1971,59 @@
                     <i class="fas fa-mouse-pointer"></i>
                     Haga clic en un campo para insertarlo en la expresión
                 </div>
+
+                <!-- Panel de operadores estático debajo del helper -->
+                <div class="operators-static-panel">
+                    <div class="operators-static-title">
+                        <i class="fas fa-calculator"></i>
+                        <span>Operadores</span>
+                    </div>
+                    <div class="operators-grid">
+                        <!-- Operadores Aritméticos -->
+                        <div class="op-pill draggable-operator-item" draggable="true" data-operator="+" ondragstart="dragOperatorStart(event)" ondragend="dragOperatorEnd(event)">
+                            <span class="op-pill-symbol">+</span>
+                            <span class="op-pill-name">Suma</span>
+                        </div>
+                        <div class="op-pill draggable-operator-item" draggable="true" data-operator="-" ondragstart="dragOperatorStart(event)" ondragend="dragOperatorEnd(event)">
+                            <span class="op-pill-symbol">−</span>
+                            <span class="op-pill-name">Resta</span>
+                        </div>
+                        <div class="op-pill draggable-operator-item" draggable="true" data-operator="*" ondragstart="dragOperatorStart(event)" ondragend="dragOperatorEnd(event)">
+                            <span class="op-pill-symbol">×</span>
+                            <span class="op-pill-name">Multiplicación</span>
+                        </div>
+                        <div class="op-pill draggable-operator-item" draggable="true" data-operator="/" ondragstart="dragOperatorStart(event)" ondragend="dragOperatorEnd(event)">
+                            <span class="op-pill-symbol">÷</span>
+                            <span class="op-pill-name">División</span>
+                        </div>
+                        
+                        <!-- Operadores de Comparación -->
+                        <div class="op-pill draggable-operator-item" draggable="true" data-operator=">" ondragstart="dragOperatorStart(event)" ondragend="dragOperatorEnd(event)">
+                            <span class="op-pill-symbol">&gt;</span>
+                            <span class="op-pill-name">Mayor que</span>
+                        </div>
+                        <div class="op-pill draggable-operator-item" draggable="true" data-operator="<" ondragstart="dragOperatorStart(event)" ondragend="dragOperatorEnd(event)">
+                            <span class="op-pill-symbol">&lt;</span>
+                            <span class="op-pill-name">Menor que</span>
+                        </div>
+                        <div class="op-pill draggable-operator-item" draggable="true" data-operator=">=" ondragstart="dragOperatorStart(event)" ondragend="dragOperatorEnd(event)">
+                            <span class="op-pill-symbol">≥</span>
+                            <span class="op-pill-name">Mayor o igual</span>
+                        </div>
+                        <div class="op-pill draggable-operator-item" draggable="true" data-operator="<=" ondragstart="dragOperatorStart(event)" ondragend="dragOperatorEnd(event)">
+                            <span class="op-pill-symbol">≤</span>
+                            <span class="op-pill-name">Menor o igual</span>
+                        </div>
+                        <div class="op-pill draggable-operator-item" draggable="true" data-operator="=" ondragstart="dragOperatorStart(event)" ondragend="dragOperatorEnd(event)">
+                            <span class="op-pill-symbol">=</span>
+                            <span class="op-pill-name">Igual</span>
+                        </div>
+                        <div class="op-pill draggable-operator-item" draggable="true" data-operator="!=" ondragstart="dragOperatorStart(event)" ondragend="dragOperatorEnd(event)">
+                            <span class="op-pill-symbol">≠</span>
+                            <span class="op-pill-name">Diferente</span>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -2154,72 +2166,6 @@
         <div class="functions-sidebar-hint">
             <i class="fas fa-hand-pointer"></i>
             <span>Arrastra una función hacia la zona de expresión</span>
-        </div>
-    </div>
-
-    <!-- Panel lateral de operadores arrastrables -->
-    <div class="operators-sidebar">
-        <div class="operators-sidebar-header">
-            <div class="operators-sidebar-header-left">
-                <i class="fas fa-calculator"></i>
-                <span class="operators-sidebar-title">Operadores</span>
-            </div>
-            <div class="operators-sidebar-close" onclick="closeOperatorsSidebar()">
-                <i class="fas fa-times"></i>
-            </div>
-        </div>
-        
-        <div class="operators-sidebar-content">
-            <div class="operators-grid">
-                <!-- Operadores Aritméticos -->
-                <div class="draggable-operator-item" draggable="true" data-operator="+" ondragstart="dragOperatorStart(event)" ondragend="dragOperatorEnd(event)">
-                    <div class="draggable-operator-symbol">+</div>
-                    <div class="draggable-operator-name">Suma</div>
-                </div>
-                <div class="draggable-operator-item" draggable="true" data-operator="-" ondragstart="dragOperatorStart(event)" ondragend="dragOperatorEnd(event)">
-                    <div class="draggable-operator-symbol">−</div>
-                    <div class="draggable-operator-name">Resta</div>
-                </div>
-                <div class="draggable-operator-item" draggable="true" data-operator="*" ondragstart="dragOperatorStart(event)" ondragend="dragOperatorEnd(event)">
-                    <div class="draggable-operator-symbol">×</div>
-                    <div class="draggable-operator-name">Multiplicación</div>
-                </div>
-                <div class="draggable-operator-item" draggable="true" data-operator="/" ondragstart="dragOperatorStart(event)" ondragend="dragOperatorEnd(event)">
-                    <div class="draggable-operator-symbol">÷</div>
-                    <div class="draggable-operator-name">División</div>
-                </div>
-                
-                <!-- Operadores de Comparación -->
-                <div class="draggable-operator-item" draggable="true" data-operator=">" ondragstart="dragOperatorStart(event)" ondragend="dragOperatorEnd(event)">
-                    <div class="draggable-operator-symbol">&gt;</div>
-                    <div class="draggable-operator-name">Mayor que</div>
-                </div>
-                <div class="draggable-operator-item" draggable="true" data-operator="<" ondragstart="dragOperatorStart(event)" ondragend="dragOperatorEnd(event)">
-                    <div class="draggable-operator-symbol">&lt;</div>
-                    <div class="draggable-operator-name">Menor que</div>
-                </div>
-                <div class="draggable-operator-item" draggable="true" data-operator=">=" ondragstart="dragOperatorStart(event)" ondragend="dragOperatorEnd(event)">
-                    <div class="draggable-operator-symbol">≥</div>
-                    <div class="draggable-operator-name">Mayor o igual</div>
-                </div>
-                <div class="draggable-operator-item" draggable="true" data-operator="<=" ondragstart="dragOperatorStart(event)" ondragend="dragOperatorEnd(event)">
-                    <div class="draggable-operator-symbol">≤</div>
-                    <div class="draggable-operator-name">Menor o igual</div>
-                </div>
-                <div class="draggable-operator-item" draggable="true" data-operator="=" ondragstart="dragOperatorStart(event)" ondragend="dragOperatorEnd(event)">
-                    <div class="draggable-operator-symbol">=</div>
-                    <div class="draggable-operator-name">Igual</div>
-                </div>
-                <div class="draggable-operator-item" draggable="true" data-operator="!=" ondragstart="dragOperatorStart(event)" ondragend="dragOperatorEnd(event)">
-                    <div class="draggable-operator-symbol">≠</div>
-                    <div class="draggable-operator-name">Diferente</div>
-                </div>
-            </div>
-        </div>
-
-        <div class="operators-sidebar-hint">
-            <i class="fas fa-hand-pointer"></i>
-            <span>Arrastra un operador hacia la zona de expresión</span>
         </div>
     </div>
 
@@ -2985,19 +2931,15 @@
         function toggleCard(id) {
             const card = document.getElementById('varCard' + id);
             const functionsSidebar = document.querySelector('.functions-sidebar');
-            const operatorsSidebar = document.querySelector('.operators-sidebar');
 
             // Si esta card ya está expandida, cerrarla
             if (card.classList.contains('expanded')) {
                 card.classList.remove('expanded');
                 currentExpandedCard = null;
 
-                // Ocultar ambos paneles laterales
+                // Ocultar panel de funciones
                 if (functionsSidebar) {
                     functionsSidebar.style.display = 'none';
-                }
-                if (operatorsSidebar) {
-                    operatorsSidebar.style.display = 'none';
                 }
                 return;
             }
@@ -3014,12 +2956,9 @@
             card.classList.add('expanded');
             currentExpandedCard = id;
 
-            // Mostrar ambos paneles laterales
+            // Mostrar panel de funciones
             if (functionsSidebar) {
                 functionsSidebar.style.display = 'flex';
-            }
-            if (operatorsSidebar) {
-                operatorsSidebar.style.display = 'flex';
             }
 
             // Scroll suave a la card expandida
@@ -3080,14 +3019,10 @@
                 if (currentExpandedCard === id) {
                     currentExpandedCard = null;
 
-                    // Ocultar ambos paneles laterales si se elimina la variable expandida
+                    // Ocultar panel de funciones si se elimina la variable expandida
                     const functionsSidebar = document.querySelector('.functions-sidebar');
-                    const operatorsSidebar = document.querySelector('.operators-sidebar');
                     if (functionsSidebar) {
                         functionsSidebar.style.display = 'none';
-                    }
-                    if (operatorsSidebar) {
-                        operatorsSidebar.style.display = 'none';
                     }
                 }
 
