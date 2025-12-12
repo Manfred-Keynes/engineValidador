@@ -560,6 +560,18 @@
             }
         }
 
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.7);
+            }
+            50% {
+                box-shadow: 0 0 0 10px rgba(37, 99, 235, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(37, 99, 235, 0);
+            }
+        }
+
         .autocomplete-header {
             padding: 8px 12px;
             background: var(--gray-50);
@@ -1763,8 +1775,28 @@
             const card = builder.closest('.variable-card');
             const functionMenu = card.querySelector('.function-menu');
             if (functionMenu) {
+                // Cerrar todos los otros menús
                 document.querySelectorAll('.function-menu.active').forEach(m => m.classList.remove('active'));
+
+                // Abrir este menú
                 functionMenu.classList.add('active');
+
+                // Hacer scroll hasta el menú de funciones con animación suave
+                setTimeout(() => {
+                    const functionMenuContainer = card.querySelector('.function-menu-container');
+                    if (functionMenuContainer) {
+                        functionMenuContainer.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'nearest'
+                        });
+
+                        // Efecto visual de destacar el menú
+                        functionMenu.style.animation = 'pulse 0.5s ease-in-out';
+                        setTimeout(() => {
+                            functionMenu.style.animation = '';
+                        }, 500);
+                    }
+                }, 100);
             }
         }
 
@@ -1772,19 +1804,24 @@
         function openFieldSelector(varId) {
             const fields = getAvailableFields();
             if (fields.length === 0) {
-                alert('No hay campos disponibles');
+                alert('⚠️ No hay campos disponibles\n\nAsegúrese de que existen campos configurados en el sistema.');
                 return;
             }
 
-            let fieldOptions = 'Seleccione un campo:\n\n';
-            fields.forEach((f, i) => { fieldOptions += `${i + 1}. ${f.name}\n`; });
-            fieldOptions += '\nIngrese el número:';
+            let fieldOptions = '📊 SELECCIONAR CAMPO\n\n';
+            fieldOptions += 'Campos disponibles:\n\n';
+            fields.forEach((f, i) => {
+                fieldOptions += `  ${i + 1}. ${f.name}${f.description ? ' - ' + f.description : ''}\n`;
+            });
+            fieldOptions += '\n💡 Ingrese el número del campo:';
 
             const fieldName = prompt(fieldOptions);
             if (fieldName) {
                 const fieldIndex = parseInt(fieldName) - 1;
                 if (fieldIndex >= 0 && fieldIndex < fields.length) {
                     addExprComponent(varId, 'field', `[${fields[fieldIndex].name}]`, `<i class="fas fa-database expr-icon"></i><span class="expr-value">[${fields[fieldIndex].name}]</span>`);
+                } else {
+                    alert('❌ Número inválido\n\nPor favor ingrese un número entre 1 y ' + fields.length);
                 }
             }
         }
@@ -1792,29 +1829,39 @@
         // Abrir selector de operadores
         function openOperatorSelector(varId) {
             const operators = [
-                { symbol: '+', name: 'Suma' }, { symbol: '-', name: 'Resta' },
-                { symbol: '*', name: 'Multiplicación' }, { symbol: '/', name: 'División' },
-                { symbol: '>', name: 'Mayor que' }, { symbol: '<', name: 'Menor que' },
-                { symbol: '>=', name: 'Mayor o igual' }, { symbol: '<=', name: 'Menor o igual' },
-                { symbol: '=', name: 'Igual' }, { symbol: '!=', name: 'Diferente' }
+                { symbol: '+', name: 'Suma', emoji: '➕' },
+                { symbol: '-', name: 'Resta', emoji: '➖' },
+                { symbol: '*', name: 'Multiplicación', emoji: '✖️' },
+                { symbol: '/', name: 'División', emoji: '➗' },
+                { symbol: '>', name: 'Mayor que', emoji: '▶️' },
+                { symbol: '<', name: 'Menor que', emoji: '◀️' },
+                { symbol: '>=', name: 'Mayor o igual', emoji: '⏩' },
+                { symbol: '<=', name: 'Menor o igual', emoji: '⏪' },
+                { symbol: '=', name: 'Igual', emoji: '🟰' },
+                { symbol: '!=', name: 'Diferente', emoji: '≠' }
             ];
 
-            let opOptions = 'Seleccione un operador:\n\n';
-            operators.forEach((o, i) => { opOptions += `${i + 1}. ${o.symbol} (${o.name})\n`; });
-            opOptions += '\nIngrese el número:';
+            let opOptions = '🧮 SELECCIONAR OPERADOR\n\n';
+            opOptions += 'Operadores disponibles:\n\n';
+            operators.forEach((o, i) => {
+                opOptions += `  ${i + 1}. ${o.symbol.padEnd(3)} ${o.emoji} ${o.name}\n`;
+            });
+            opOptions += '\n💡 Ingrese el número del operador:';
 
             const choice = prompt(opOptions);
             if (choice) {
                 const opIndex = parseInt(choice) - 1;
                 if (opIndex >= 0 && opIndex < operators.length) {
                     addExprComponent(varId, 'operator', operators[opIndex].symbol, `<span class="expr-value">${operators[opIndex].symbol}</span>`);
+                } else {
+                    alert('❌ Número inválido\n\nPor favor ingrese un número entre 1 y ' + operators.length);
                 }
             }
         }
 
         // Agregar componente de valor
         function addValueComponent(varId) {
-            const value = prompt('Ingrese el valor (número o texto entre comillas):');
+            const value = prompt('🔢 INGRESAR VALOR\n\nIngrese el valor:\n\nEjemplos:\n  • Número: 18, 25, 100\n  • Texto: "APROBADO", "RECHAZADO"\n  • Decimal: 3.14, 0.5\n\n💡 Ingrese el valor:');
             if (value !== null && value.trim() !== '') {
                 const displayValue = value.trim();
                 addExprComponent(varId, 'value', displayValue, `<i class="fas fa-hashtag expr-icon"></i><span class="expr-value">${displayValue}</span>`);
@@ -1823,19 +1870,28 @@
 
         // Agregar paréntesis
         function addParenthesis(varId, type) {
-            const choice = prompt('Seleccione:\n1. Abrir paréntesis (\n2. Cerrar paréntesis )\n\nIngrese el número:');
+            const choice = prompt('() SELECCIONAR PARÉNTESIS\n\nOpciones:\n\n  1. ( Abrir paréntesis\n  2. ) Cerrar paréntesis\n\n💡 Ingrese el número:');
             if (choice === '1') {
                 addExprComponent(varId, 'parenthesis', '(', '<span class="expr-value">(</span>');
             } else if (choice === '2') {
                 addExprComponent(varId, 'parenthesis', ')', '<span class="expr-value">)</span>');
+            } else if (choice !== null && choice.trim() !== '') {
+                alert('❌ Opción inválida\n\nPor favor ingrese 1 o 2');
             }
         }
 
         // Agregar componente a la expresión
-        function addExprComponent(varId, type, value, html) {
+        function addExprComponent(varId, type, value, html, metadata = null) {
             initExpressionComponents(varId);
             const componentId = 'comp_' + (++componentCounter);
-            const component = { id: componentId, type: type, value: value, html: html, order: expressionComponents[varId].length };
+            const component = {
+                id: componentId,
+                type: type,
+                value: value,
+                html: html,
+                order: expressionComponents[varId].length,
+                metadata: metadata // Guardar metadata para funciones (nombre, bloques, etc)
+            };
             expressionComponents[varId].push(component);
             renderExpression(varId);
             updateExpressionPreview(varId);
@@ -1868,11 +1924,37 @@
         }
 
         // Eliminar componente
+        // Eliminar componente con confirmación
         function deleteExprComponent(compId, varId) {
             initExpressionComponents(varId);
-            expressionComponents[varId] = expressionComponents[varId].filter(c => c.id !== compId);
-            renderExpression(varId);
-            updateExpressionPreview(varId);
+            const comp = expressionComponents[varId].find(c => c.id === compId);
+            if (!comp) return;
+
+            // Construir mensaje de confirmación
+            const componentTypes = {
+                'function': '📅 Función',
+                'field': '📊 Campo',
+                'operator': '➕ Operador',
+                'value': '🔢 Valor',
+                'parenthesis': '() Paréntesis'
+            };
+
+            const typeLabel = componentTypes[comp.type] || comp.type;
+            const shortValue = comp.value.length > 30 ? comp.value.substring(0, 27) + '...' : comp.value;
+
+            let mensaje = `¿Eliminar este componente?\n\n`;
+            mensaje += `Tipo: ${typeLabel}\n`;
+            mensaje += `Valor: ${shortValue}`;
+
+            if (comp.type === 'function' && comp.metadata) {
+                mensaje += `\n\n⚠️ Esta función tiene ${comp.metadata.blocks ? comp.metadata.blocks.length : 0} bloque(s) configurado(s)`;
+            }
+
+            if (confirm(mensaje)) {
+                expressionComponents[varId] = expressionComponents[varId].filter(c => c.id !== compId);
+                renderExpression(varId);
+                updateExpressionPreview(varId);
+            }
         }
 
         // Editar valor de componente
@@ -1890,9 +1972,61 @@
         }
 
         // Editar componente de función
+        // Editar componente de función (reabre el modal con los bloques cargados)
         function editExprComponent(compId, varId) {
-            alert('Para editar una función, elimínela y agréguela de nuevo.');
+            initExpressionComponents(varId);
+            const comp = expressionComponents[varId].find(c => c.id === compId);
+            if (!comp || comp.type !== 'function') return;
+
+            // Guardar referencia para actualizar después
+            window.editingComponent = { compId, varId };
+
+            // Si tiene metadata (bloques guardados), recargarlos
+            if (comp.metadata && comp.metadata.functionName && comp.metadata.blocks) {
+                const builder = document.getElementById('exprBuilder' + varId);
+                const tempInput = document.createElement('textarea');
+                tempInput.style.display = 'none';
+                builder.appendChild(tempInput);
+
+                activeInput = tempInput;
+                activeInput.varId = varId;
+                activeInput.editMode = true; // Marcar que estamos en modo edición
+
+                // Abrir modal con la función
+                openFunctionModal(comp.metadata.functionName, tempInput);
+
+                // Esperar a que el modal se renderice y luego cargar los bloques
+                setTimeout(() => {
+                    loadBlocksIntoModal(comp.metadata.blocks);
+                }, 300);
+            } else {
+                // Fallback: intentar parsear la función del texto
+                alert('No se puede editar esta función. Por favor elimínela y créela de nuevo.');
+            }
         }
+
+        // Cargar bloques guardados en el modal para edición
+        function loadBlocksIntoModal(blocks) {
+            if (!blocks || blocks.length === 0) return;
+
+            // Limpiar bloques actuales
+            droppedBlocks = [];
+
+            // Recargar cada bloque
+            blocks.forEach(block => {
+                droppedBlocks.push({
+                    id: 'block_' + Date.now() + '_' + Math.random(),
+                    type: block.type,
+                    value: block.value,
+                    order: block.order
+                });
+            });
+
+            // Renderizar bloques en el modal
+            renderBlocks();
+            updateBlockPreview();
+        }
+
 
         // Actualizar preview de la expresión
         function updateExpressionPreview(varId) {
@@ -2310,13 +2444,60 @@
         }
 
         function eliminarVariable(id) {
-            if (confirm('¿Está seguro de eliminar esta variable?')) {
-                const card = document.getElementById('varCard' + id);
+            // Obtener información de la variable antes de eliminar
+            const card = document.getElementById('varCard' + id);
+            if (!card) return;
+
+            const nameInput = card.querySelector('input[placeholder="Nombre de la variable"]');
+            const varName = nameInput ? nameInput.value.trim() : '';
+            const displayName = varName || 'Variable ' + id;
+
+            // Contar componentes de expresión
+            initExpressionComponents(id);
+            const components = expressionComponents[id] || [];
+            const componentCount = components.length;
+
+            // Construir mensaje de confirmación detallado
+            let mensaje = `⚠️ ¿Está seguro de eliminar esta variable?\n\n`;
+            mensaje += `📝 Variable: ${displayName}\n`;
+
+            if (componentCount > 0) {
+                mensaje += `🧩 Componentes: ${componentCount} elemento(s) configurado(s)\n`;
+
+                // Mostrar preview de componentes
+                const componentTypes = {
+                    'function': '📅 Función',
+                    'field': '📊 Campo',
+                    'operator': '➕ Operador',
+                    'value': '🔢 Valor',
+                    'parenthesis': '() Paréntesis'
+                };
+
+                const summary = components.slice(0, 3).map(c => {
+                    const typeLabel = componentTypes[c.type] || c.type;
+                    const shortValue = c.value.length > 20 ? c.value.substring(0, 17) + '...' : c.value;
+                    return `   • ${typeLabel}: ${shortValue}`;
+                }).join('\n');
+
+                mensaje += '\nContenido:\n' + summary;
+                if (componentCount > 3) {
+                    mensaje += `\n   ... y ${componentCount - 3} más`;
+                }
+            } else {
+                mensaje += `📭 Sin componentes configurados\n`;
+            }
+
+            mensaje += `\n\n⚠️ Esta acción no se puede deshacer.`;
+
+            if (confirm(mensaje)) {
                 card.remove();
 
                 if (currentExpandedCard === id) {
                     currentExpandedCard = null;
                 }
+
+                // Limpiar componentes de expresión
+                delete expressionComponents[id];
 
                 updateVariablesCount();
             }
@@ -3221,11 +3402,33 @@
             const preview = document.getElementById('modalPreviewCode').textContent;
 
             if (activeInput && activeInput.varId) {
-                // Es el constructor visual - insertar como componente
                 const varId = activeInput.varId;
                 const icon = '<i class="fas fa-function expr-icon"></i>';
                 const shortPreview = preview.length > 40 ? preview.substring(0, 37) + '...' : preview;
-                addExprComponent(varId, 'function', preview, `${icon}<span class="expr-value">${shortPreview}</span>`);
+
+                // Preparar metadata con los bloques y nombre de función
+                const metadata = {
+                    functionName: currentFunction,
+                    blocks: droppedBlocks.map(b => ({ type: b.type, value: b.value, order: b.order }))
+                };
+
+                // Verificar si estamos editando un componente existente
+                if (activeInput.editMode && window.editingComponent) {
+                    // Modo edición: actualizar el componente existente
+                    initExpressionComponents(varId);
+                    const comp = expressionComponents[varId].find(c => c.id === window.editingComponent.compId);
+                    if (comp) {
+                        comp.value = preview;
+                        comp.html = `${icon}<span class="expr-value">${shortPreview}</span>`;
+                        comp.metadata = metadata;
+                        renderExpression(varId);
+                        updateExpressionPreview(varId);
+                    }
+                    window.editingComponent = null;
+                } else {
+                    // Modo inserción: crear nuevo componente
+                    addExprComponent(varId, 'function', preview, `${icon}<span class="expr-value">${shortPreview}</span>`, metadata);
+                }
 
                 // Remover el input temporal
                 activeInput.remove();
