@@ -868,6 +868,54 @@
             background: #f59e0b;
         }
 
+        /* Funciones anidadas */
+        .param-block[data-type="function"],
+        .param-block-function {
+            border-color: #ec4899;
+            background: linear-gradient(135deg, #fce7f3 0%, white 100%);
+            cursor: default; /* No arrastrable hasta configurar */
+        }
+
+        .param-block-function .param-block-number {
+            background: #ec4899;
+        }
+
+        .param-block-function.nested-function-configured {
+            border-color: #10b981;
+            background: linear-gradient(135deg, #d1fae5 0%, white 100%);
+        }
+
+        .param-block-function.nested-function-configured .param-block-number {
+            background: #10b981;
+        }
+
+        .nested-function-info {
+            font-size: 11px;
+            color: var(--gray-600);
+            margin-top: 4px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .nested-function-pending .nested-function-info {
+            color: #f59e0b;
+        }
+
+        .nested-function-configured .nested-function-info {
+            color: #10b981;
+        }
+
+        .param-block-btn.config {
+            background: #ec4899;
+            color: white;
+        }
+
+        .param-block-btn.config:hover {
+            background: #db2777;
+            transform: scale(1.1);
+        }
+
         /* Paleta de elementos disponibles */
         .elements-palette {
             background: transparent;
@@ -947,6 +995,20 @@
             background: #fffbeb;
             border-color: #f59e0b;
             color: #d97706;
+        }
+
+        .palette-item[data-type="function"],
+        .palette-item-function {
+            background: #fce7f3;
+            border-color: #ec4899;
+            color: #be185d;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .palette-item-function i {
+            font-size: 10px;
         }
 
         /* Scrollbars para las columnas */
@@ -1658,6 +1720,151 @@
             border-radius: 4px;
         }
 
+        /* ===== PANEL LATERAL DE CONFIGURACIÓN ===== */
+        /* Panel de configuración inline (debajo del expression-builder) */
+        .config-panel {
+            display: none;
+            margin-top: 16px;
+            background: white;
+            border: 2px solid #667eea;
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            animation: expandPanel 0.3s ease-out;
+        }
+
+        @keyframes expandPanel {
+            from {
+                opacity: 0;
+                max-height: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                max-height: 800px;
+                transform: translateY(0);
+            }
+        }
+
+        .config-panel.active {
+            display: block;
+        }
+
+        .config-panel-overlay {
+            display: none; /* No necesitamos overlay en versión inline */
+        }
+
+        .config-panel-content {
+            display: flex;
+            flex-direction: column;
+            max-height: 600px;
+        }
+
+        .config-panel-header {
+            padding: 16px 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .config-panel-header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .config-panel-header i {
+            font-size: 18px;
+        }
+
+        .config-panel-title {
+            font-size: 16px;
+            font-weight: 700;
+        }
+
+        .config-panel-close {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+        }
+
+        .config-panel-close:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: rotate(90deg);
+        }
+
+        .config-panel-breadcrumb {
+            padding: 12px 20px;
+            background: #f8f9fa;
+            border-bottom: 1px solid var(--gray-200);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            color: var(--gray-600);
+        }
+
+        .config-panel-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            max-height: 400px;
+        }
+
+        .config-panel-footer {
+            padding: 16px 24px;
+            background: #f8f9fa;
+            border-top: 1px solid var(--gray-200);
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+        }
+
+        .config-panel-footer .btn {
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 14px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .config-panel-footer .btn-secondary {
+            background: white;
+            color: var(--gray-700);
+            border: 2px solid var(--gray-300);
+        }
+
+        .config-panel-footer .btn-secondary:hover {
+            background: var(--gray-50);
+            border-color: var(--gray-400);
+        }
+
+        .config-panel-footer .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .config-panel-footer .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
         /* ===== PANEL LATERAL DE RECURSOS (Campos + Operadores) - SIEMPRE VISIBLE ===== */
         .resources-sidebar {
             position: fixed;
@@ -2060,6 +2267,359 @@
 
         .operators-sidebar-hint i {
             color: #f59e0b;
+        }
+
+        /* ===== MODAL ANIDADO PARA CONFIGURAR FUNCIONES ===== */
+        .nested-function-modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: 10000; /* Encima del modal principal */
+            align-items: center;
+            justify-content: center;
+        }
+
+        .nested-function-modal {
+            background: white;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 900px;
+            max-height: 85vh;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+            animation: modalSlideIn 0.3s ease-out;
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .nested-function-modal-header {
+            padding: 20px 24px;
+            border-bottom: 2px solid var(--gray-200);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: linear-gradient(135deg, #fce7f3 0%, #fbcfe8 100%);
+            border-radius: 12px 12px 0 0;
+        }
+
+        .nested-function-modal-header div {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .nested-function-modal-header i {
+            font-size: 20px;
+            color: #ec4899;
+        }
+
+        .nested-function-modal-header span {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--gray-900);
+        }
+
+        .nested-function-modal-body {
+            padding: 24px;
+            overflow-y: auto;
+            flex: 1;
+        }
+
+        .nested-function-modal-footer {
+            padding: 16px 24px;
+            border-top: 2px solid var(--gray-200);
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+            background: var(--gray-50);
+            border-radius: 0 0 12px 12px;
+        }
+
+        .nested-function-content {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .nested-function-info-banner {
+            background: #dbeafe;
+            border-left: 4px solid #3b82f6;
+            padding: 12px 16px;
+            border-radius: 6px;
+            font-size: 13px;
+            color: #1e40af;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .nested-two-column {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 20px;
+        }
+
+        .nested-palette {
+            background: var(--gray-50);
+            border: 1px solid var(--gray-200);
+            border-radius: 8px;
+            padding: 12px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .nested-palette-section {
+            margin-bottom: 16px;
+        }
+
+        .nested-palette-section:last-child {
+            margin-bottom: 0;
+        }
+
+        .nested-palette-title {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--gray-700);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .nested-palette-items {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .nested-drop-area {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .nested-drop-label {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--gray-700);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .nested-drop-zone {
+            background: white;
+            border: 2px dashed var(--gray-300);
+            border-radius: 8px;
+            padding: 16px;
+            min-height: 200px;
+            transition: all 0.2s;
+        }
+
+        .nested-drop-zone.drag-over {
+            background: var(--primary-light);
+            border-color: var(--primary);
+            border-style: solid;
+        }
+
+        .nested-param-block {
+            background: white;
+            border: 2px solid var(--gray-300);
+            border-radius: 6px;
+            padding: 10px 12px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.2s;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .nested-param-block:hover {
+            border-color: var(--primary);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+        }
+
+        /* Estilos para funciones anidadas profundamente */
+        .nested-param-block-function {
+            background: linear-gradient(135deg, #fef3c7 0%, #fef9e7 100%);
+            border: 2px solid #f59e0b;
+        }
+
+        .nested-param-block-function:hover {
+            border-color: #d97706;
+            box-shadow: 0 4px 8px rgba(245, 158, 11, 0.3);
+        }
+
+        .nested-function-pending {
+            border-style: dashed;
+            opacity: 0.8;
+        }
+
+        .nested-function-configured {
+            border-style: solid;
+        }
+
+        .nested-function-info-small {
+            font-size: 10px;
+            color: var(--gray-600);
+            margin-top: 2px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .nested-function-info-small i {
+            font-size: 10px;
+        }
+
+        .nested-param-block-number {
+            width: 24px;
+            height: 24px;
+            background: var(--primary);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 11px;
+            flex-shrink: 0;
+        }
+
+        .nested-param-block-content {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .nested-param-block-label {
+            font-size: 10px;
+            font-weight: 600;
+            color: var(--gray-600);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 2px;
+        }
+
+        .nested-param-block-value {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--gray-900);
+            font-family: 'Courier New', monospace;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .nested-param-block-actions {
+            display: flex;
+            gap: 4px;
+            flex-shrink: 0;
+        }
+
+        .nested-param-block-btn {
+            width: 24px;
+            height: 24px;
+            border: none;
+            background: var(--gray-100);
+            color: var(--gray-600);
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            font-size: 11px;
+        }
+
+        .nested-param-block-btn.delete:hover {
+            background: var(--danger);
+            color: white;
+        }
+
+        .nested-param-block[data-type="field"] {
+            border-color: #3b82f6;
+            background: linear-gradient(135deg, #eff6ff 0%, white 100%);
+        }
+
+        .nested-param-block[data-type="field"] .nested-param-block-number {
+            background: #3b82f6;
+        }
+
+        .nested-param-block[data-type="operator"] {
+            border-color: #8b5cf6;
+            background: linear-gradient(135deg, #f5f3ff 0%, white 100%);
+        }
+
+        .nested-param-block[data-type="operator"] .nested-param-block-number {
+            background: #8b5cf6;
+        }
+
+        .nested-param-block[data-type="value"] {
+            border-color: #10b981;
+            background: linear-gradient(135deg, #f0fdf4 0%, white 100%);
+        }
+
+        .nested-param-block[data-type="value"] .nested-param-block-number {
+            background: #10b981;
+        }
+
+        .nested-preview {
+            background: var(--gray-50);
+            border: 1px solid var(--gray-200);
+            border-radius: 6px;
+            padding: 12px;
+        }
+
+        .nested-preview-label {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--gray-600);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 8px;
+        }
+
+        .nested-preview-code {
+            background: #1e293b;
+            color: #10b981;
+            padding: 12px 16px;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            font-weight: 600;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+
+        .btn-add-value {
+            padding: 6px 10px;
+            background: var(--primary-light);
+            border: 2px solid var(--primary);
+            border-radius: 6px;
+            color: var(--primary-dark);
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 11px;
+            transition: all 0.2s;
+        }
+
+        .btn-add-value:hover {
+            background: var(--primary);
+            color: white;
         }
     </style>
 </asp:Content>
@@ -3229,6 +3789,44 @@
                                 </div>
                             </div>
                         </div>
+
+                        <!-- Panel de configuración inline para funciones -->
+                        <div class="config-panel" id="configPanel${variablesCounter}">
+                            <div class="config-panel-content">
+                                <!-- Header -->
+                                <div class="config-panel-header">
+                                    <div class="config-panel-header-left">
+                                        <i class="fas fa-cog"></i>
+                                        <span class="config-panel-title" id="configPanelTitle${variablesCounter}">Configurar Función</span>
+                                    </div>
+                                    <button class="config-panel-close" onclick="closeConfigPanel(${variablesCounter})" title="Cerrar" type="button">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+
+                                <!-- Breadcrumb para funciones anidadas -->
+                                <div class="config-panel-breadcrumb" id="configBreadcrumb${variablesCounter}" style="display: none;">
+                                    <!-- Dinámico: Función 1 > Función 2 > Función 3 -->
+                                </div>
+
+                                <!-- Body -->
+                                <div class="config-panel-body" id="configPanelBody${variablesCounter}">
+                                    <!-- Contenido dinámico -->
+                                </div>
+
+                                <!-- Footer -->
+                                <div class="config-panel-footer">
+                                    <button class="btn btn-secondary" onclick="closeConfigPanel(${variablesCounter})" type="button">
+                                        <i class="fas fa-times"></i>
+                                        Cancelar
+                                    </button>
+                                    <button class="btn btn-primary" onclick="acceptFunctionConfig(${variablesCounter})" type="button">
+                                        <i class="fas fa-check"></i>
+                                        Aceptar
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
                     <div class="variable-field">
@@ -3857,6 +4455,12 @@
                 order: droppedBlocks.length
             };
 
+            // Si es una función anidada, agregar metadata
+            if (type === 'function') {
+                block.nestedBlocks = []; // Bloques dentro de esta función
+                block.configured = false; // Si ya fue configurada
+            }
+
             droppedBlocks.push(block);
 
             // Renderizar bloques
@@ -3893,22 +4497,55 @@
                     'field': 'Campo',
                     'operator': 'Operador',
                     'value': 'Valor',
-                    'format': 'Formato'
+                    'format': 'Formato',
+                    'function': 'Función'
                 };
 
-                html += `
-                    <div class="param-block" data-type="${block.type}" data-block-id="${block.id}" draggable="true" ondragstart="dragBlockStart(event, '${block.id}')">
-                        <div class="param-block-number">${index + 1}</div>
-                        <div class="param-block-content">
-                            <div class="param-block-label">${labels[block.type]}</div>
-                            <div class="param-block-value">${block.value}</div>
+                // Si es función anidada, renderizar de forma especial
+                if (block.type === 'function') {
+                    const configuredClass = block.configured ? 'nested-function-configured' : 'nested-function-pending';
+                    const configuredIcon = block.configured ? 'fa-check-circle' : 'fa-exclamation-circle';
+                    const nestedCount = block.nestedBlocks ? block.nestedBlocks.length : 0;
+
+                    html += `
+                        <div class="param-block param-block-function ${configuredClass}" data-type="${block.type}" data-block-id="${block.id}">
+                            <div class="param-block-number">${index + 1}</div>
+                            <div class="param-block-content">
+                                <div class="param-block-label">
+                                    <i class="fas fa-layer-group"></i> Función Anidada
+                                </div>
+                                <div class="param-block-value">#${block.value}(...)#</div>
+                                <div class="nested-function-info">
+                                    <i class="fas ${configuredIcon}"></i>
+                                    ${block.configured ? nestedCount + ' parámetros' : 'Sin configurar - Click en ⚙️'}
+                                </div>
+                            </div>
+                            <div class="param-block-actions">
+                                <button type="button" class="param-block-btn config" onclick="configureNestedFunction('${block.id}')" title="Configurar función">
+                                    <i class="fas fa-cog"></i>
+                                </button>
+                                <button type="button" class="param-block-btn delete" onclick="deleteBlock('${block.id}')" title="Eliminar">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
                         </div>
-                        <div class="param-block-actions">
-                            ${block.type === 'value' ? `<button type="button" class="param-block-btn edit" onclick="editBlockValue('${block.id}')" title="Editar"><i class="fas fa-edit"></i></button>` : ''}
-                            <button type="button" class="param-block-btn delete" onclick="deleteBlock('${block.id}')" title="Eliminar"><i class="fas fa-trash"></i></button>
+                    `;
+                } else {
+                    // Renderizado normal para otros tipos
+                    html += `
+                        <div class="param-block" data-type="${block.type}" data-block-id="${block.id}" draggable="true" ondragstart="dragBlockStart(event, '${block.id}')">
+                            <div class="param-block-number">${index + 1}</div>
+                            <div class="param-block-content">
+                                <div class="param-block-label">${labels[block.type]}</div>
+                                <div class="param-block-value">${block.value}</div>
+                            </div>
+                            <div class="param-block-actions">
+                                ${block.type === 'value' ? `<button type="button" class="param-block-btn edit" onclick="editBlockValue('${block.id}')" title="Editar"><i class="fas fa-edit"></i></button>` : ''}
+                                <button type="button" class="param-block-btn delete" onclick="deleteBlock('${block.id}')" title="Eliminar"><i class="fas fa-trash"></i></button>
+                            </div>
                         </div>
-                    </div>
-                `;
+                    `;
+                }
             });
 
             dropZone.innerHTML = html;
@@ -3961,6 +4598,410 @@
             }
         }
 
+        // ===== CONFIGURAR FUNCIÓN ANIDADA =====
+        let currentNestedFunctionBlockId = null;
+
+        function configureNestedFunction(blockId) {
+            const block = droppedBlocks.find(b => b.id === blockId);
+            if (!block || block.type !== 'function') return;
+
+            currentNestedFunctionBlockId = blockId;
+
+            // Abrir modal secundario para configurar la función anidada
+            openNestedFunctionModal(block.value, block.nestedBlocks || []);
+        }
+
+        function openNestedFunctionModal(functionName, existingBlocks) {
+            // Resetear bloques anidados
+            nestedDroppedBlocks = existingBlocks && existingBlocks.length > 0 ? [...existingBlocks] : [];
+
+            // Crear modal secundario (más pequeño, encima del modal principal)
+            let nestedModal = document.getElementById('nestedFunctionModal');
+
+            if (!nestedModal) {
+                nestedModal = document.createElement('div');
+                nestedModal.id = 'nestedFunctionModal';
+                nestedModal.className = 'nested-function-modal-overlay';
+                nestedModal.innerHTML = `
+                    <div class="nested-function-modal">
+                        <div class="nested-function-modal-header">
+                            <div>
+                                <i class="fas fa-layer-group" id="nestedModalIcon"></i>
+                                <span id="nestedModalTitle">Configurar Función</span>
+                            </div>
+                            <button type="button" onclick="closeNestedFunctionModal()" class="modal-close-btn">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                        <div class="nested-function-modal-body" id="nestedModalBody">
+                            <!-- Contenido dinámico -->
+                        </div>
+                        <div class="nested-function-modal-footer">
+                            <button type="button" onclick="closeNestedFunctionModal()" class="btn-secondary">
+                                <i class="fas fa-times"></i> Cancelar
+                            </button>
+                            <button type="button" onclick="saveNestedFunctionWithStack()" class="btn-primary">
+                                <i class="fas fa-check"></i> Guardar Función
+                            </button>
+                        </div>
+                    </div>
+                `;
+                document.body.appendChild(nestedModal);
+            }
+
+            // Configurar título
+            document.getElementById('nestedModalTitle').textContent = 'Configurar: #' + functionName + '#';
+
+            // Generar contenido del modal
+            const modalBody = document.getElementById('nestedModalBody');
+            modalBody.innerHTML = generateNestedFunctionContent(functionName, existingBlocks);
+
+            // Renderizar bloques existentes
+            setTimeout(() => {
+                renderNestedBlocks();
+                updateNestedPreview();
+            }, 100);
+
+            // Mostrar modal
+            nestedModal.style.display = 'flex';
+        }
+
+        function generateNestedFunctionContent(functionName, existingBlocks) {
+            // Crear un sistema de bloques similar pero más compacto
+            return `
+                <div class="nested-function-content">
+                    <div class="nested-function-info-banner">
+                        <i class="fas fa-info-circle"></i>
+                        Arrastra bloques para configurar los parámetros de <strong>#${functionName}#</strong>
+                    </div>
+
+                    <div class="nested-two-column">
+                        <!-- Paleta compacta -->
+                        <div class="nested-palette">
+                            <div class="nested-palette-section">
+                                <div class="nested-palette-title">📊 Campos</div>
+                                <div class="nested-palette-items" id="nestedFieldsContainer">
+                                    ${generateFieldPaletteItems()}
+                                </div>
+                            </div>
+
+                            <div class="nested-palette-section">
+                                <div class="nested-palette-title">🧮 Operadores</div>
+                                <div class="nested-palette-items">
+                                    <div class="palette-item" data-type="operator" data-value=">" draggable="true" ondragstart="dragNestedStart(event)">&gt;</div>
+                                    <div class="palette-item" data-type="operator" data-value="<" draggable="true" ondragstart="dragNestedStart(event)">&lt;</div>
+                                    <div class="palette-item" data-type="operator" data-value=">=" draggable="true" ondragstart="dragNestedStart(event)">&gt;=</div>
+                                    <div class="palette-item" data-type="operator" data-value="<=" draggable="true" ondragstart="dragNestedStart(event)">&lt;=</div>
+                                    <div class="palette-item" data-type="operator" data-value="=" draggable="true" ondragstart="dragNestedStart(event)">=</div>
+                                    <div class="palette-item" data-type="operator" data-value="!=" draggable="true" ondragstart="dragNestedStart(event)">!=</div>
+                                </div>
+                            </div>
+
+                            <div class="nested-palette-section">
+                                <div class="nested-palette-title"># Valores</div>
+                                <div class="nested-palette-items">
+                                    <div class="palette-item" data-type="value" data-value="1" draggable="true" ondragstart="dragNestedStart(event)">1</div>
+                                    <div class="palette-item" data-type="value" data-value="3" draggable="true" ondragstart="dragNestedStart(event)">3</div>
+                                    <div class="palette-item" data-type="value" data-value="6" draggable="true" ondragstart="dragNestedStart(event)">6</div>
+                                    <button type="button" onclick="addNestedCustomValue()" class="btn-add-value">
+                                        <i class="fas fa-plus"></i>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="nested-palette-section">
+                                <div class="nested-palette-title">🔗 Funciones Anidadas</div>
+                                <div style="font-size: 10px; color: var(--gray-500); margin-bottom: 8px;">Arrastra para anidar más funciones</div>
+                                <div class="nested-palette-items">
+                                    <div class="palette-item palette-item-function" data-type="function" data-value="Conteo" draggable="true" ondragstart="dragNestedStart(event)">
+                                        <i class="fas fa-hashtag"></i> Conteo
+                                    </div>
+                                    <div class="palette-item palette-item-function" data-type="function" data-value="Máximo" draggable="true" ondragstart="dragNestedStart(event)">
+                                        <i class="fas fa-arrow-up"></i> Máximo
+                                    </div>
+                                    <div class="palette-item palette-item-function" data-type="function" data-value="Mínimo" draggable="true" ondragstart="dragNestedStart(event)">
+                                        <i class="fas fa-arrow-down"></i> Mínimo
+                                    </div>
+                                    <div class="palette-item palette-item-function" data-type="function" data-value="Suma" draggable="true" ondragstart="dragNestedStart(event)">
+                                        <i class="fas fa-plus"></i> Suma
+                                    </div>
+                                    <div class="palette-item palette-item-function" data-type="function" data-value="CuentaCaracteres" draggable="true" ondragstart="dragNestedStart(event)">
+                                        <i class="fas fa-text-width"></i> Caracteres
+                                    </div>
+                                    <div class="palette-item palette-item-function" data-type="function" data-value="DifFechaHoy" draggable="true" ondragstart="dragNestedStart(event)">
+                                        <i class="fas fa-calendar-day"></i> DifFecha
+                                    </div>
+                                    <div class="palette-item palette-item-function" data-type="function" data-value="Si entonces" draggable="true" ondragstart="dragNestedStart(event)">
+                                        <i class="fas fa-code-branch"></i> Si
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Zona de drop -->
+                        <div class="nested-drop-area">
+                            <div class="nested-drop-label">
+                                <i class="fas fa-cubes"></i> Parámetros de la Función
+                            </div>
+                            <div class="nested-drop-zone" id="nestedDropZone" ondrop="dropNestedBlock(event)" ondragover="allowDrop(event)" ondragleave="dragLeave(event)">
+                                <div class="empty">
+                                    <i class="fas fa-hand-pointer"></i>
+                                    Arrastra bloques aquí
+                                </div>
+                            </div>
+                            <div class="nested-preview">
+                                <div class="nested-preview-label">Vista Previa</div>
+                                <div class="nested-preview-code" id="nestedPreviewCode">#${functionName}()#</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function closeNestedFunctionModal() {
+            const modal = document.getElementById('nestedFunctionModal');
+            if (modal) {
+                modal.style.display = 'none';
+            }
+            currentNestedFunctionBlockId = null;
+        }
+
+        function saveNestedFunction() {
+            if (!currentNestedFunctionBlockId) return;
+
+            const block = droppedBlocks.find(b => b.id === currentNestedFunctionBlockId);
+            if (!block) return;
+
+            // Guardar los bloques anidados
+            block.nestedBlocks = [...nestedDroppedBlocks];
+            block.configured = nestedDroppedBlocks.length > 0;
+
+            // Cerrar modal
+            closeNestedFunctionModal();
+
+            // Actualizar renderizado
+            renderBlocks();
+            updateBlockPreview();
+        }
+
+        // Stack para manejar funciones anidadas recursivamente
+        let nestedFunctionStack = [];
+
+        function configureDeepNestedFunction(blockId) {
+            // Encontrar el bloque dentro de nestedDroppedBlocks
+            const block = nestedDroppedBlocks.find(b => b.id === blockId);
+            if (!block || block.type !== 'function') return;
+
+            // Guardar el estado actual en el stack
+            nestedFunctionStack.push({
+                blockId: currentNestedFunctionBlockId,
+                blocks: [...nestedDroppedBlocks]
+            });
+
+            // Configurar el nuevo nivel
+            currentNestedFunctionBlockId = blockId;
+
+            // Abrir modal anidado para esta función
+            openNestedFunctionModal(block.value, block.nestedBlocks || []);
+        }
+
+        // Modificar saveNestedFunction para manejar el stack
+        function saveNestedFunctionWithStack() {
+            if (!currentNestedFunctionBlockId) return;
+
+            // Si estamos en un nivel profundo, guardar en el bloque correcto
+            if (nestedFunctionStack.length > 0) {
+                // Encontrar el bloque en nestedDroppedBlocks actual
+                const block = nestedDroppedBlocks.find(b => b.id === currentNestedFunctionBlockId);
+                if (block) {
+                    block.nestedBlocks = [...nestedDroppedBlocks];
+                    block.configured = nestedDroppedBlocks.length > 0;
+                }
+
+                // Restaurar el nivel anterior del stack
+                const previousLevel = nestedFunctionStack.pop();
+                currentNestedFunctionBlockId = previousLevel.blockId;
+                nestedDroppedBlocks = previousLevel.blocks;
+
+                // Re-renderizar el nivel anterior
+                renderNestedBlocks();
+                updateNestedPreview();
+            } else {
+                // Nivel principal - usar la lógica original
+                const block = droppedBlocks.find(b => b.id === currentNestedFunctionBlockId);
+                if (block) {
+                    block.nestedBlocks = [...nestedDroppedBlocks];
+                    block.configured = nestedDroppedBlocks.length > 0;
+                }
+
+                closeNestedFunctionModal();
+                renderBlocks();
+                updateBlockPreview();
+            }
+        }
+
+        // Variables para manejo de bloques anidados
+        let nestedDroppedBlocks = [];
+        let draggedNestedElement = null;
+
+        function dragNestedStart(event) {
+            draggedNestedElement = event.target;
+            event.dataTransfer.setData('type', event.target.getAttribute('data-type'));
+            event.dataTransfer.setData('value', event.target.getAttribute('data-value'));
+            event.target.classList.add('dragging');
+        }
+
+        function dropNestedBlock(event) {
+            event.preventDefault();
+            const dropZone = document.getElementById('nestedDropZone');
+            dropZone.classList.remove('drag-over');
+
+            const type = event.dataTransfer.getData('type');
+            const value = event.dataTransfer.getData('value');
+
+            if (!type || !value) return;
+
+            // Remover empty
+            const emptyDiv = dropZone.querySelector('.empty');
+            if (emptyDiv) emptyDiv.remove();
+
+            // Crear bloque
+            const blockId = 'nested_block_' + Date.now();
+            const block = {
+                id: blockId,
+                type: type,
+                value: value,
+                order: nestedDroppedBlocks.length
+            };
+
+            // Si es una función anidada, agregar metadata
+            if (type === 'function') {
+                block.nestedBlocks = []; // Bloques dentro de esta función
+                block.configured = false; // Si ya fue configurada
+            }
+
+            nestedDroppedBlocks.push(block);
+            renderNestedBlocks();
+            updateNestedPreview();
+
+            if (draggedNestedElement) {
+                draggedNestedElement.classList.remove('dragging');
+                draggedNestedElement = null;
+            }
+        }
+
+        function renderNestedBlocks() {
+            const dropZone = document.getElementById('nestedDropZone');
+            if (!dropZone) return;
+
+            if (nestedDroppedBlocks.length === 0) {
+                dropZone.innerHTML = `
+                    <div class="empty">
+                        <i class="fas fa-hand-pointer"></i>
+                        Arrastra bloques aquí
+                    </div>
+                `;
+                return;
+            }
+
+            nestedDroppedBlocks.sort((a, b) => a.order - b.order);
+
+            let html = '';
+            nestedDroppedBlocks.forEach((block, index) => {
+                const labels = {
+                    'field': 'Campo',
+                    'operator': 'Operador',
+                    'value': 'Valor',
+                    'format': 'Formato',
+                    'function': 'Función'
+                };
+
+                // Si es función anidada, renderizar de forma especial
+                if (block.type === 'function') {
+                    const configuredClass = block.configured ? 'nested-function-configured' : 'nested-function-pending';
+                    const configuredIcon = block.configured ? 'fa-check-circle' : 'fa-exclamation-circle';
+                    const nestedCount = block.nestedBlocks ? block.nestedBlocks.length : 0;
+
+                    html += `
+                        <div class="nested-param-block nested-param-block-function ${configuredClass}" data-type="${block.type}" data-block-id="${block.id}">
+                            <div class="nested-param-block-number">${index + 1}</div>
+                            <div class="nested-param-block-content">
+                                <div class="nested-param-block-label">
+                                    <i class="fas fa-layer-group"></i> Función
+                                </div>
+                                <div class="nested-param-block-value">#${block.value}(...)#</div>
+                                <div class="nested-function-info-small">
+                                    <i class="fas ${configuredIcon}"></i>
+                                    ${block.configured ? nestedCount + ' params' : 'Sin configurar'}
+                                </div>
+                            </div>
+                            <div class="nested-param-block-actions">
+                                <button type="button" class="nested-param-block-btn config" onclick="configureDeepNestedFunction('${block.id}')" title="Configurar">
+                                    <i class="fas fa-cog"></i>
+                                </button>
+                                <button type="button" class="nested-param-block-btn delete" onclick="deleteNestedBlock('${block.id}')" title="Eliminar">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    // Renderizado normal para otros tipos
+                    html += `
+                        <div class="nested-param-block" data-type="${block.type}" data-block-id="${block.id}">
+                            <div class="nested-param-block-number">${index + 1}</div>
+                            <div class="nested-param-block-content">
+                                <div class="nested-param-block-label">${labels[block.type]}</div>
+                                <div class="nested-param-block-value">${block.value}</div>
+                            </div>
+                            <div class="nested-param-block-actions">
+                                <button type="button" class="nested-param-block-btn delete" onclick="deleteNestedBlock('${block.id}')">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                }
+            });
+
+            dropZone.innerHTML = html;
+        }
+
+        function deleteNestedBlock(blockId) {
+            nestedDroppedBlocks = nestedDroppedBlocks.filter(b => b.id !== blockId);
+            renderNestedBlocks();
+            updateNestedPreview();
+        }
+
+        function updateNestedPreview() {
+            const previewEl = document.getElementById('nestedPreviewCode');
+            if (!previewEl) return;
+
+            const block = droppedBlocks.find(b => b.id === currentNestedFunctionBlockId);
+            if (!block) return;
+
+            const functionName = block.value;
+            const params = nestedDroppedBlocks.map(b => b.value).join(',');
+
+            previewEl.textContent = `#${functionName}(${params})#`;
+        }
+
+        function addNestedCustomValue() {
+            const value = prompt('Ingrese el valor:');
+            if (value !== null && value.trim() !== '') {
+                const paletteItems = document.querySelector('#nestedFunctionModal .nested-palette-section:nth-child(3) .nested-palette-items');
+                const newItem = document.createElement('div');
+                newItem.className = 'palette-item';
+                newItem.setAttribute('data-type', 'value');
+                newItem.setAttribute('data-value', value.trim());
+                newItem.setAttribute('draggable', 'true');
+                newItem.ondragstart = dragNestedStart;
+                newItem.textContent = value.trim();
+                paletteItems.insertBefore(newItem, paletteItems.lastElementChild);
+            }
+        }
+
         // Arrastrar bloque existente para reordenar
         let draggedBlockId = null;
 
@@ -3975,18 +5016,26 @@
             const previewEl = document.getElementById('modalPreviewCode');
             if (!previewEl) return;
 
-            // Extraer parámetros de los bloques
-            const campo = droppedBlocks.find(b => b.type === 'field')?.value || '';
-            const operador = droppedBlocks.find(b => b.type === 'operator')?.value || '';
-            const valor = droppedBlocks.find(b => b.type === 'value')?.value || '';
-            const formato = droppedBlocks.find(b => b.type === 'format')?.value || 'YYYY';
+            // Construir preview con todas las partes, incluyendo funciones anidadas
+            let preview = '#CalculaEdad(';
 
-            const campoStr = campo ? '[' + campo + ']' : '[]';
-            const operadorStr = operador ? '[' + operador + ']' : '[]';
-            const valorStr = valor ? '[' + valor + ']' : '[]';
-            const formatoStr = '[' + formato + ']';
+            droppedBlocks.forEach((block, index) => {
+                if (index > 0) preview += ',';
 
-            const preview = `#CalculaEdad(${campoStr},${operadorStr},${valorStr},${formatoStr})#`;
+                if (block.type === 'function') {
+                    // Si es función anidada, mostrar su representación
+                    if (block.configured && block.nestedBlocks && block.nestedBlocks.length > 0) {
+                        const nestedParams = block.nestedBlocks.map(nb => nb.value).join(',');
+                        preview += `#${block.value}(${nestedParams})#`;
+                    } else {
+                        preview += `#${block.value}(...)#`;
+                    }
+                } else {
+                    preview += '[' + block.value + ']';
+                }
+            });
+
+            preview += ')#';
             previewEl.textContent = preview;
         }
 
@@ -4052,24 +5101,50 @@
 
         // Abrir modal de configuración
         function openFunctionModal(functionName, input) {
-            // Si se pasa un input, establecerlo como activo
+            // Redirigir al nuevo panel de configuración
+            openConfigPanel(functionName, input);
+        }
+
+        // ===== PANEL DE CONFIGURACIÓN (REEMPLAZO DE MODALES) =====
+
+        let configStack = []; // Stack para funciones anidadas
+        let currentConfigVarId = null;
+
+        function openConfigPanel(functionName, input) {
+            // Si se pasa un input, establecer lo como activo y extraer varId
             if (input) {
                 activeInput = input;
+                currentConfigVarId = input.varId;
             }
 
-            currentFunction = functionName;
-            const modal = document.getElementById('functionModalOverlay');
+            // Agregar a stack de configuración
+            configStack.push({
+                functionName: functionName,
+                params: {}
+            });
 
-            if (!modal) {
-                createModalInBody();
-                setTimeout(() => openFunctionModal(functionName), 100);
-                return;
+            // Actualizar UI del panel
+            updateConfigPanel();
+
+            // Mostrar panel inline de esta variable específica
+            const panel = document.getElementById('configPanel' + currentConfigVarId);
+            if (panel) {
+                panel.classList.add('active');
             }
+        }
 
-            const modalBody = document.getElementById('modalBody');
-            const modalTitle = document.getElementById('modalTitle');
-            const modalIcon = document.getElementById('modalIcon');
+        function updateConfigPanel() {
+            const currentConfig = configStack[configStack.length - 1];
+            if (!currentConfig || !currentConfigVarId) return;
 
+            // Usar elementos específicos de esta variable
+            const title = document.getElementById('configPanelTitle' + currentConfigVarId);
+            const breadcrumb = document.getElementById('configBreadcrumb' + currentConfigVarId);
+            const body = document.getElementById('configPanelBody' + currentConfigVarId);
+
+            if (!title || !body) return;
+
+            // Actualizar título
             const icons = {
                 'Conteo': 'fa-hashtag',
                 'Máximo': 'fa-arrow-up',
@@ -4083,33 +5158,119 @@
                 'Cualquier fecha': 'fa-calendar-alt'
             };
 
-            modalTitle.textContent = functionName;
-            modalIcon.className = 'fas ' + (icons[functionName] || 'fa-magic');
+            title.innerHTML = `<i class="fas ${icons[currentConfig.functionName] || 'fa-cog'}"></i> ${currentConfig.functionName}`;
 
-            availableFields = getAvailableFields();
-            modalBody.innerHTML = generateFunctionForm(functionName);
-
-            // Si es Calcular edad, inicializar el sistema de bloques
-            if (functionName === 'Calcular edad') {
-                droppedBlocks = [];
-                updateBlockPreview();
+            // Actualizar breadcrumb si hay funciones anidadas
+            if (configStack.length > 1) {
+                breadcrumb.style.display = 'flex';
+                breadcrumb.innerHTML = configStack.map((config, index) => {
+                    const isLast = index === configStack.length - 1;
+                    return `
+                        <span class="breadcrumb-item ${isLast ? 'active' : ''}" onclick="navigateToConfigLevel(${index})">
+                            ${config.functionName}
+                        </span>
+                        ${!isLast ? '<i class="fas fa-chevron-right"></i>' : ''}
+                    `;
+                }).join('');
             } else {
-                // Para otras funciones, agregar event listeners normales
-                setTimeout(() => {
-                    const inputs = modalBody.querySelectorAll('input, select, textarea');
-                    inputs.forEach(input => {
-                        input.addEventListener('input', updateModalPreview);
-                        input.addEventListener('change', updateModalPreview);
-                    });
-                    updateModalPreview();
-                }, 100);
+                breadcrumb.style.display = 'none';
             }
 
-            modal.style.display = 'flex';
-            document.body.style.overflow = 'hidden';
+            // Generar formulario
+            availableFields = getAvailableFields();
+            body.innerHTML = generateFunctionForm(currentConfig.functionName);
+
+            // Agregar event listeners
+            setTimeout(() => {
+                const inputs = body.querySelectorAll('input, select, textarea');
+                inputs.forEach(input => {
+                    input.addEventListener('input', updateConfigPreview);
+                    input.addEventListener('change', updateConfigPreview);
+                });
+            }, 100);
         }
 
-        // Cerrar modal
+        function updateConfigPreview() {
+            // Actualizar preview dentro del panel
+            const preview = document.getElementById('configPanelPreview');
+            if (preview) {
+                const currentConfig = configStack[configStack.length - 1];
+                // Generar preview basado en inputs actuales
+                const inputs = document.querySelectorAll('#configPanelBody input, #configPanelBody select');
+                let params = [];
+                inputs.forEach(input => {
+                    if (input.value) params.push(input.value);
+                });
+                preview.textContent = `#${currentConfig.functionName}(${params.join(', ')})#`;
+            }
+        }
+
+        function navigateToConfigLevel(level) {
+            // Retroceder en el stack a un nivel específico
+            while (configStack.length > level + 1) {
+                configStack.pop();
+            }
+            updateConfigPanel();
+        }
+
+        function closeConfigPanel(varId) {
+            // Si no se pasa varId, usar el currentConfigVarId
+            const targetVarId = varId || currentConfigVarId;
+            if (!targetVarId) return;
+
+            const panel = document.getElementById('configPanel' + targetVarId);
+            if (panel) {
+                panel.classList.remove('active');
+            }
+
+            // Limpiar stack
+            configStack = [];
+            currentConfigVarId = null;
+        }
+
+        function acceptFunctionConfig(varId) {
+            // Si no se pasa varId, usar el currentConfigVarId
+            const targetVarId = varId || currentConfigVarId;
+            if (!targetVarId) return;
+
+            const currentConfig = configStack[configStack.length - 1];
+            if (!currentConfig) return;
+
+            // Recopilar valores del formulario usando el body específico de esta variable
+            const body = document.getElementById('configPanelBody' + targetVarId);
+            if (!body) return;
+
+            const inputs = body.querySelectorAll('input, select, textarea');
+            let params = [];
+
+            inputs.forEach(input => {
+                if (input.value && input.value.trim() !== '') {
+                    params.push(input.value.trim());
+                }
+            });
+
+            // Si estamos en una función anidada, volver al nivel anterior
+            if (configStack.length > 1) {
+                // Guardar configuración y volver
+                configStack.pop();
+                const parentConfig = configStack[configStack.length - 1];
+                // Aquí se debería agregar la función configurada como parámetro del padre
+                updateConfigPanel();
+                return;
+            }
+
+            // Si es el nivel raíz, crear el componente final
+            const functionText = `#${currentConfig.functionName}(${params.join(', ')})#`;
+            const displayHtml = `<i class="fas fa-magic expr-icon"></i><span class="expr-value">${currentConfig.functionName}(...)</span>`;
+
+            addExprComponent(targetVarId, 'function', functionText, displayHtml);
+
+            closeConfigPanel(targetVarId);
+        }
+
+        // ===== FUNCIONES AUXILIARES =====
+
+        // Cerrar modal (mantener por compatibilidad)
         function closeFunctionModal() {
             const modal = document.getElementById('functionModalOverlay');
             if (modal) {
@@ -4203,6 +5364,34 @@
                                         <div class="palette-items">
                                             <div class="palette-item" data-type="format" data-value="YYYY" draggable="true" ondragstart="dragStart(event)">YYYY</div>
                                             <div class="palette-item" data-type="format" data-value="YY" draggable="true" ondragstart="dragStart(event)">YY</div>
+                                        </div>
+                                    </div>
+
+                                    <div class="palette-section">
+                                        <div class="palette-title">
+                                            <i class="fas fa-layer-group" style="color: #ec4899;"></i>
+                                            Funciones Anidadas
+                                        </div>
+                                        <div style="font-size: 10px; color: var(--gray-500); margin-bottom: 8px;">Arrastra para anidar funciones</div>
+                                        <div class="palette-items">
+                                            <div class="palette-item palette-item-function" data-type="function" data-value="Conteo" draggable="true" ondragstart="dragStart(event)">
+                                                <i class="fas fa-hashtag"></i> Conteo
+                                            </div>
+                                            <div class="palette-item palette-item-function" data-type="function" data-value="Máximo" draggable="true" ondragstart="dragStart(event)">
+                                                <i class="fas fa-arrow-up"></i> Máximo
+                                            </div>
+                                            <div class="palette-item palette-item-function" data-type="function" data-value="Mínimo" draggable="true" ondragstart="dragStart(event)">
+                                                <i class="fas fa-arrow-down"></i> Mínimo
+                                            </div>
+                                            <div class="palette-item palette-item-function" data-type="function" data-value="Suma" draggable="true" ondragstart="dragStart(event)">
+                                                <i class="fas fa-plus"></i> Suma
+                                            </div>
+                                            <div class="palette-item palette-item-function" data-type="function" data-value="CuentaCaracteres" draggable="true" ondragstart="dragStart(event)">
+                                                <i class="fas fa-text-width"></i> CuentaCaracteres
+                                            </div>
+                                            <div class="palette-item palette-item-function" data-type="function" data-value="DifFechaHoy" draggable="true" ondragstart="dragStart(event)">
+                                                <i class="fas fa-calendar-day"></i> DifFechaHoy
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -4411,4 +5600,7 @@
             }
         }, false);
     </script>
+
+    <!-- Panel lateral de configuración de funciones -->
+
 </asp:Content>
