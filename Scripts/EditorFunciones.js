@@ -304,7 +304,19 @@ function openNestedFunctionConfig(functionName, parentBuilderId, functionId) {
     // Guardar el estado actual antes de navegar
     saveCurrentLevelState();
 
-    // Crear nuevo nivel
+    // ✨ NUEVO: Buscar si ya existe un nivel con este functionId
+    const existingLevelIndex = navigationStack.levels.findIndex(
+        level => level.functionId === functionId && level.parentBuilderId === parentBuilderId
+    );
+
+    if (existingLevelIndex !== -1) {
+        console.log('♻️ Nivel existente encontrado, navegando a él:', existingLevelIndex);
+        // Navegar al nivel existente en lugar de crear uno nuevo
+        navigateToLevel(existingLevelIndex);
+        return;
+    }
+
+    // No existe, crear nuevo nivel
     const newLevel = createConfigLevel(functionName, parentBuilderId, functionId, varId);
     console.log('🆕 Nuevo nivel creado:', newLevel);
 
@@ -375,6 +387,18 @@ function renderCurrentConfigLevel() {
         console.log('🆕 Generando formulario nuevo');
         availableFields = getAvailableFields();
         body.innerHTML = generateFunctionForm(currentLevel.functionName);
+
+        // ✨ NUEVO: Restaurar componentes desde miniBuilderStates si existen
+        if (Object.keys(currentLevel.miniBuilderStates).length > 0) {
+            console.log('   🔄 Restaurando componentes desde miniBuilderStates');
+            Object.keys(currentLevel.miniBuilderStates).forEach(builderId => {
+                miniBuilderComponents[builderId] = JSON.parse(
+                    JSON.stringify(currentLevel.miniBuilderStates[builderId])
+                );
+                console.log(`      Restaurando ${builderId}:`, miniBuilderComponents[builderId].length, 'componentes');
+                renderMiniBuilder(builderId);
+            });
+        }
     }
 
     // Scroll al inicio
@@ -463,6 +487,49 @@ function navigateToLevel(targetLevel) {
 
     // Guardar estado actual antes de navegar
     saveCurrentLevelState();
+
+    // ✨ NUEVO: Si estamos navegando hacia un nivel padre, actualizar la expresión completa de la función anidada
+    if (targetLevel < navigationStack.currentLevel) {
+        const childLevel = navigationStack.levels[navigationStack.currentLevel];
+        if (childLevel.parentBuilderId && childLevel.functionId) {
+            console.log('🔄 Actualizando expresión completa de función anidada:', childLevel.functionName);
+
+            // Construir la expresión completa del nivel hijo
+            let childExpression = buildLevelExpression(childLevel);
+            console.log('   Expresión construida del hijo:', childExpression);
+
+            // Actualizar el componente de función en el nivel padre
+            const parentComponents = miniBuilderComponents[childLevel.parentBuilderId];
+            if (parentComponents) {
+                const functionComp = parentComponents.find(c => c.functionId === childLevel.functionId);
+                if (functionComp) {
+                    functionComp.fullExpression = childExpression;
+                    functionComp.configured = true;
+
+                    // Actualizar el HTML del componente para reflejar los parámetros
+                    const paramsPreview = childExpression.length > 50 ?
+                        childExpression.substring(0, 47) + '...' :
+                        childExpression;
+                    functionComp.html = `<i class="fas fa-magic expr-icon"></i><span class="expr-value">${paramsPreview}</span>`;
+
+                    console.log('   ✅ Componente actualizado en memoria:', functionComp);
+
+                    // ✨ CRÍTICO: También actualizar el estado guardado del nivel padre
+                    const parentLevel = navigationStack.levels[targetLevel];
+                    if (parentLevel && parentLevel.miniBuilderStates[childLevel.parentBuilderId]) {
+                        const savedComponents = parentLevel.miniBuilderStates[childLevel.parentBuilderId];
+                        const savedFunctionComp = savedComponents.find(c => c.functionId === childLevel.functionId);
+                        if (savedFunctionComp) {
+                            savedFunctionComp.fullExpression = childExpression;
+                            savedFunctionComp.configured = true;
+                            savedFunctionComp.html = functionComp.html;
+                            console.log('   ✅ Estado guardado del padre también actualizado');
+                        }
+                    }
+                }
+            }
+        }
+    }
 
     // Cambiar nivel actual
     navigationStack.currentLevel = targetLevel;
@@ -573,38 +640,90 @@ function renderMiniBuilder(builderId) {
                 </div>
             `).join('');
 
-    // Actualizar preview
-    updateMiniBuilderPreview(builderId);
-}
-
-function removeMiniBuilderComponent(builderId, index) {
-    if (miniBuilderComponents[builderId]) {
-        miniBuilderComponents[builderId].splice(index, 1);
-        renderMiniBuilder(builderId);
-    }
-}
-
-function updateMiniBuilderPreview(builderId) {
-    const preview = document.getElementById(builderId + '_preview');
-    if (!preview) return;
-
-    const components = miniBuilderComponents[builderId] || [];
-    if (components.length === 0) {
-        preview.classList.remove('active');
-        return;
-    }
-
-    // Construir expresión usando la función que maneja funciones anidadas
-    const expression = buildComponentsExpression(components);
-
-    preview.querySelector('.preview-text').textContent = expression;
-    preview.classList.add('active');
-
-    // ✅ NUEVO: Actualizar vista previa global del nivel actual
+    // Actualizar vista previa global
     updateCurrentLevelPreview();
 }
 
-// ✅ NUEVO: Actualizar vista previa global del nivel actual
+function removeMiniBuilderComponent(builderId, index) {
+    if (!miniBuilderComponents[builderId]) return;
+
+    const component = miniBuilderComponents[builderId][index];
+    console.log('🗑️ Eliminando componente:', component);
+
+    // Si es una función anidada, eliminar su nivel del navigationStack
+    if (component.type === 'function' && component.functionId) {
+        const functionId = component.functionId;
+        console.log('   Buscando nivel anidado con functionId:', functionId);
+
+        // Buscar y eliminar el nivel hijo del navigationStack
+        const levelIndex = navigationStack.levels.findIndex(level =>
+            level.functionId === functionId && level.parentBuilderId === builderId
+        );
+
+        if (levelIndex !== -1) {
+            console.log('   ✅ Eliminando nivel anidado del stack:', navigationStack.levels[levelIndex].functionName);
+
+            // ✨ NUEVO: Limpiar TODOS los mini-builders asociados con este nivel
+            const levelToDelete = navigationStack.levels[levelIndex];
+            console.log('   🧹 Limpiando mini-builders del nivel:', levelIndex);
+
+            // Buscar y eliminar todos los mini-builders que pertenecen a este nivel
+            const buildersToDelete = Object.keys(miniBuilderComponents).filter(key =>
+                key.startsWith(`miniBuilder_level${levelIndex}_`)
+            );
+
+            buildersToDelete.forEach(builderKey => {
+                console.log('      Eliminando mini-builder:', builderKey);
+                delete miniBuilderComponents[builderKey];
+            });
+
+            // También limpiar del estado guardado del nivel
+            if (levelToDelete.miniBuilderStates) {
+                Object.keys(levelToDelete.miniBuilderStates).forEach(builderKey => {
+                    console.log('      Eliminando estado guardado de:', builderKey);
+                    delete levelToDelete.miniBuilderStates[builderKey];
+                });
+            }
+
+            // Si estamos en ese nivel o uno posterior, retroceder
+            if (navigationStack.currentLevel >= levelIndex) {
+                const parentLevelIndex = navigationStack.levels.findIndex(level =>
+                    !level.parentBuilderId || level.parentBuilderId !== builderId
+                );
+                if (parentLevelIndex !== -1 && parentLevelIndex < levelIndex) {
+                    navigateToLevel(parentLevelIndex);
+                }
+            }
+
+            // Eliminar el nivel del stack
+            navigationStack.levels.splice(levelIndex, 1);
+
+            // Ajustar currentLevel si es necesario
+            if (navigationStack.currentLevel >= levelIndex) {
+                navigationStack.currentLevel = Math.max(0, navigationStack.currentLevel - 1);
+            }
+
+            // ✨ NUEVO: Actualizar el breadcrumb para reflejar la eliminación del nivel
+            const currentLevel = navigationStack.levels[navigationStack.currentLevel];
+            if (currentLevel && currentLevel.varId) {
+                const breadcrumb = document.getElementById('configBreadcrumb' + currentLevel.varId);
+                if (breadcrumb) {
+                    console.log('   🔄 Actualizando breadcrumb después de eliminar nivel');
+                    updateNavigationBreadcrumb(breadcrumb);
+                }
+            }
+        }
+    }
+
+    // Eliminar el componente del array
+    miniBuilderComponents[builderId].splice(index, 1);
+    console.log('   ✅ Componente eliminado, re-renderizando');
+
+    // Re-renderizar el mini-builder (esto llama a updateCurrentLevelPreview)
+    renderMiniBuilder(builderId);
+}
+
+// ✅ Actualizar vista previa global del nivel actual
 function updateCurrentLevelPreview() {
     console.log('🔍 updateCurrentLevelPreview() llamado');
 
@@ -675,8 +794,7 @@ function updateCurrentLevelPreview() {
 
     previewElement.textContent = fullExpression;
 
-    // Mostrar el contenedor
-    previewContainer.style.display = 'block';
+    // ✅ El contenedor ahora siempre es visible, solo actualizamos el contenido
 }
 
 function closeOperatorsSidebar() {
@@ -1057,37 +1175,254 @@ function editExprValue(compId, varId) {
 }
 
 // Editar componente de función
-// Editar componente de función (reabre el modal con los bloques cargados)
+// ✨ NUEVO: Editar componente de función desde expression builder
 function editExprComponent(compId, varId) {
     initExpressionComponents(varId);
     const comp = expressionComponents[varId].find(c => c.id === compId);
     if (!comp || comp.type !== 'function') return;
 
-    // Guardar referencia para actualizar después
-    window.editingComponent = { compId, varId };
+    console.log('✏️ Editando función:', comp);
 
-    // Si tiene metadata (bloques guardados), recargarlos
-    if (comp.metadata && comp.metadata.functionName && comp.metadata.blocks) {
-        const builder = document.getElementById('exprBuilder' + varId);
-        const tempInput = document.createElement('textarea');
-        tempInput.style.display = 'none';
-        builder.appendChild(tempInput);
-
-        activeInput = tempInput;
-        activeInput.varId = varId;
-        activeInput.editMode = true; // Marcar que estamos en modo edición
-
-        // Abrir modal con la función
-        openFunctionModal(comp.metadata.functionName, tempInput);
-
-        // Esperar a que el modal se renderice y luego cargar los bloques
-        setTimeout(() => {
-            loadBlocksIntoModal(comp.metadata.blocks);
-        }, 300);
-    } else {
-        // Fallback: intentar parsear la función del texto
+    // Verificar que tenga metadata con la información necesaria
+    if (!comp.metadata || !comp.metadata.functionName) {
         alert('No se puede editar esta función. Por favor elimínela y créela de nuevo.');
+        return;
     }
+
+    // Guardar referencia para actualizar después
+    window.editingComponent = { compId, varId, originalComponent: comp };
+
+    // Crear input temporal para el contexto
+    const builder = document.getElementById('exprBuilder' + varId);
+    const tempInput = document.createElement('textarea');
+    tempInput.style.display = 'none';
+    builder.appendChild(tempInput);
+
+    activeInput = tempInput;
+    activeInput.varId = varId;
+    activeInput.editMode = true; // Marcar modo edición
+
+    // Abrir panel de configuración
+    openConfigPanel(comp.metadata.functionName, tempInput);
+
+    // Esperar a que el panel se renderice y cargar los parámetros
+    setTimeout(() => {
+        loadParamsIntoConfigPanel(comp.metadata, varId);
+    }, 300);
+}
+
+// ✨ NUEVA FUNCIÓN: Cargar parámetros guardados en el panel de configuración para editar
+function loadParamsIntoConfigPanel(metadata, varId) {
+    console.log('📥 Cargando parámetros para editar:', metadata);
+
+    if (!metadata.params || metadata.params.length === 0) {
+        console.log('   No hay parámetros guardados');
+        return;
+    }
+
+    const body = document.getElementById('configPanelBody' + varId);
+    if (!body) return;
+
+    const miniBuilders = body.querySelectorAll('.mini-expression-builder');
+
+    console.log('   Mini-builders encontrados:', miniBuilders.length);
+    console.log('   Parámetros a cargar:', metadata.params);
+
+    // Cargar cada parámetro en su mini-builder correspondiente
+    metadata.params.forEach((paramExpression, index) => {
+        if (index >= miniBuilders.length) return;
+
+        const builder = miniBuilders[index];
+        const builderId = builder.id;
+
+        console.log(`   Cargando en builder ${index} (${builderId}):`, paramExpression);
+
+        // Parsear la expresión del parámetro y recrear los componentes
+        const components = parseExpressionToComponents(paramExpression);
+
+        if (components.length > 0) {
+            miniBuilderComponents[builderId] = components;
+            renderMiniBuilder(builderId);
+            console.log('      ✅ Componentes cargados:', components);
+
+            // ✨ NUEVO: Recrear niveles anidados en el navigationStack para funciones anidadas
+            components.forEach(comp => {
+                if (comp.type === 'function' && comp.configured && comp.params) {
+                    console.log('      🔄 Recreando nivel anidado para:', comp.value);
+                    recreateNestedLevel(comp.value, builderId, comp.functionId, comp.params, varId);
+                }
+            });
+        }
+    });
+
+    // Actualizar vista previa
+    setTimeout(() => {
+        updateCurrentLevelPreview();
+    }, 100);
+}
+
+// ✨ NUEVA FUNCIÓN: Recrear nivel anidado en el navigationStack
+function recreateNestedLevel(functionName, parentBuilderId, functionId, params, varId) {
+    console.log('      📦 Recreando nivel:', functionName, 'con params:', params);
+
+    // Verificar si ya existe este nivel en el stack
+    const existingLevel = navigationStack.levels.find(
+        level => level.functionId === functionId && level.parentBuilderId === parentBuilderId
+    );
+
+    if (existingLevel) {
+        console.log('      ℹ️ Nivel ya existe, saltando recreación');
+        return;
+    }
+
+    // Crear nuevo nivel
+    const newLevel = createConfigLevel(functionName, parentBuilderId, functionId, varId);
+
+    // Parsear los parámetros y crear mini-builders para este nivel
+    params.forEach((paramExpression, paramIndex) => {
+        const paramBuilderId = `miniBuilder_level${navigationStack.levels.length}_param${paramIndex + 1}`;
+
+        console.log(`         Creando builder ${paramBuilderId} con expresión:`, paramExpression);
+
+        // Parsear componentes del parámetro
+        const paramComponents = parseExpressionToComponents(paramExpression);
+
+        if (paramComponents.length > 0) {
+            // Guardar componentes en el estado del nivel
+            newLevel.miniBuilderStates[paramBuilderId] = paramComponents;
+
+            // Recursivamente recrear sub-niveles si hay funciones anidadas
+            paramComponents.forEach(comp => {
+                if (comp.type === 'function' && comp.configured && comp.params) {
+                    console.log(`         🔄 Función anidada encontrada: ${comp.value}`);
+                    // Agregar el nivel actual primero antes de recursar
+                    const tempLevelIndex = navigationStack.levels.length;
+                    navigationStack.levels.push(newLevel);
+                    recreateNestedLevel(comp.value, paramBuilderId, comp.functionId, comp.params, varId);
+                    // El nivel ya fue agregado, no lo agregamos de nuevo
+                    return;
+                }
+            });
+        }
+    });
+
+    // Agregar el nivel al stack si aún no está
+    if (!navigationStack.levels.find(l => l.functionId === functionId)) {
+        navigationStack.levels.push(newLevel);
+        console.log('      ✅ Nivel recreado y agregado al stack');
+    }
+}
+
+// ✨ NUEVA FUNCIÓN: Parsear parámetros respetando funciones anidadas
+function parseNestedParams(paramsStr) {
+    if (!paramsStr || paramsStr.trim() === '') {
+        return [];
+    }
+
+    const params = [];
+    let current = '';
+    let depth = 0; // Nivel de anidación de #...#
+
+    for (let i = 0; i < paramsStr.length; i++) {
+        const char = paramsStr[i];
+
+        if (char === '#') {
+            // Alternar depth cuando encontramos #
+            if (i > 0 && paramsStr[i - 1] !== '\\') { // No contar \# escapado
+                depth = depth === 0 ? 1 : 0;
+            }
+            current += char;
+        } else if (char === ',' && depth === 0) {
+            // Solo dividir por coma si no estamos dentro de una función (#...#)
+            if (current.trim() !== '') {
+                params.push(current.trim());
+            }
+            current = '';
+        } else {
+            current += char;
+        }
+    }
+
+    // Agregar el último parámetro
+    if (current.trim() !== '') {
+        params.push(current.trim());
+    }
+
+    return params;
+}
+
+// ✨ NUEVA FUNCIÓN: Parsear expresión de texto a componentes
+function parseExpressionToComponents(expression) {
+    const components = [];
+
+    if (!expression || expression.trim() === '') {
+        return components;
+    }
+
+    console.log('      Parseando expresión:', expression);
+
+    // Regex para detectar campos [nombre], funciones #Nombre(...)#, operadores y valores
+    const tokens = expression.match(/\[([^\]]+)\]|#([^(]+)\(([^)]*)\)#|(\bAND\b|\bOR\b|[+\-*/=<>!]+)|([^[\]#\s]+)/g);
+
+    if (!tokens) return components;
+
+    tokens.forEach((token, idx) => {
+        // Campo: [nombre]
+        if (token.startsWith('[') && token.endsWith(']')) {
+            const fieldName = token.slice(1, -1);
+            components.push({
+                type: 'field',
+                value: fieldName,
+                html: `<i class="fas fa-database expr-icon"></i><span class="expr-value">${fieldName}</span>`
+            });
+        }
+        // Función anidada: #Nombre(params)#
+        else if (token.startsWith('#') && token.endsWith('#')) {
+            // Parsear función manualmente para soportar paréntesis anidados
+            const funcNameMatch = token.match(/#([^(]+)\(/);
+            if (funcNameMatch) {
+                const funcName = funcNameMatch[1];
+
+                // Extraer parámetros manejando paréntesis anidados
+                const startIdx = token.indexOf('(') + 1;
+                const endIdx = token.lastIndexOf(')');
+                const paramsStr = token.substring(startIdx, endIdx);
+
+                // Parsear parámetros dividiendo por comas, pero respetando funciones anidadas
+                const funcParams = parseNestedParams(paramsStr);
+
+                const functionId = 'func_' + Date.now() + '_' + idx;
+
+                components.push({
+                    type: 'function',
+                    value: funcName,
+                    functionId: functionId,
+                    configured: true,
+                    fullExpression: token,
+                    params: funcParams,
+                    html: `<i class="fas fa-magic expr-icon"></i><span class="expr-value">${token}</span>`
+                });
+            }
+        }
+        // Operadores
+        else if (/^(AND|OR|[+\-*/=<>!]+)$/i.test(token.trim())) {
+            components.push({
+                type: 'operator',
+                value: token.trim(),
+                html: `<span class="expr-operator">${token.trim()}</span>`
+            });
+        }
+        // Valores simples
+        else if (token.trim() !== '' && token.trim() !== ',') {
+            components.push({
+                type: 'value',
+                value: token.trim(),
+                html: `<i class="fas fa-hashtag expr-icon"></i><span class="expr-value">${token.trim()}</span>`
+            });
+        }
+    });
+
+    return components;
 }
 
 // Cargar bloques guardados en el modal para edición
@@ -1368,12 +1703,14 @@ function agregarVariable() {
                                 </div>
 
                                 <!-- ✅ NUEVO: Vista previa global de la expresión completa -->
-                                <div style="background: var(--gray-900); border-radius: 8px; padding: 16px; margin: 16px; display: none;" id="globalPreview${variablesCounter}Container">
-                                    <div style="font-size: 11px; font-weight: 600; color: var(--gray-400); margin-bottom: 8px; display: flex; align-items: center; gap: 6px;">
-                                        <i class="fas fa-eye"></i>
+                                <div style="background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); border-radius: 12px; padding: 20px; margin: 16px; box-shadow: 0 4px 6px rgba(0,0,0,0.3); border: 2px solid #334155;" id="globalPreview${variablesCounter}Container">
+                                    <div style="font-size: 12px; font-weight: 700; color: #94a3b8; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; text-transform: uppercase; letter-spacing: 1px;">
+                                        <i class="fas fa-eye" style="color: #10b981; font-size: 16px;"></i>
                                         VISTA PREVIA COMPLETA
                                     </div>
-                                    <div id="globalPreview${variablesCounter}" style="font-family: 'Courier New', monospace; font-size: 13px; color: #a6e22e; word-break: break-word; line-height: 1.6;"></div>
+                                    <div id="globalPreview${variablesCounter}" style="font-family: 'Courier New', Consolas, Monaco, monospace; font-size: 14px; color: #10b981; word-break: break-all; line-height: 1.8; padding: 12px; background: rgba(16, 185, 129, 0.1); border-radius: 6px; border-left: 4px solid #10b981; min-height: 40px;">
+                                        <span style="color: #64748b; font-style: italic;">Esperando parámetros...</span>
+                                    </div>
                                 </div>
 
                                 <!-- Footer -->
@@ -2758,6 +3095,14 @@ function closeConfigPanel(varId) {
 
     currentConfigVarId = null;
     currentFunction = null;
+
+    // ✨ NUEVO: Limpiar modo edición si está activo
+    if (activeInput && activeInput.editMode) {
+        delete activeInput.editMode;
+    }
+    if (window.editingComponent) {
+        delete window.editingComponent;
+    }
 }
 function addBackButtonToPanel(varId) {
     const header = document.querySelector(`#configPanel${varId} .config-panel-header`);
@@ -2810,11 +3155,145 @@ function addBackButtonToPanel(varId) {
     };
 }
 
+// ✨ NUEVA FUNCIÓN: Guardar toda la estructura con niveles anidados de una vez
+function acceptAllNestedLevels(varId) {
+    console.log('🔄 Procesando todos los niveles anidados...');
+
+    // Guardar el estado actual del nivel raíz
+    saveCurrentLevelState();
+
+    // Procesar todos los niveles desde el más profundo hacia arriba
+    // Comenzar desde el nivel más alto (más anidado) hacia el nivel 0
+    for (let levelIndex = navigationStack.levels.length - 1; levelIndex > 0; levelIndex--) {
+        const currentLevel = navigationStack.levels[levelIndex];
+        const parentLevel = navigationStack.levels[levelIndex - 1];
+
+        console.log(`   Procesando nivel ${levelIndex}: ${currentLevel.functionName}`);
+
+        // Construir expresión completa del nivel actual
+        const levelExpression = buildLevelExpression(currentLevel);
+        console.log(`      Expresión: ${levelExpression}`);
+
+        // Actualizar el componente de función en el nivel padre
+        if (currentLevel.parentBuilderId && currentLevel.functionId) {
+            const parentComponents = miniBuilderComponents[currentLevel.parentBuilderId];
+
+            if (!parentComponents) {
+                // Si no existe en memoria, restaurar desde el estado guardado
+                if (parentLevel.miniBuilderStates[currentLevel.parentBuilderId]) {
+                    miniBuilderComponents[currentLevel.parentBuilderId] = JSON.parse(
+                        JSON.stringify(parentLevel.miniBuilderStates[currentLevel.parentBuilderId])
+                    );
+                }
+            }
+
+            const parentComponents2 = miniBuilderComponents[currentLevel.parentBuilderId];
+            if (parentComponents2) {
+                const functionComp = parentComponents2.find(c => c.functionId === currentLevel.functionId);
+                if (functionComp) {
+                    functionComp.fullExpression = levelExpression;
+                    functionComp.configured = true;
+
+                    // Actualizar HTML
+                    const shortPreview = levelExpression.length > 40 ?
+                        levelExpression.substring(0, 37) + '...' :
+                        levelExpression;
+                    functionComp.html = `<i class="fas fa-magic expr-icon"></i><span class="expr-value">${shortPreview}</span>`;
+
+                    console.log(`      ✅ Componente actualizado en nivel ${levelIndex - 1}`);
+
+                    // Actualizar estado guardado del padre
+                    parentLevel.miniBuilderStates[currentLevel.parentBuilderId] = JSON.parse(
+                        JSON.stringify(miniBuilderComponents[currentLevel.parentBuilderId])
+                    );
+                }
+            }
+        }
+    }
+
+    // Ahora construir la expresión final del nivel raíz
+    const rootLevel = navigationStack.levels[0];
+    console.log('   📦 Construyendo expresión final del nivel raíz:', rootLevel.functionName);
+
+    let params = [];
+    for (let builderId in rootLevel.miniBuilderStates) {
+        const components = rootLevel.miniBuilderStates[builderId];
+        if (components && components.length > 0) {
+            const expression = buildComponentsExpression(components);
+            params.push(expression);
+        }
+    }
+
+    const paramsText = params.filter(p => p.trim() !== '').join(',');
+    const functionText = `#${rootLevel.functionName}(${paramsText})#`;
+
+    console.log('   ✅ Expresión completa final:', functionText);
+
+    // Preparar metadata y HTML
+    let displayPreview = functionText;
+    if (functionText.length > 60) {
+        displayPreview = functionText.substring(0, 50) + '...' + functionText.substring(functionText.length - 7);
+    }
+
+    const displayHtml = `<i class="fas fa-magic expr-icon"></i><span class="expr-value">${displayPreview}</span>`;
+
+    const metadata = {
+        functionName: rootLevel.functionName,
+        params: params,
+        fullExpression: functionText
+    };
+
+    // Verificar si estamos en modo edición
+    if (activeInput && activeInput.editMode && window.editingComponent) {
+        console.log('✏️ Actualizando función editada con toda la estructura');
+
+        initExpressionComponents(window.editingComponent.varId);
+        const comp = expressionComponents[window.editingComponent.varId].find(
+            c => c.id === window.editingComponent.compId
+        );
+
+        if (comp) {
+            comp.value = functionText;
+            comp.html = displayHtml;
+            comp.metadata = metadata;
+            renderExpression(window.editingComponent.varId);
+            updateExpressionPreview(window.editingComponent.varId);
+        }
+
+        delete window.editingComponent;
+        delete activeInput.editMode;
+    } else {
+        // Agregar nuevo componente
+        console.log('✅ Agregando función completa al expression builder');
+        addExprComponent(varId, 'function', functionText, displayHtml, metadata);
+    }
+
+    // Limpiar todos los mini-builders
+    navigationStack.levels.forEach(level => {
+        Object.keys(level.miniBuilderStates).forEach(builderId => {
+            delete miniBuilderComponents[builderId];
+        });
+    });
+
+    // Limpiar stack
+    navigationStack.levels = [];
+    navigationStack.currentLevel = -1;
+
+    closeConfigPanel(varId);
+}
+
 // ✨ MEJORADA: Aceptar configuración (puede ser raíz o anidada)
 // ✨ MEJORADA: Aceptar configuración con navegación
 function acceptFunctionConfig(varId) {
     const targetVarId = varId || currentConfigVarId;
     if (!targetVarId) return;
+
+    // ✨ NUEVO: Si estamos en nivel raíz (0) y hay niveles anidados, guardar todo de una vez
+    if (navigationStack.currentLevel === 0 && navigationStack.levels.length > 1) {
+        console.log('💾 Guardando toda la estructura con niveles anidados');
+        acceptAllNestedLevels(targetVarId);
+        return;
+    }
 
     const body = document.getElementById('configPanelBody' + targetVarId);
     if (!body) return;
@@ -2881,21 +3360,14 @@ function acceptFunctionConfig(varId) {
             }
         }
 
-        // Limpiar mini-builders del nivel actual
-        miniBuilders.forEach(builder => {
-            delete miniBuilderComponents[builder.id];
-        });
+        // ✨ NUEVO: NO eliminar el nivel del stack, solo navegar de vuelta al padre
+        // Esto permite que cuando vuelvas a abrir esta función, recupere sus parámetros
 
-        // Eliminar nivel actual del stack
-        navigationStack.levels.pop();
-        navigationStack.currentLevel--;
+        // Guardar el estado actual antes de navegar
+        saveCurrentLevelState();
 
-        // Navegar al nivel anterior
-        const previousLevel = navigationStack.levels[navigationStack.currentLevel];
-        currentFunction = previousLevel.functionName;
-
-        // Renderizar nivel anterior
-        renderCurrentConfigLevel();
+        // Navegar al nivel padre usando navigateToLevel en lugar de eliminar el nivel
+        navigateToLevel(navigationStack.currentLevel - 1);
 
         // Renderizar el mini-builder padre para reflejar cambios
         setTimeout(() => {
@@ -2925,9 +3397,37 @@ function acceptFunctionConfig(varId) {
         fullExpression: functionText
     };
 
-    console.log('✅ Función raíz aceptada:', functionText);
+    // ✨ NUEVO: Verificar si estamos en modo edición
+    if (activeInput && activeInput.editMode && window.editingComponent) {
+        console.log('✏️ Actualizando función editada:', functionText);
 
-    addExprComponent(targetVarId, 'function', functionText, displayHtml, metadata);
+        // Encontrar y actualizar el componente existente
+        initExpressionComponents(window.editingComponent.varId);
+        const comp = expressionComponents[window.editingComponent.varId].find(
+            c => c.id === window.editingComponent.compId
+        );
+
+        if (comp) {
+            // Actualizar el componente con los nuevos valores
+            comp.value = functionText;
+            comp.html = displayHtml;
+            comp.metadata = metadata;
+
+            console.log('   ✅ Componente actualizado:', comp);
+
+            // Re-renderizar expression builder
+            renderExpression(window.editingComponent.varId);
+            updateExpressionPreview(window.editingComponent.varId);
+        }
+
+        // Limpiar modo edición
+        delete window.editingComponent;
+        delete activeInput.editMode;
+    } else {
+        // Modo normal: agregar nuevo componente
+        console.log('✅ Función raíz aceptada:', functionText);
+        addExprComponent(targetVarId, 'function', functionText, displayHtml, metadata);
+    }
 
     // Limpiar mini-builders
     miniBuilders.forEach(builder => {
@@ -2941,6 +3441,32 @@ function acceptFunctionConfig(varId) {
     closeConfigPanel(targetVarId);
 }
 // ✨ NUEVA FUNCIÓN: Construir expresión a partir de componentes (con funciones anidadas)
+// ✨ NUEVA FUNCIÓN: Construir expresión completa de un nivel con todos sus parámetros
+function buildLevelExpression(level) {
+    console.log('🔨 Construyendo expresión para nivel:', level.functionName);
+
+    // Recopilar parámetros de todos los mini-builders del nivel
+    let params = [];
+
+    // Iterar por todos los mini-builders guardados en el nivel
+    for (let builderId in level.miniBuilderStates) {
+        const components = level.miniBuilderStates[builderId];
+        if (components && components.length > 0) {
+            const expression = buildComponentsExpression(components);
+            console.log('   Builder', builderId, '→', expression);
+            params.push(expression);
+        } else {
+            params.push('');
+        }
+    }
+
+    const paramsText = params.filter(p => p.trim() !== '').join(',');
+    const fullExpression = `#${level.functionName}(${paramsText})#`;
+
+    console.log('   📦 Expresión completa:', fullExpression);
+    return fullExpression;
+}
+
 function buildComponentsExpression(components) {
     return components.map(comp => {
         if (comp.type === 'field') return `[${comp.value}]`;
@@ -3011,8 +3537,8 @@ function renderMiniBuilder(builderId) {
         return badge;
     }).join('');
 
-    // Actualizar preview
-    updateMiniBuilderPreview(builderId);
+    // Actualizar vista previa global
+    updateCurrentLevelPreview();
 }
 
 // ✨ NUEVA FUNCIÓN: Editar/Configurar función anidada en mini-builder
@@ -3023,14 +3549,13 @@ function editNestedFunction(builderId, componentIndex) {
     const funcComponent = components[componentIndex];
     if (funcComponent.type !== 'function') return;
 
-    // Abrir configuración de esta función
-    openNestedFunctionConfig(funcComponent.value, builderId, funcComponent.functionId);
+    console.log('🔧 Editando función anidada:', funcComponent.value);
+    console.log('   Configurada:', funcComponent.configured);
+    console.log('   Parámetros guardados:', funcComponent.params);
 
-    // Si ya estaba configurada, pre-cargar sus parámetros
-    if (funcComponent.configured && funcComponent.params) {
-        // TODO: Implementar pre-carga de parámetros existentes
-        // Por ahora, permite reconfigurar desde cero
-    }
+    // ✅ Abrir configuración de esta función
+    // openNestedFunctionConfig ahora busca si el nivel ya existe y recupera sus parámetros automáticamente
+    openNestedFunctionConfig(funcComponent.value, builderId, funcComponent.functionId);
 }
 
 // ✅ ELIMINADO: Segunda función closeConfigPanel duplicada - Ya existe una versión en línea 2590
@@ -3095,9 +3620,6 @@ function generateMiniBuilder(paramId, label, placeholder = "Arrastra campos, ope
                     <i class="fas fa-hand-pointer" style="margin-right: 6px;"></i>
                     ${placeholder}
                 </div>
-            </div>
-            <div class="mini-preview" id="${builderId}_preview" style="margin-top: 8px; padding: 8px 12px; background: #1e293b; color: #10b981; font-family: 'Courier New', monospace; font-size: 12px; border-radius: 6px; display: none;">
-                <strong style="color: #64748b;">VISTA PREVIA:</strong> <span class="preview-text"></span>
             </div>
         </div>
     `;
@@ -3274,61 +3796,10 @@ function generateFunctionForm(functionName) {
             break;
     }
 
-    // ✅ CORREGIDO: No agregar vista previa para "Calcular edad" porque ya tiene una personalizada
-    if (functionName !== 'Calcular edad') {
-        html += `
-            <div style="background: var(--gray-900); border-radius: 8px; padding: 16px; margin-top: 24px;">
-                <div style="font-size: 11px; font-weight: 600; color: var(--gray-400); margin-bottom: 8px;">VISTA PREVIA</div>
-                <div id="modalPreviewCode" style="font-family: 'Courier New', monospace; font-size: 13px; color: #a6e22e;">#${functionName}()#</div>
-            </div>
-        `;
-    }
-
     return html;
 }
 
-    // Actualizar preview del modal
-    function updateModalPreview() {
-        const previewEl = document.getElementById('modalPreviewCode');
-        if (!previewEl || !currentFunction) return;
-
-        const params = [];
-        let i = 1;
-        let param;
-
-        while (param = document.getElementById('param' + i)) {
-            let value = param.value.trim();
-            if (param.tagName === 'SELECT' && value) {
-                value = '[' + value + ']';
-            }
-            params.push(value || '');
-            i++;
-        }
-
-        let preview = '';
-        switch (currentFunction) {
-            case 'Calcular edad':
-                // param1 = campo (field)
-                // param2 = operador (select)
-                // param3 = valor (text)
-                // param4 = formato (select)
-                const campo = params[0] || '[]';
-                const operador = params[1] ? '[' + params[1] + ']' : '[]';
-                const valor = params[2] ? '[' + params[2] + ']' : '[]';
-                const formato = params[3] || '[YYYY]';
-                preview = `#CalculaEdad(${campo},${operador},${valor},${formato})#`;
-                break;
-            case 'Si entonces':
-                preview = `#SiEntonces(${params[0] || 'condicion'}, ${params[1] || 'valorVerdadero'}, ${params[2] || 'valorFalso'})#`;
-                break;
-            default:
-                preview = `#${currentFunction}(${params[0] || '[]'})#`;
-        }
-
-        previewEl.textContent = preview;
-    }
-
-    // Insertar función desde el modal
+// Insertar función desde el modal
     function insertFunctionFromModal() {
         const preview = document.getElementById('modalPreviewCode').textContent;
 

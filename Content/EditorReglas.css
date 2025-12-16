@@ -455,3 +455,255 @@ body {
     .field-list::-webkit-scrollbar-thumb:hover {
         background: var(--gray-400);
     }
+.component-palette-items .btn-function-menu {
+    padding: 6px 10px; /* Mismo padding que otros botones */
+    font-size: 12px; /* Mismo tamaño de fuente */
+    background: #eff6ff; /* Fondo azul claro (tipo function) */
+    border-color: #3b82f6; /* Borde azul */
+    color: #1e40af; /* Texto azul oscuro */
+}
+
+    .component-palette-items .btn-function-menu:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+/* Breadcrumb para funciones anidadas */
+.config-panel-breadcrumb {
+    display: flex;
+    align-items: center;
+    padding: 12px 16px;
+    background: linear-gradient(to right, var(--gray-50), white);
+    border-bottom: 2px solid var(--gray-200);
+    font-size: 12px;
+    overflow-x: auto;
+    gap: 4px;
+}
+.breadcrumb-nav-item {
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.breadcrumb-item {
+    color: var(--gray-600);
+    font-weight: 500;
+    white-space: nowrap;
+    transition: all 0.2s;
+}
+.breadcrumb-nav-item:not(:disabled):active {
+    transform: scale(0.95);
+}
+/* Animación de transición entre niveles */
+.config-panel-body {
+    position: relative;
+}
+
+@keyframes slideInRight {
+    from {
+        opacity: 0;
+        transform: translateX(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes slideInLeft {
+    from {
+        opacity: 0;
+        transform: translateX(-20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.config-panel-body > * {
+    animation: slideInRight 0.3s ease;
+}
+    .breadcrumb-item:not(.active):hover {
+        color: var(--primary);
+    }
+
+    .breadcrumb-item.active {
+        color: var(--primary);
+        font-weight: 600;
+    }
+
+/* Indicador de función configurada/sin configurar */
+.expr-component[data-type="function"] .fa-check-circle {
+    color: var(--success);
+}
+
+.expr-component[data-type="function"] .fa-cog {
+    color: var(--warning);
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.5;
+    }
+}
+
+/* Botón de eliminar parámetro */
+.btn-remove-param {
+    background: var(--danger) !important;
+    color: white !important;
+    border: none !important;
+    border-radius: 6px !important;
+    padding: 4px 8px !important;
+    margin-left: 8px !important;
+    cursor: pointer !important;
+    font-size: 11px !important;
+    transition: all 0.2s !important;
+    vertical-align: middle !important;
+}
+    .btn-remove-param:hover {
+        background: #dc2626 !important;
+        transform: scale(1.05) !important;
+        box-shadow: 0 2px 4px rgba(220, 38, 38, 0.3) !important;
+    }
+    .btn-remove-param:active {
+        transform: scale(0.95) !important;
+    }
+
+/* Animación para parámetros que se agregan */
+.mini-builder-container {
+    transition: all 0.3s ease;
+    overflow: hidden;
+}
+
+    /* Label con asterisco requerido */
+    .mini-builder-container label {
+        display: flex;
+        align-items: center;
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--gray-700);
+        margin-bottom: 8px;
+    }
+
+        .mini-builder-container label .text-danger {
+            color: var(--danger);
+            margin-left: 4px;
+        }
+
+
+
+/* Estilo para mini-expression-builder en estado drag-over */
+.mini-expression-builder {
+    min-height: 60px;
+    padding: 12px;
+    border: 2px dashed var(--gray-300);
+    border-radius: 8px;
+    background: var(--gray-50);
+    transition: all 0.2s;
+    position: relative;
+}
+
+    .mini-expression-builder.drag-over {
+        border-color: var(--primary);
+        background: var(--primary-light);
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+
+    .mini-expression-builder .empty {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 60px;
+        font-size: 13px;
+        color: var(--gray-500);
+        text-align: center;
+        pointer-events: none;
+    } 
+
+    .mini-expression-builder.drag-over .empty {
+        color: var(--primary);
+        font-weight: 600;
+    }
+
+    /* Componentes dentro del mini-builder */
+    .mini-expression-builder .expression-components {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        align-items: center;
+    }
+
+    .mini-expression-builder .expr-component {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 10px;
+        background: white;
+        border: 2px solid var(--gray-300);
+        border-radius: 6px;
+        font-size: 13px;
+        font-weight: 500;
+        transition: all 0.2s;
+    }
+
+        .mini-expression-builder .expr-component:hover {
+            border-color: var(--primary);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+    .mini-expression-builder .expr-icon {
+        font-size: 12px;
+        color: var(--primary);
+    }
+
+    .mini-expression-builder .expr-value {
+        color: var(--gray-700);
+    }
+
+    /* Función sin configurar */
+    .mini-expression-builder .expr-component[data-type="function"] {
+        border-color: var(--warning);
+        background: #fef3c7;
+    }
+
+        .mini-expression-builder .expr-component[data-type="function"].configured {
+            border-color: var(--success);
+            background: #d1fae5;
+        }
+
+/* Preview del mini-builder */
+.mini-preview {
+    margin-top: 8px;
+    padding: 8px 12px;
+    background: #1e293b;
+    color: #10b981;
+    font-family: 'Courier New', monospace;
+    font-size: 12px;
+    border-radius: 6px;
+    transition: all 0.3s;
+    opacity: 0;
+    max-height: 0;
+    overflow: hidden;
+}
+
+    .mini-preview.active {
+        opacity: 1;
+        max-height: 100px;
+        display: block !important;
+    }
+
+    .mini-preview strong {
+        color: #64748b;
+    }
+
+    .mini-preview .preview-text {
+        color: #10b981;
+        word-break: break-word;
+    }
