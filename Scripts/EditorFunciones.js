@@ -411,9 +411,154 @@ function renderCurrentConfigLevel() {
     // ✅ NUEVO: Actualizar vista previa global después de renderizar
     setTimeout(() => {
         updateCurrentLevelPreview();
+
+        // ✨ NUEVO: Actualizar breadcrumbs individuales para "Si entonces"
+        if (currentLevel.functionName === 'Si entonces') {
+            console.log('🥖 Actualizando breadcrumbs individuales para Si entonces');
+            const levelIndex = navigationStack.currentLevel;
+
+            // Actualizar breadcrumb para cada mini-builder del nivel
+            for (let paramNum = 1; paramNum <= 3; paramNum++) {
+                const builderId = `miniBuilder_level${levelIndex}_param${paramNum}`;
+                updateMiniBreadcrumb(builderId);
+            }
+        }
     }, 100);
 }
+// ✨ NUEVA FUNCIÓN: Obtener nombre legible del parámetro según la función y builderId
+function getParameterLabel(parentBuilderId, parentFunctionName) {
+    if (!parentBuilderId) return null;
+
+    // Extraer número de parámetro del builderId: miniBuilder_level0_param1 → param1
+    const paramMatch = parentBuilderId.match(/param(\d+)$/);
+    if (!paramMatch) return null;
+
+    const paramNum = parseInt(paramMatch[1]);
+
+    // Mapear según la función padre
+    const paramLabels = {
+        'Si entonces': {
+            1: 'Condición',
+            2: 'Valor si es Verdadero',
+            3: 'Valor si es Falso'
+        },
+        'Conteo': { 1: 'Campo o Expresión' },
+        'Máximo': { 1: 'Campo o Expresión' },
+        'Mínimo': { 1: 'Campo o Expresión' },
+        'Suma': { 1: 'Campo o Expresión' },
+        'Promedio': { 1: 'Campo o Expresión' },
+        'Conteo caracteres': { 1: 'Texto' },
+        'Expresión regular': { 1: 'Texto', 2: 'Patrón' },
+        'Cualquier fecha': { 1: 'Fecha', 2: 'Formato Entrada', 3: 'Formato Salida' }
+    };
+
+    const labels = paramLabels[parentFunctionName];
+    return labels ? labels[paramNum] : `Parámetro ${paramNum}`;
+}
+
+// ✨ NUEVA FUNCIÓN: Actualizar breadcrumb específico de un mini-builder
+// Filtra los niveles de navegación para mostrar solo los relevantes a ese mini-builder
+function updateMiniBreadcrumb(builderId) {
+    const breadcrumb = document.getElementById('breadcrumb_' + builderId);
+    if (!breadcrumb) return;
+
+    console.log('🥖 Actualizando breadcrumb para:', builderId);
+
+    // Filtrar niveles que pertenecen a la cadena de este mini-builder
+    const relevantLevels = [];
+
+    // Encontrar el nivel que contiene este mini-builder
+    for (let i = 0; i < navigationStack.levels.length; i++) {
+        const level = navigationStack.levels[i];
+
+        // Verificar si este nivel tiene este builderId en sus miniBuilderStates
+        if (level.miniBuilderStates && level.miniBuilderStates[builderId]) {
+            // Encontrado - ahora reconstruir la cadena desde el inicio
+            let chainLevel = i;
+            while (chainLevel >= 0) {
+                relevantLevels.unshift(navigationStack.levels[chainLevel]);
+
+                // Buscar el nivel padre
+                const currentLevel = navigationStack.levels[chainLevel];
+                if (!currentLevel.parentBuilderId) {
+                    break; // Llegamos al nivel raíz
+                }
+
+                // Buscar el nivel que contiene el parentBuilderId
+                let found = false;
+                for (let j = chainLevel - 1; j >= 0; j--) {
+                    if (navigationStack.levels[j].miniBuilderStates &&
+                        navigationStack.levels[j].miniBuilderStates[currentLevel.parentBuilderId]) {
+                        chainLevel = j;
+                        found = true;
+                        break;
+                    }
+                }
+
+                if (!found) break;
+            }
+            break;
+        }
+    }
+
+    console.log('   Niveles relevantes encontrados:', relevantLevels.length);
+
+    // Si no hay niveles anidados, ocultar breadcrumb
+    if (relevantLevels.length <= 1) {
+        breadcrumb.style.display = 'none';
+        return;
+    }
+
+    // Generar HTML del breadcrumb
+    breadcrumb.style.display = 'flex';
+
+    let html = '<i class="fas fa-sitemap" style="color: var(--gray-400); margin-right: 4px; font-size: 11px;"></i>';
+
+    relevantLevels.forEach((level, index) => {
+        const isLast = (index === relevantLevels.length - 1);
+
+        // Encontrar el índice global de este nivel en navigationStack.levels
+        const globalIndex = navigationStack.levels.indexOf(level);
+
+        // Obtener etiqueta del parámetro si existe
+        let displayLabel = level.functionName;
+        if (level.parentBuilderId) {
+            const parentLevel = relevantLevels[index - 1];
+            if (parentLevel) {
+                const paramLabel = getParameterLabel(level.parentBuilderId, parentLevel.functionName);
+                if (paramLabel) {
+                    displayLabel = `${level.functionName} <span style="color: var(--gray-500); font-size: 10px;">(${paramLabel})</span>`;
+                }
+            }
+        }
+
+        html += `
+            <span style="
+                color: ${isLast ? 'var(--primary)' : 'var(--gray-600)'};
+                font-weight: ${isLast ? '600' : '500'};
+                font-size: 11px;
+                cursor: ${isLast ? 'default' : 'pointer'};
+                padding: 2px 6px;
+                border-radius: 4px;
+                background: ${isLast ? 'var(--primary-light)' : 'transparent'};
+                transition: all 0.2s;
+            " ${!isLast ? `onclick="navigateToLevel(${globalIndex})"` : ''}
+            ${!isLast ? `onmouseover="this.style.background='var(--gray-100)'"` : ''}
+            ${!isLast ? `onmouseout="this.style.background='transparent'"` : ''}>
+                ${displayLabel}
+            </span>
+        `;
+
+        if (!isLast) {
+            html += '<i class="fas fa-chevron-right" style="color: var(--gray-400); font-size: 9px;"></i>';
+        }
+    });
+
+    breadcrumb.innerHTML = html;
+}
+
 // ✨ NUEVA FUNCIÓN: Actualizar breadcrumb con navegación funcional
+// ✅ MEJORADO: Muestra contexto del parámetro para cada nivel
 function updateNavigationBreadcrumb(breadcrumb) {
     if (!breadcrumb) return;
 
@@ -433,10 +578,20 @@ function updateNavigationBreadcrumb(breadcrumb) {
         const isLast = index === navigationStack.currentLevel;
         const isCurrent = index === navigationStack.currentLevel;
 
+        // ✅ NUEVO: Obtener contexto del parámetro padre si existe
+        let displayLabel = level.functionName;
+        if (level.parentBuilderId && index > 0) {
+            const parentLevel = navigationStack.levels[index - 1];
+            const paramLabel = getParameterLabel(level.parentBuilderId, parentLevel.functionName);
+            if (paramLabel) {
+                displayLabel = `${level.functionName} <span style="color: ${isCurrent ? 'rgba(255,255,255,0.7)' : 'var(--gray-500)'}; font-size: 10px;">(${paramLabel})</span>`;
+            }
+        }
+
         // Botón navegable
         html += `
             <button type="button"
-                    class="breadcrumb-nav-item ${isCurrent ? 'active' : ''}" 
+                    class="breadcrumb-nav-item ${isCurrent ? 'active' : ''}"
                     onclick="navigateToLevel(${index})"
                     style="
                         background: ${isCurrent ? 'var(--primary)' : 'var(--gray-100)'};
@@ -466,7 +621,7 @@ function updateNavigationBreadcrumb(breadcrumb) {
                     font-size: 10px;
                     font-weight: 700;
                 ">${index + 1}</span>
-                ${level.functionName}
+                ${displayLabel}
             </button>
         `;
 
@@ -516,15 +671,22 @@ function navigateToLevel(targetLevel) {
 
                     // ✨ CRÍTICO: También actualizar el estado guardado del nivel padre
                     const parentLevel = navigationStack.levels[targetLevel];
-                    if (parentLevel && parentLevel.miniBuilderStates[childLevel.parentBuilderId]) {
-                        const savedComponents = parentLevel.miniBuilderStates[childLevel.parentBuilderId];
-                        const savedFunctionComp = savedComponents.find(c => c.functionId === childLevel.functionId);
-                        if (savedFunctionComp) {
-                            savedFunctionComp.fullExpression = childExpression;
-                            savedFunctionComp.configured = true;
-                            savedFunctionComp.html = functionComp.html;
-                            console.log('   ✅ Estado guardado del padre también actualizado');
+                    if (parentLevel) {
+                        // Actualizar miniBuilderStates
+                        if (parentLevel.miniBuilderStates[childLevel.parentBuilderId]) {
+                            const savedComponents = parentLevel.miniBuilderStates[childLevel.parentBuilderId];
+                            const savedFunctionComp = savedComponents.find(c => c.functionId === childLevel.functionId);
+                            if (savedFunctionComp) {
+                                savedFunctionComp.fullExpression = childExpression;
+                                savedFunctionComp.configured = true;
+                                savedFunctionComp.html = functionComp.html;
+                                console.log('   ✅ Estado guardado del padre también actualizado');
+                            }
                         }
+
+                        // ✅ NUEVO: Invalidar savedHTML para forzar re-generación con componentes actualizados
+                        console.log('   🔄 Invalidando savedHTML del nivel padre para re-generar DOM');
+                        parentLevel.savedHTML = null;
                     }
                 }
             }
@@ -554,18 +716,22 @@ function saveCurrentLevelState() {
         // Guardar HTML completo
         currentLevel.savedHTML = body.innerHTML;
 
-        // Guardar estados de mini-builders
+        // ✅ CORREGIDO: Guardar solo los builders que pertenecen a este nivel
+        // Los builders tienen IDs como: miniBuilder_level0_param1, miniBuilder_level1_param1, etc.
+        const levelPrefix = `_level${navigationStack.currentLevel}_`;
         const miniBuilders = body.querySelectorAll('.mini-expression-builder');
+
         miniBuilders.forEach(builder => {
             const builderId = builder.id;
-            if (miniBuilderComponents[builderId]) {
+            // Solo guardar si el builder pertenece a este nivel
+            if (builderId.includes(levelPrefix) && miniBuilderComponents[builderId]) {
                 currentLevel.miniBuilderStates[builderId] = JSON.parse(
                     JSON.stringify(miniBuilderComponents[builderId])
                 );
             }
         });
 
-        console.log('💾 Estado guardado:', currentLevel.functionName, currentLevel.miniBuilderStates);
+        console.log('💾 Estado guardado:', currentLevel.functionName, 'nivel:', navigationStack.currentLevel, currentLevel.miniBuilderStates);
     }
 }
 
@@ -608,41 +774,7 @@ function showNestedConfigPanel(functionName, parentBuilderId, functionId) {
 }
 
 // ✅ ELIMINADO: updateConfigBreadcrumb() - Ya existe updateNavigationBreadcrumb() que usa navigationStack
-
-function renderMiniBuilder(builderId) {
-    const builder = document.getElementById(builderId);
-    if (!builder) return;
-
-    const components = miniBuilderComponents[builderId] || [];
-
-    // Ocultar empty si hay componentes
-    const emptyDiv = builder.querySelector('.empty');
-    if (emptyDiv) {
-        emptyDiv.style.display = components.length > 0 ? 'none' : 'flex';
-    }
-
-    // Crear o actualizar contenedor de componentes
-    let componentsContainer = builder.querySelector('.expression-components');
-    if (!componentsContainer) {
-        componentsContainer = document.createElement('div');
-        componentsContainer.className = 'expression-components';
-        builder.appendChild(componentsContainer);
-    }
-
-    // Renderizar badges
-    componentsContainer.innerHTML = components.map((comp, index) => `
-                <div class="expr-component" data-type="${comp.type}">
-                    ${comp.html}
-                    <button type="button" onclick="removeMiniBuilderComponent('${builderId}', ${index})" 
-                            style="background: none; border: none; color: var(--danger); cursor: pointer; padding: 0; margin-left: 4px;">
-                        <i class="fas fa-times"></i>
-                    </button>
-                </div>
-            `).join('');
-
-    // Actualizar vista previa global
-    updateCurrentLevelPreview();
-}
+// ✅ ELIMINADO: renderMiniBuilder() duplicado - La versión mejorada está en línea ~3876
 
 function removeMiniBuilderComponent(builderId, index) {
     if (!miniBuilderComponents[builderId]) return;
@@ -1503,6 +1635,7 @@ function loadParamsIntoConfigPanel(metadata, varId) {
 }
 
 // ✨ NUEVA FUNCIÓN: Recrear nivel anidado en el navigationStack
+// ✅ CORREGIDO: Calcular levelIndex correctamente antes de usarlo
 function recreateNestedLevel(functionName, parentBuilderId, functionId, params, varId) {
     console.log('      📦 Recreando nivel:', functionName, 'con params:', params);
 
@@ -1516,12 +1649,17 @@ function recreateNestedLevel(functionName, parentBuilderId, functionId, params, 
         return;
     }
 
+    // ✅ CRÍTICO: Calcular el índice del nivel ANTES de agregarlo
+    const levelIndex = navigationStack.levels.length;
+    console.log(`      📍 Nivel será el índice: ${levelIndex}`);
+
     // Crear nuevo nivel
     const newLevel = createConfigLevel(functionName, parentBuilderId, functionId, varId);
 
     // Parsear los parámetros y crear mini-builders para este nivel
     params.forEach((paramExpression, paramIndex) => {
-        const paramBuilderId = `miniBuilder_level${navigationStack.levels.length}_param${paramIndex + 1}`;
+        // ✅ CORREGIDO: Usar levelIndex fijo en lugar de navigationStack.levels.length dinámico
+        const paramBuilderId = `miniBuilder_level${levelIndex}_param${paramIndex + 1}`;
 
         console.log(`         Creando builder ${paramBuilderId} con expresión:`, paramExpression);
 
@@ -1531,13 +1669,13 @@ function recreateNestedLevel(functionName, parentBuilderId, functionId, params, 
         if (paramComponents.length > 0) {
             // Guardar componentes en el estado del nivel
             newLevel.miniBuilderStates[paramBuilderId] = paramComponents;
+            console.log(`         💾 Guardados ${paramComponents.length} componentes en ${paramBuilderId}`);
 
             // Recursivamente recrear sub-niveles si hay funciones anidadas
             paramComponents.forEach(comp => {
                 if (comp.type === 'function' && comp.configured && comp.params) {
                     console.log(`         🔄 Función anidada encontrada: ${comp.value}`);
                     // Agregar el nivel actual primero antes de recursar
-                    const tempLevelIndex = navigationStack.levels.length;
                     navigationStack.levels.push(newLevel);
                     recreateNestedLevel(comp.value, paramBuilderId, comp.functionId, comp.params, varId);
                     // El nivel ya fue agregado, no lo agregamos de nuevo
@@ -1593,6 +1731,7 @@ function parseNestedParams(paramsStr) {
 }
 
 // ✨ NUEVA FUNCIÓN: Parsear expresión de texto a componentes
+// ✅ CORREGIDO: Parser manual para manejar funciones anidadas correctamente
 function parseExpressionToComponents(expression) {
     const components = [];
 
@@ -1602,66 +1741,108 @@ function parseExpressionToComponents(expression) {
 
     console.log('      Parseando expresión:', expression);
 
-    // Regex para detectar campos [nombre], funciones #Nombre(...)#, operadores y valores
-    const tokens = expression.match(/\[([^\]]+)\]|#([^(]+)\(([^)]*)\)#|(\bAND\b|\bOR\b|[+\-*/=<>!]+)|([^[\]#\s]+)/g);
+    let i = 0;
+    while (i < expression.length) {
+        const char = expression[i];
 
-    if (!tokens) return components;
-
-    tokens.forEach((token, idx) => {
-        // Campo: [nombre]
-        if (token.startsWith('[') && token.endsWith(']')) {
-            const fieldName = token.slice(1, -1);
-            components.push({
-                type: 'field',
-                value: fieldName,
-                html: `<i class="fas fa-database expr-icon"></i><span class="expr-value">${fieldName}</span>`
-            });
+        // Saltar espacios
+        if (char === ' ') {
+            i++;
+            continue;
         }
-        // Función anidada: #Nombre(params)#
-        else if (token.startsWith('#') && token.endsWith('#')) {
-            // Parsear función manualmente para soportar paréntesis anidados
-            const funcNameMatch = token.match(/#([^(]+)\(/);
-            if (funcNameMatch) {
-                const funcName = funcNameMatch[1];
 
-                // Extraer parámetros manejando paréntesis anidados
-                const startIdx = token.indexOf('(') + 1;
-                const endIdx = token.lastIndexOf(')');
-                const paramsStr = token.substring(startIdx, endIdx);
-
-                // Parsear parámetros dividiendo por comas, pero respetando funciones anidadas
-                const funcParams = parseNestedParams(paramsStr);
-
-                const functionId = 'func_' + Date.now() + '_' + idx;
-
+        // Detectar campo: [nombre]
+        if (char === '[') {
+            const endIdx = expression.indexOf(']', i);
+            if (endIdx !== -1) {
+                const fieldName = expression.substring(i + 1, endIdx);
                 components.push({
-                    type: 'function',
-                    value: funcName,
-                    functionId: functionId,
-                    configured: true,
-                    fullExpression: token,
-                    params: funcParams,
-                    html: `<i class="fas fa-magic expr-icon"></i><span class="expr-value">${token}</span>`
+                    type: 'field',
+                    value: fieldName,
+                    html: `<i class="fas fa-database expr-icon"></i><span class="expr-value">${fieldName}</span>`
                 });
+                i = endIdx + 1;
+                continue;
             }
         }
-        // Operadores
-        else if (/^(AND|OR|[+\-*/=<>!]+)$/i.test(token.trim())) {
+
+        // Detectar función anidada: #Nombre(...)#
+        if (char === '#') {
+            // Buscar el # de cierre, contando paréntesis para manejar anidación
+            let depth = 0;
+            let inFunction = false;
+            let endIdx = i + 1;
+
+            for (let j = i + 1; j < expression.length; j++) {
+                if (expression[j] === '(') {
+                    depth++;
+                    inFunction = true;
+                } else if (expression[j] === ')') {
+                    depth--;
+                } else if (expression[j] === '#' && inFunction && depth === 0) {
+                    endIdx = j;
+                    break;
+                }
+            }
+
+            if (endIdx > i + 1) {
+                const token = expression.substring(i, endIdx + 1);
+                const funcNameMatch = token.match(/#([^(]+)\(/);
+                if (funcNameMatch) {
+                    const funcName = funcNameMatch[1];
+                    const startIdx = token.indexOf('(') + 1;
+                    const lastIdx = token.lastIndexOf(')');
+                    const paramsStr = token.substring(startIdx, lastIdx);
+                    const funcParams = parseNestedParams(paramsStr);
+                    const functionId = 'func_' + Date.now() + '_' + i;
+
+                    components.push({
+                        type: 'function',
+                        value: funcName,
+                        functionId: functionId,
+                        configured: true,
+                        fullExpression: token,
+                        params: funcParams,
+                        html: `<i class="fas fa-magic expr-icon"></i><span class="expr-value">${token}</span>`
+                    });
+                }
+                i = endIdx + 1;
+                continue;
+            }
+        }
+
+        // Detectar operadores
+        const remaining = expression.substring(i);
+        const operatorMatch = remaining.match(/^(AND|OR|>=|<=|!=|[+\-*/=<>!])/i);
+        if (operatorMatch) {
+            const operator = operatorMatch[1];
             components.push({
                 type: 'operator',
-                value: token.trim(),
-                html: `<span class="expr-operator">${token.trim()}</span>`
+                value: operator,
+                html: `<span class="expr-operator">${operator}</span>`
             });
+            i += operator.length;
+            continue;
         }
-        // Valores simples
-        else if (token.trim() !== '' && token.trim() !== ',') {
-            components.push({
-                type: 'value',
-                value: token.trim(),
-                html: `<i class="fas fa-hashtag expr-icon"></i><span class="expr-value">${token.trim()}</span>`
-            });
+
+        // Detectar valores simples (números, texto, etc.)
+        const valueMatch = remaining.match(/^([^\s\[\]#(),]+)/);
+        if (valueMatch) {
+            const value = valueMatch[1];
+            if (value !== ',') {  // Ignorar comas sueltas
+                components.push({
+                    type: 'value',
+                    value: value,
+                    html: `<i class="fas fa-hashtag expr-icon"></i><span class="expr-value">${value}</span>`
+                });
+            }
+            i += value.length;
+            continue;
         }
-    });
+
+        // Si no coincide con nada, avanzar un carácter
+        i++;
+    }
 
     return components;
 }
@@ -3500,6 +3681,18 @@ function acceptAllNestedLevels(varId) {
     // Guardar el estado actual del nivel raíz
     saveCurrentLevelState();
 
+    // ✅ NUEVO: Restaurar TODOS los mini-builders de TODOS los niveles desde sus estados guardados
+    // Esto asegura que todos los componentes estén en memoria antes de procesarlos
+    console.log('📥 Restaurando todos los mini-builders desde estados guardados...');
+    navigationStack.levels.forEach((level, idx) => {
+        console.log(`   Restaurando mini-builders del nivel ${idx}:`, Object.keys(level.miniBuilderStates));
+        Object.keys(level.miniBuilderStates).forEach(builderId => {
+            miniBuilderComponents[builderId] = JSON.parse(
+                JSON.stringify(level.miniBuilderStates[builderId])
+            );
+        });
+    });
+
     // Procesar todos los niveles desde el más profundo hacia arriba
     // Comenzar desde el nivel más alto (más anidado) hacia el nivel 0
     for (let levelIndex = navigationStack.levels.length - 1; levelIndex > 0; levelIndex--) {
@@ -3516,18 +3709,8 @@ function acceptAllNestedLevels(varId) {
         if (currentLevel.parentBuilderId && currentLevel.functionId) {
             const parentComponents = miniBuilderComponents[currentLevel.parentBuilderId];
 
-            if (!parentComponents) {
-                // Si no existe en memoria, restaurar desde el estado guardado
-                if (parentLevel.miniBuilderStates[currentLevel.parentBuilderId]) {
-                    miniBuilderComponents[currentLevel.parentBuilderId] = JSON.parse(
-                        JSON.stringify(parentLevel.miniBuilderStates[currentLevel.parentBuilderId])
-                    );
-                }
-            }
-
-            const parentComponents2 = miniBuilderComponents[currentLevel.parentBuilderId];
-            if (parentComponents2) {
-                const functionComp = parentComponents2.find(c => c.functionId === currentLevel.functionId);
+            if (parentComponents) {
+                const functionComp = parentComponents.find(c => c.functionId === currentLevel.functionId);
                 if (functionComp) {
                     functionComp.fullExpression = levelExpression;
                     functionComp.configured = true;
@@ -3538,13 +3721,21 @@ function acceptAllNestedLevels(varId) {
                         levelExpression;
                     functionComp.html = `<i class="fas fa-magic expr-icon"></i><span class="expr-value">${shortPreview}</span>`;
 
-                    console.log(`      ✅ Componente actualizado en nivel ${levelIndex - 1}`);
+                    console.log(`      ✅ Componente actualizado en nivel ${levelIndex - 1}:`, functionComp.value);
 
                     // Actualizar estado guardado del padre
                     parentLevel.miniBuilderStates[currentLevel.parentBuilderId] = JSON.parse(
                         JSON.stringify(miniBuilderComponents[currentLevel.parentBuilderId])
                     );
+
+                    // ✅ NUEVO: Renderizar el mini-builder padre para mostrar el cambio visualmente
+                    console.log(`      🎨 Re-renderizando mini-builder padre:`, currentLevel.parentBuilderId);
+                    renderMiniBuilder(currentLevel.parentBuilderId);
+                } else {
+                    console.warn(`      ⚠️ No se encontró componente con functionId:`, currentLevel.functionId);
                 }
+            } else {
+                console.warn(`      ⚠️ No se encontraron componentes para builder:`, currentLevel.parentBuilderId);
             }
         }
     }
@@ -3555,6 +3746,7 @@ function acceptAllNestedLevels(varId) {
 
     let functionText;
     let displayPreview;
+    let params = []; // ✅ CORREGIDO: Declarar params fuera del bloque para que esté disponible en metadata
 
     // Manejo especial para "Calcular edad"
     if (rootLevel.functionName === 'Calcular edad' && typeof droppedBlocks !== 'undefined') {
@@ -3565,7 +3757,6 @@ function acceptAllNestedLevels(varId) {
         console.log('   👁️ Vista previa:', displayPreview);
     } else {
         // Funciones normales con mini-builders
-        let params = [];
         for (let builderId in rootLevel.miniBuilderStates) {
             const components = rootLevel.miniBuilderStates[builderId];
             if (components && components.length > 0) {
@@ -3978,18 +4169,34 @@ function generateFieldOptions() {
 // Generar mini expression builder para parámetros de función
 let paramBuilderCounter = 0;
 
-function generateMiniBuilder(paramId, label, placeholder = "Arrastra campos, operadores o funciones") {
+function generateMiniBuilder(paramId, label, placeholder = "Arrastra campos, operadores o funciones", includeBreadcrumb = false) {
     // ✅ CORREGIDO: ID predecible basado en nivel actual y paramId
     const levelId = navigationStack.currentLevel >= 0 ? navigationStack.currentLevel : 0;
     const builderId = `miniBuilder_level${levelId}_${paramId}`;
 
     console.log('🔨 Generando mini-builder:', builderId, 'para nivel:', levelId);
 
+    // ✅ NUEVO: Agregar breadcrumb opcional para cada mini-builder
+    const breadcrumbHtml = includeBreadcrumb ? `
+        <div id="breadcrumb_${builderId}" class="mini-builder-breadcrumb" style="
+            display: none;
+            align-items: center;
+            gap: 4px;
+            flex-wrap: wrap;
+            margin-bottom: 8px;
+            padding: 8px 12px;
+            background: var(--gray-50);
+            border-radius: 6px;
+            border: 1px solid var(--gray-200);
+        "></div>
+    ` : '';
+
     return `
         <div class="mini-builder-container" style="margin-bottom: 20px;">
             <label style="display: block; font-size: 13px; font-weight: 600; color: var(--gray-700); margin-bottom: 8px;">
                 ${label} <span style="color: var(--danger);">*</span>
             </label>
+            ${breadcrumbHtml}
             <div class="mini-expression-builder"
                  id="${builderId}"
                  ondrop="dropIntoMiniBuilder(event, '${builderId}')"
@@ -4147,9 +4354,9 @@ function generateFunctionForm(functionName) {
                     `;
             break;
         case 'Si entonces':
-            html = generateMiniBuilder('param1', 'Condición', 'Arrastra campos y operadores de comparación');
-            html += generateMiniBuilder('param2', 'Valor si es Verdadero', 'Arrastra un campo o usa el botón Valor');
-            html += generateMiniBuilder('param3', 'Valor si es Falso', 'Arrastra un campo o usa el botón Valor');
+            html = generateMiniBuilder('param1', 'Condición', 'Arrastra campos y operadores de comparación', true);
+            html += generateMiniBuilder('param2', 'Valor si es Verdadero', 'Arrastra un campo o usa el botón Valor', true);
+            html += generateMiniBuilder('param3', 'Valor si es Falso', 'Arrastra un campo o usa el botón Valor', true);
             break;
         default:
             // Funciones simples que necesitan 1 o más parámetros de campo/expresión
