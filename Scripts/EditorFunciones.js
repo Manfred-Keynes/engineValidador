@@ -756,38 +756,47 @@ function updateCurrentLevelPreview() {
         return;
     }
 
-    // Recopilar expresiones de todos los mini-builders del nivel actual
-    const miniBuilders = body.querySelectorAll('.mini-expression-builder');
-    console.log('🔨 Mini-builders encontrados:', miniBuilders.length);
-
+    // Verificar si es "Calcular edad" que usa bloques en lugar de mini-builders
     let params = [];
-
-    miniBuilders.forEach((builder, index) => {
-        const builderId = builder.id;
-        const components = miniBuilderComponents[builderId] || [];
-
-        console.log(`   Builder ${index + 1} (${builderId}):`, components.length, 'componentes');
-        console.log('      Componentes:', components);
-
-        if (components.length > 0) {
-            const expression = buildComponentsExpression(components);
-            console.log('      Expresión construida:', expression);
-            params.push(expression);
-        } else {
-            params.push('');  // Parámetro vacío
-        }
-    });
-
-    console.log('📦 Parámetros recopilados:', params);
-
-    // Construir expresión completa
     let fullExpression;
-    if (params.length > 0) {
-        // Unir parámetros con comas
-        const paramsText = params.filter(p => p.trim() !== '').join(',');
-        fullExpression = `#${currentLevel.functionName}(${paramsText})#`;
+
+    if (currentLevel.functionName === 'Calcular edad' && typeof droppedBlocks !== 'undefined') {
+        console.log('🎂 Función Calcular edad detectada, usando droppedBlocks');
+        console.log('   Bloques:', droppedBlocks);
+
+        // La vista previa muestra lo que el usuario está construyendo
+        fullExpression = buildCalculaEdadPreview();
     } else {
-        fullExpression = `#${currentLevel.functionName}()#`;
+        // Recopilar expresiones de todos los mini-builders del nivel actual
+        const miniBuilders = body.querySelectorAll('.mini-expression-builder');
+        console.log('🔨 Mini-builders encontrados:', miniBuilders.length);
+
+        miniBuilders.forEach((builder, index) => {
+            const builderId = builder.id;
+            const components = miniBuilderComponents[builderId] || [];
+
+            console.log(`   Builder ${index + 1} (${builderId}):`, components.length, 'componentes');
+            console.log('      Componentes:', components);
+
+            if (components.length > 0) {
+                const expression = buildComponentsExpression(components);
+                console.log('      Expresión construida:', expression);
+                params.push(expression);
+            } else {
+                params.push('');  // Parámetro vacío
+            }
+        });
+
+        console.log('📦 Parámetros recopilados:', params);
+
+        // Construir expresión completa
+        if (params.length > 0) {
+            // Unir parámetros con comas
+            const paramsText = params.filter(p => p.trim() !== '').join(',');
+            fullExpression = `#${currentLevel.functionName}(${paramsText})#`;
+        } else {
+            fullExpression = `#${currentLevel.functionName}()#`;
+        }
     }
 
     console.log('✅ Expresión completa:', fullExpression);
@@ -833,6 +842,216 @@ function allowFunctionDrop(event, varId) {
 
 function dragFunctionLeave(event) {
     event.currentTarget.classList.remove('drag-over');
+}
+
+// ========== DRAG DE VARIABLES ==========
+let draggedVariableId = null;
+let draggedVariableName = '';
+
+function dragVariable(event, varId) {
+    console.log('🎯 DRAG START Variable:', varId);
+    draggedVariableId = varId;
+
+    // Obtener el nombre de la variable
+    const nameElement = document.getElementById('varName' + varId);
+    draggedVariableName = nameElement ? nameElement.textContent : `Variable ${varId}`;
+
+    event.dataTransfer.effectAllowed = 'copy';
+    event.dataTransfer.setData('text/plain', draggedVariableName);
+    event.target.classList.add('dragging');
+}
+
+function dragEnd(event) {
+    console.log('🏁 DRAG END Variable');
+    event.target.classList.remove('dragging');
+}
+
+// ========== EXPRESIÓN LÓGICA FINAL ==========
+let logicComponents = [];
+let draggedLogicOperator = null;
+
+// Drag operadores lógicos
+function dragLogicOperator(event, operator) {
+    console.log('🔧 DRAG START Logic Operator:', operator);
+    draggedLogicOperator = operator;
+    event.dataTransfer.effectAllowed = 'copy';
+    event.dataTransfer.setData('text/plain', operator);
+    event.target.classList.add('dragging');
+}
+
+function dragLogicOperatorEnd(event) {
+    console.log('🏁 DRAG END Logic Operator');
+    event.target.classList.remove('dragging');
+}
+
+// Drop zone handlers
+function allowLogicDrop(event) {
+    event.preventDefault();
+    event.stopPropagation();
+    console.log('👀 DRAG OVER expresión lógica');
+    event.currentTarget.classList.add('drag-over');
+}
+
+function dragLogicLeave(event) {
+    console.log('👋 DRAG LEAVE expresión lógica');
+    event.currentTarget.classList.remove('drag-over');
+}
+
+// Drop into logic expression
+function dropIntoLogicExpression(event) {
+    event.preventDefault();
+    event.currentTarget.classList.remove('drag-over');
+
+    console.log('📦 DROP en expresión lógica');
+
+    let component = null;
+
+    // Verificar si es una variable
+    if (draggedVariableId !== null) {
+        console.log('   ✅ Variable detectada:', draggedVariableId);
+
+        const nameElement = document.getElementById('varName' + draggedVariableId);
+        const varName = nameElement ? nameElement.textContent : `Variable ${draggedVariableId}`;
+
+        component = {
+            type: 'variable',
+            id: draggedVariableId,
+            name: varName,
+            html: varName
+        };
+
+        draggedVariableId = null;
+        draggedVariableName = '';
+    }
+    // Verificar si es un operador lógico (de la paleta nueva)
+    else if (draggedLogicOperator !== null) {
+        console.log('   ✅ Operador lógico detectado:', draggedLogicOperator);
+
+        const isParenthesis = draggedLogicOperator === '(' || draggedLogicOperator === ')';
+
+        component = {
+            type: isParenthesis ? 'parenthesis' : 'operator',
+            value: draggedLogicOperator,
+            html: draggedLogicOperator
+        };
+
+        draggedLogicOperator = null;
+    }
+    // Verificar si es un operador del sidebar
+    else if (draggedOperator !== null && draggedOperator !== undefined) {
+        console.log('   ✅ Operador del sidebar detectado:', draggedOperator);
+
+        const isParenthesis = draggedOperator === '(' || draggedOperator === ')';
+
+        component = {
+            type: isParenthesis ? 'parenthesis' : 'operator',
+            value: draggedOperator,
+            html: draggedOperator
+        };
+
+        draggedOperator = null;
+    }
+
+    if (component) {
+        logicComponents.push(component);
+        console.log('   📊 Total componentes:', logicComponents.length);
+        renderLogicExpression();
+    }
+
+    // Limpiar estados de dragging
+    document.querySelectorAll('.dragging').forEach(el => {
+        el.classList.remove('dragging');
+    });
+}
+
+// Renderizar la expresión lógica
+function renderLogicExpression() {
+    const builder = document.getElementById('logicExprBuilder');
+    if (!builder) {
+        console.error('❌ No se encontró el contenedor logicExprBuilder');
+        return;
+    }
+
+    console.log('🎨 Renderizando expresión lógica:', logicComponents);
+    console.log('   Builder encontrado:', builder);
+
+    if (logicComponents.length === 0) {
+        builder.innerHTML = `
+            <div class="empty">
+                <i class="fas fa-hand-pointer" style="margin-right: 8px;"></i>
+                Arrastra variables y operadores para construir la expresión lógica
+            </div>
+        `;
+        console.log('   ✅ Placeholder mostrado (sin componentes)');
+        updateLogicExpressionString();
+        return;
+    }
+
+    console.log('   🧹 Limpiando contenedor...');
+    builder.innerHTML = '';
+
+    logicComponents.forEach((comp, index) => {
+        console.log(`   🔨 Creando pill #${index}:`, comp);
+
+        const pill = document.createElement('div');
+        pill.className = `logic-component ${comp.type}`;
+        pill.innerHTML = `
+            <span>${comp.html}</span>
+            <button class="remove-btn" onclick="removeLogicComponent(${index})" type="button">
+                <i class="fas fa-times"></i>
+            </button>
+        `;
+
+        builder.appendChild(pill);
+        console.log(`      ✅ Pill #${index} agregada. Clases:`, pill.className);
+    });
+
+    console.log('   📊 Total pills en DOM:', builder.children.length);
+    console.log('   📝 HTML final:', builder.innerHTML.substring(0, 200) + '...');
+
+    updateLogicExpressionString();
+}
+
+// Eliminar un componente de la expresión lógica
+function removeLogicComponent(index) {
+    console.log('🗑️ Eliminando componente lógico:', index);
+    logicComponents.splice(index, 1);
+    renderLogicExpression();
+}
+
+// Actualizar el string de la expresión lógica
+function updateLogicExpressionString() {
+    const expression = logicComponents.map(comp => {
+        if (comp.type === 'variable') {
+            // Las variables se representan con su nombre entre llaves
+            return `{${comp.name}}`;
+        } else if (comp.type === 'operator' || comp.type === 'parenthesis') {
+            return comp.value;
+        }
+        return '';
+    }).join(' ');
+
+    console.log('📝 Expresión lógica final:', expression);
+
+    // Actualizar el HiddenField si existe
+    const hiddenField = document.querySelector('input[id*="hdnExpresionLogica"]');
+    if (hiddenField) {
+        hiddenField.value = expression;
+        console.log('   ✅ HiddenField actualizado');
+    }
+
+    // Actualizar la vista previa visual
+    const preview = document.getElementById('logicExpressionPreview');
+    if (preview) {
+        if (expression.trim() === '') {
+            preview.innerHTML = '<span class="preview-empty">Sin expresión configurada</span>';
+        } else {
+            preview.textContent = expression;
+        }
+        console.log('   ✅ Vista previa actualizada');
+    }
+
+    return expression;
 }
 
 function dropFunction(event, varId) {
@@ -1214,6 +1433,28 @@ function editExprComponent(compId, varId) {
 // ✨ NUEVA FUNCIÓN: Cargar parámetros guardados en el panel de configuración para editar
 function loadParamsIntoConfigPanel(metadata, varId) {
     console.log('📥 Cargando parámetros para editar:', metadata);
+
+    // Manejo especial para "Calcular edad" que usa bloques
+    console.log('   🔍 Verificando Calcular edad:', {
+        functionName: metadata.functionName,
+        hasBlocks: !!metadata.blocks,
+        blocksLength: metadata.blocks ? metadata.blocks.length : 0
+    });
+
+    if (metadata.functionName === 'Calcular edad' && metadata.blocks) {
+        console.log('   🎂 Restaurando bloques de Calcular edad:', metadata.blocks);
+
+        // Restaurar droppedBlocks desde metadata
+        droppedBlocks = JSON.parse(JSON.stringify(metadata.blocks));
+
+        // Renderizar los bloques en la drop zone
+        setTimeout(() => {
+            renderBlocks();
+            updateBlockPreview();
+        }, 100);
+
+        return;
+    }
 
     if (!metadata.params || metadata.params.length === 0) {
         console.log('   No hay parámetros guardados');
@@ -1606,7 +1847,10 @@ function agregarVariable() {
     card.className = 'variable-card';
     card.id = 'varCard' + variablesCounter;
     card.innerHTML = `
-                <div class="variable-card-header" onclick="toggleCard(${variablesCounter})">
+                <div class="variable-card-header" onclick="toggleCard(${variablesCounter})"
+                     draggable="true"
+                     ondragstart="dragVariable(event, ${variablesCounter})"
+                     ondragend="dragEnd(event)">
                     <div class="variable-card-content">
                         <div class="variable-number">${variablesCounter}</div>
                         <div class="variable-info">
@@ -1945,6 +2189,14 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Crear popup de autocompletado
     createAutocompletePopup();
+
+    // Verificar que el contenedor de expresión lógica existe
+    const logicBuilder = document.getElementById('logicExprBuilder');
+    if (logicBuilder) {
+        console.log('✅ Logic expression builder encontrado');
+    } else {
+        console.error('❌ Logic expression builder NO encontrado');
+    }
 
     document.addEventListener('focus', function (e) {
         if (e.target.classList.contains('variable-field-input') ||
@@ -2336,8 +2588,28 @@ function dropBlock(event) {
     const dropZone = document.getElementById('dropZone');
     dropZone.classList.remove('drag-over');
 
-    const type = event.dataTransfer.getData('type');
-    const value = event.dataTransfer.getData('value');
+    let type = event.dataTransfer.getData('type');
+    let value = event.dataTransfer.getData('value');
+
+    // Si no hay type/value, verificar si es un campo o operador arrastrado desde el sidebar
+    if (!type || !value) {
+        if (draggedField) {
+            console.log('📦 Campo detectado en dropBlock:', draggedField);
+            type = 'field';
+            value = draggedField;
+            draggedField = null; // Limpiar
+        } else if (draggedOperator) {
+            console.log('📦 Operador detectado en dropBlock:', draggedOperator);
+            type = 'operator';
+            value = draggedOperator;
+            draggedOperator = null; // Limpiar
+        } else if (draggedFunctionName) {
+            console.log('📦 Función detectada en dropBlock:', draggedFunctionName);
+            type = 'function';
+            value = draggedFunctionName;
+            draggedFunctionName = null; // Limpiar
+        }
+    }
 
     if (!type || !value) return;
 
@@ -2367,6 +2639,9 @@ function dropBlock(event) {
     // Renderizar bloques
     renderBlocks();
     updateBlockPreview();
+
+    // Actualizar vista previa global del nivel actual
+    updateCurrentLevelPreview();
 
     // Limpiar clase dragging
     if (draggedElement) {
@@ -2457,6 +2732,7 @@ function deleteBlock(blockId) {
     droppedBlocks = droppedBlocks.filter(b => b.id !== blockId);
     renderBlocks();
     updateBlockPreview();
+    updateCurrentLevelPreview();
 }
 
 // Editar valor de bloque
@@ -2469,6 +2745,7 @@ function editBlockValue(blockId) {
         block.value = newValue.trim();
         renderBlocks();
         updateBlockPreview();
+        updateCurrentLevelPreview();
     }
 }
 
@@ -2912,31 +3189,84 @@ function dragBlockStart(event, blockId) {
     event.target.classList.add('dragging');
 }
 
+// Construir la expresión completa de CalculaEdad con TODOS los parámetros
+function buildCalculaEdadExpression() {
+    // CalculaEdad siempre tiene 4 parámetros: campo_fecha, operador, valor, formato
+    const params = ['[]', '[]', '[]', 'YYYY']; // Valores por defecto
+
+    droppedBlocks.forEach((block) => {
+        if (block.type === 'field') {
+            // Primer campo encontrado va en param[0]
+            if (params[0] === '[]') {
+                params[0] = `[${block.value}]`;
+            }
+        } else if (block.type === 'operator') {
+            // Primer operador encontrado va en param[1]
+            if (params[1] === '[]') {
+                params[1] = block.value;
+            }
+        } else if (block.type === 'value' || (!isNaN(block.value) && block.type !== 'format')) {
+            // Primer valor encontrado va en param[2]
+            if (params[2] === '[]') {
+                params[2] = block.value;
+            }
+        } else if (block.type === 'format' || block.value === 'YYYY' || block.value === 'YY') {
+            // Formato va en param[3]
+            params[3] = block.value;
+        } else if (block.type === 'function') {
+            // Si es función anidada, puede ir en cualquier posición vacía
+            const funcStr = block.configured && block.nestedBlocks && block.nestedBlocks.length > 0
+                ? `#${block.value}(${block.nestedBlocks.map(nb => nb.value).join(',')})#`
+                : `#${block.value}(...)#`;
+
+            // Buscar primer parámetro vacío
+            const emptyIndex = params.findIndex(p => p === '[]');
+            if (emptyIndex !== -1) {
+                params[emptyIndex] = funcStr;
+            }
+        }
+    });
+
+    return `#CalculaEdad(${params.join(',')})#`;
+}
+
+// Construir vista previa de CalculaEdad (solo muestra lo que el usuario arrastró)
+function buildCalculaEdadPreview() {
+    if (!droppedBlocks || droppedBlocks.length === 0) {
+        return '#Calcular edad()#';
+    }
+
+    const previewParams = [];
+
+    droppedBlocks.forEach((block) => {
+        if (block.type === 'field') {
+            previewParams.push(`[${block.value}]`);
+        } else if (block.type === 'operator') {
+            previewParams.push(block.value);
+        } else if (block.type === 'value' || (!isNaN(block.value) && block.type !== 'format')) {
+            previewParams.push(block.value);
+        } else if (block.type === 'format' || block.value === 'YYYY' || block.value === 'YY') {
+            previewParams.push(block.value);
+        } else if (block.type === 'function') {
+            const funcStr = block.configured && block.nestedBlocks && block.nestedBlocks.length > 0
+                ? `#${block.value}(${block.nestedBlocks.map(nb => nb.value).join(',')})#`
+                : `#${block.value}(...)#`;
+            previewParams.push(funcStr);
+        } else {
+            previewParams.push(block.value);
+        }
+    });
+
+    return `#Calcular edad(${previewParams.join(',')})#`;
+}
+
 // Actualizar preview de bloques
 function updateBlockPreview() {
     const previewEl = document.getElementById('modalPreviewCode');
     if (!previewEl) return;
 
-    // Construir preview con todas las partes, incluyendo funciones anidadas
-    let preview = '#CalculaEdad(';
-
-    droppedBlocks.forEach((block, index) => {
-        if (index > 0) preview += ',';
-
-        if (block.type === 'function') {
-            // Si es función anidada, mostrar su representación
-            if (block.configured && block.nestedBlocks && block.nestedBlocks.length > 0) {
-                const nestedParams = block.nestedBlocks.map(nb => nb.value).join(',');
-                preview += `#${block.value}(${nestedParams})#`;
-            } else {
-                preview += `#${block.value}(...)#`;
-            }
-        } else {
-            preview += '[' + block.value + ']';
-        }
-    });
-
-    preview += ')#';
+    // La vista previa muestra lo que el usuario está construyendo
+    const preview = buildCalculaEdadPreview();
     previewEl.textContent = preview;
 }
 
@@ -3025,6 +3355,11 @@ function openConfigPanel(functionName, input) {
         navigationStack.currentLevel = -1;
     }
 
+    // Limpiar droppedBlocks solo si NO estamos en modo edición
+    if (!input || !input.editMode) {
+        droppedBlocks = [];
+    }
+
     // ✅ CORREGIDO: Crear nivel raíz usando navigationStack (sistema unificado)
     const newLevel = createConfigLevel(functionName, null, null, currentConfigVarId);
     navigationStack.levels.push(newLevel);
@@ -3092,6 +3427,9 @@ function closeConfigPanel(varId) {
     // Limpiar stack de navegación
     navigationStack.levels = [];
     navigationStack.currentLevel = -1;
+
+    // Limpiar bloques de Calcular edad
+    droppedBlocks = [];
 
     currentConfigVarId = null;
     currentFunction = null;
@@ -3215,24 +3553,37 @@ function acceptAllNestedLevels(varId) {
     const rootLevel = navigationStack.levels[0];
     console.log('   📦 Construyendo expresión final del nivel raíz:', rootLevel.functionName);
 
-    let params = [];
-    for (let builderId in rootLevel.miniBuilderStates) {
-        const components = rootLevel.miniBuilderStates[builderId];
-        if (components && components.length > 0) {
-            const expression = buildComponentsExpression(components);
-            params.push(expression);
+    let functionText;
+    let displayPreview;
+
+    // Manejo especial para "Calcular edad"
+    if (rootLevel.functionName === 'Calcular edad' && typeof droppedBlocks !== 'undefined') {
+        console.log('   🎂 Calcular edad detectado, usando blocks');
+        functionText = buildCalculaEdadExpression();  // Guarda con todos los parámetros
+        displayPreview = buildCalculaEdadPreview();   // Vista previa con lo arrastrado
+        console.log('   💾 Valor guardado:', functionText);
+        console.log('   👁️ Vista previa:', displayPreview);
+    } else {
+        // Funciones normales con mini-builders
+        let params = [];
+        for (let builderId in rootLevel.miniBuilderStates) {
+            const components = rootLevel.miniBuilderStates[builderId];
+            if (components && components.length > 0) {
+                const expression = buildComponentsExpression(components);
+                params.push(expression);
+            }
         }
+
+        const paramsText = params.filter(p => p.trim() !== '').join(',');
+        functionText = `#${rootLevel.functionName}(${paramsText})#`;
+        displayPreview = functionText;
+
+        console.log('   ✅ Expresión completa final:', functionText);
     }
 
-    const paramsText = params.filter(p => p.trim() !== '').join(',');
-    const functionText = `#${rootLevel.functionName}(${paramsText})#`;
-
-    console.log('   ✅ Expresión completa final:', functionText);
-
-    // Preparar metadata y HTML
-    let displayPreview = functionText;
-    if (functionText.length > 60) {
-        displayPreview = functionText.substring(0, 50) + '...' + functionText.substring(functionText.length - 7);
+    // Truncar displayPreview si es muy largo
+    if (displayPreview.length > 60) {
+        displayPreview = displayPreview.substring(0, 50) + '...' + displayPreview.substring(displayPreview.length - 7);
     }
 
     const displayHtml = `<i class="fas fa-magic expr-icon"></i><span class="expr-value">${displayPreview}</span>`;
@@ -3242,6 +3593,14 @@ function acceptAllNestedLevels(varId) {
         params: params,
         fullExpression: functionText
     };
+
+    // Agregar blocks para "Calcular edad"
+    if (rootLevel.functionName === 'Calcular edad' && droppedBlocks && droppedBlocks.length > 0) {
+        metadata.blocks = JSON.parse(JSON.stringify(droppedBlocks));
+        console.log('📦 Guardando blocks en metadata (nested):', metadata.blocks);
+    }
+
+    console.log('📋 Metadata final (nested):', metadata);
 
     // Verificar si estamos en modo edición
     if (activeInput && activeInput.editMode && window.editingComponent) {
@@ -3378,15 +3737,28 @@ function acceptFunctionConfig(varId) {
     }
 
     // ✨ Nivel raíz - insertar en el constructor principal
-    // Unir params sin espacios adicionales (solo con comas)
-    const paramsText = params.filter(p => p.trim() !== '').join(',');
-    const functionText = `#${currentFunction}(${paramsText})#`;
+    let functionText;
+    let displayPreview;
 
-    // ✅ MEJORADO: Mostrar preview más descriptivo
-    let displayPreview = functionText;
-    if (functionText.length > 60) {
+    // Manejo especial para "Calcular edad" que usa blocks
+    if (currentFunction === 'Calcular edad' && typeof droppedBlocks !== 'undefined') {
+        console.log('🎂 Calcular edad detectado, usando blocks');
+        functionText = buildCalculaEdadExpression();  // Guarda con todos los parámetros
+        displayPreview = buildCalculaEdadPreview();   // Vista previa con lo arrastrado
+        console.log('💾 Valor guardado:', functionText);
+        console.log('👁️ Vista previa:', displayPreview);
+    } else {
+        // Funciones normales con mini-builders
+        // Unir params sin espacios adicionales (solo con comas)
+        const paramsText = params.filter(p => p.trim() !== '').join(',');
+        functionText = `#${currentFunction}(${paramsText})#`;
+        displayPreview = functionText;
+    }
+
+    // Truncar displayPreview si es muy largo
+    if (displayPreview.length > 60) {
         // Si es muy largo, mostrar inicio y final
-        displayPreview = functionText.substring(0, 50) + '...' + functionText.substring(functionText.length - 7);
+        displayPreview = displayPreview.substring(0, 50) + '...' + displayPreview.substring(displayPreview.length - 7);
     }
 
     const displayHtml = `<i class="fas fa-magic expr-icon"></i><span class="expr-value">${displayPreview}</span>`;
@@ -3396,6 +3768,14 @@ function acceptFunctionConfig(varId) {
         params: params,
         fullExpression: functionText
     };
+
+    // Agregar blocks para "Calcular edad"
+    if (currentFunction === 'Calcular edad' && droppedBlocks && droppedBlocks.length > 0) {
+        metadata.blocks = JSON.parse(JSON.stringify(droppedBlocks));
+        console.log('📦 Guardando blocks en metadata:', metadata.blocks);
+    }
+
+    console.log('📋 Metadata final:', metadata);
 
     // ✨ NUEVO: Verificar si estamos en modo edición
     if (activeInput && activeInput.editMode && window.editingComponent) {
@@ -3749,23 +4129,18 @@ function generateFunctionForm(functionName) {
                                 </div>
                             </div>
 
-                            <!-- COLUMNA DERECHA: Zona de Drop + Preview -->
+                            <!-- COLUMNA DERECHA: Zona de Drop -->
                             <div class="drop-column">
                                 <div>
                                     <div class="block-builder-label">
                                         <i class="fas fa-cubes"></i> Zona de Construcción
                                     </div>
-                                    <div class="drop-zone" id="dropZone" ondrop="dropBlock(event)" ondragover="allowDrop(event)" ondragleave="dragLeave(event)">
+                                    <div class="drop-zone" id="dropZone" ondrop="dropBlock(event)" ondragover="allowDrop(event)" ondragleave="dragLeave(event)" style="min-height: 120px;">
                                         <div class="empty">
                                             <i class="fas fa-hand-pointer" style="margin-right: 8px;"></i>
                                             Arrastra bloques aquí para construir la función
                                         </div>
                                     </div>
-                                </div>
-
-                                <div class="preview-section">
-                                    <div class="preview-label">Vista Previa</div>
-                                    <div class="preview-code" id="modalPreviewCode">#CalculaEdad([],[],[],[YYYY])#</div>
                                 </div>
                             </div>
                         </div>
@@ -3801,7 +4176,15 @@ function generateFunctionForm(functionName) {
 
 // Insertar función desde el modal
     function insertFunctionFromModal() {
-        const preview = document.getElementById('modalPreviewCode').textContent;
+        const previewEl = document.getElementById('modalPreviewCode');
+        let preview = previewEl ? previewEl.textContent : '#CalculaEdad()#';
+
+        // Si es Calcular edad, el valor guardado debe tener todos los parámetros
+        // pero la vista previa muestra solo lo que el usuario construyó
+        let savedValue = preview;
+        if (currentFunction === 'Calcular edad') {
+            savedValue = buildCalculaEdadExpression();  // Guarda con todos los parámetros
+        }
 
         if (activeInput && activeInput.varId) {
             const varId = activeInput.varId;
@@ -3820,7 +4203,7 @@ function generateFunctionForm(functionName) {
                 initExpressionComponents(varId);
                 const comp = expressionComponents[varId].find(c => c.id === window.editingComponent.compId);
                 if (comp) {
-                    comp.value = preview;
+                    comp.value = savedValue;  // Guarda el valor completo
                     comp.html = `${icon}<span class="expr-value">${shortPreview}</span>`;
                     comp.metadata = metadata;
                     renderExpression(varId);
@@ -3829,7 +4212,7 @@ function generateFunctionForm(functionName) {
                 window.editingComponent = null;
             } else {
                 // Modo inserción: crear nuevo componente
-                addExprComponent(varId, 'function', preview, `${icon}<span class="expr-value">${shortPreview}</span>`, metadata);
+                addExprComponent(varId, 'function', savedValue, `${icon}<span class="expr-value">${shortPreview}</span>`, metadata);
             }
 
             // Remover el input temporal
@@ -3872,9 +4255,10 @@ function generateFunctionForm(functionName) {
         // Solo permitir dragover si estamos arrastrando algo
         if (draggedFunctionName || draggedOperator || draggedField) {
             const target = e.target;
-            // ✅ CORREGIDO: Agregar .mini-expression-builder a las zonas válidas
+            // ✅ CORREGIDO: Agregar .mini-expression-builder y .logic-expression-builder a las zonas válidas
             const isValidZone = target.closest('.expression-builder') ||
                 target.closest('.mini-expression-builder') ||
+                target.closest('.logic-expression-builder') ||
                 target.closest('.drop-zone');
 
             if (!isValidZone) {
@@ -3888,9 +4272,10 @@ function generateFunctionForm(functionName) {
     // Prevenir drop en todo el documento excepto zonas válidas
     document.addEventListener('drop', function (e) {
         const target = e.target;
-        // ✅ CORREGIDO: Agregar .mini-expression-builder a las zonas válidas
+        // ✅ CORREGIDO: Agregar .mini-expression-builder y .logic-expression-builder a las zonas válidas
         const isValidZone = target.closest('.expression-builder') ||
             target.closest('.mini-expression-builder') ||
+            target.closest('.logic-expression-builder') ||
             target.closest('.drop-zone');
 
         if (!isValidZone && (draggedFunctionName || draggedOperator || draggedField)) {

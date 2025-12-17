@@ -372,6 +372,239 @@ body {
     min-height: 60px;
 }
 
+/* Logic Expression Builder (Drop Zone) */
+.logic-expression-builder {
+    background: white;
+    border: 2px dashed var(--gray-300);
+    border-radius: var(--border-radius-sm);
+    padding: 16px;
+    min-height: 120px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: flex-start;
+    transition: all 0.2s ease;
+    margin-bottom: 16px;
+}
+
+    .logic-expression-builder.drag-over {
+        border-color: var(--primary);
+        background: rgba(79, 70, 229, 0.05);
+        box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+    }
+
+    .logic-expression-builder .empty {
+        width: 100%;
+        text-align: center;
+        color: var(--gray-400);
+        font-size: 13px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 88px;
+        pointer-events: none;
+    }
+
+        .logic-expression-builder .empty * {
+            pointer-events: none;
+        }
+
+    .logic-expression-builder:not(:has(.empty)) {
+        border-style: solid;
+        border-color: var(--gray-300);
+    }
+
+/* Logic Component Items */
+.logic-component {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: grab;
+    transition: all 0.15s ease;
+    position: relative;
+}
+
+    .logic-component:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .logic-component:active {
+        cursor: grabbing;
+    }
+
+/* Variable Component */
+.logic-component.variable {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: 1px solid rgba(102, 126, 234, 0.3);
+}
+
+    .logic-component.variable .logic-icon {
+        font-size: 11px;
+    }
+
+/* Operator Component */
+.logic-component.operator {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    color: white;
+    border: 1px solid rgba(240, 147, 251, 0.3);
+    font-family: 'Courier New', monospace;
+    font-weight: 600;
+}
+
+/* Parenthesis Component */
+.logic-component.parenthesis {
+    background: var(--gray-100);
+    color: var(--gray-700);
+    border: 1px solid var(--gray-300);
+    font-family: 'Courier New', monospace;
+    font-size: 16px;
+    padding: 6px 10px;
+}
+
+/* Remove Button */
+.logic-component .remove-btn {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.2);
+    border: none;
+    color: white;
+    font-size: 10px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s ease;
+    padding: 0;
+    margin-left: 4px;
+}
+
+    .logic-component .remove-btn:hover {
+        background: rgba(0, 0, 0, 0.4);
+        transform: scale(1.1);
+    }
+
+/* Logic Operators Palette */
+.logic-operators-palette {
+    background: var(--gray-50);
+    border: 1px solid var(--gray-200);
+    border-radius: var(--border-radius-sm);
+    padding: 12px;
+    margin-bottom: 12px;
+}
+
+.logic-operators-title {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--gray-700);
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+    .logic-operators-title i {
+        color: var(--primary);
+    }
+
+.logic-operators-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+    gap: 8px;
+}
+
+.logic-operator-item {
+    background: white;
+    border: 1px solid var(--gray-300);
+    border-radius: 6px;
+    padding: 10px;
+    text-align: center;
+    cursor: grab;
+    transition: all 0.15s ease;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--gray-700);
+    user-select: none;
+}
+
+    .logic-operator-item:hover {
+        border-color: var(--primary);
+        background: rgba(79, 70, 229, 0.05);
+        transform: translateY(-2px);
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .logic-operator-item:active {
+        cursor: grabbing;
+        transform: translateY(0);
+    }
+
+    .logic-operator-item.dragging {
+        opacity: 0.5;
+        transform: scale(0.95);
+    }
+
+    .logic-operator-item span {
+        font-family: 'Courier New', monospace;
+    }
+
+/* Dragging state for variable cards */
+.variable-card-header.dragging {
+    opacity: 0.5;
+    cursor: grabbing;
+}
+
+/* Logic Expression Preview */
+.logic-expression-preview {
+    background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 12px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+    border: 2px solid #334155;
+}
+
+.logic-expression-preview-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+    font-size: 12px;
+    font-weight: 700;
+    color: #94a3b8;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+    .logic-expression-preview-header i {
+        color: #10b981;
+        font-size: 14px;
+    }
+
+.logic-expression-preview-content {
+    font-family: 'Courier New', Consolas, Monaco, monospace;
+    font-size: 14px;
+    color: #10b981;
+    word-break: break-word;
+    line-height: 1.8;
+    padding: 12px;
+    background: rgba(16, 185, 129, 0.1);
+    border-radius: 6px;
+    border-left: 4px solid #10b981;
+    min-height: 40px;
+}
+
+    .logic-expression-preview-content .preview-empty {
+        color: #64748b;
+        font-style: italic;
+    }
+
 /* Action bar */
 .action-bar {
     display: flex;

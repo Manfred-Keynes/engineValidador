@@ -2,6 +2,7 @@
 
 <asp:Content ID="Content1" ContentPlaceHolderID="head" runat="server">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="Content/EditorReglas.css" rel="stylesheet" type="text/css" />
     <style>
         * {
             box-sizing: border-box;
@@ -2794,13 +2795,33 @@
                         <span>Expresión Lógica</span>
                         <span class="badge badge-primary">Resultado final</span>
                     </div>
-                    <div class="logic-expression-content">
-                        <asp:Label ID="lblExpresionLogica" runat="server" Text="[EDAD] > 21" />
+                    <div class="logic-expression-builder" id="logicExprBuilder"
+                         ondrop="dropIntoLogicExpression(event)"
+                         ondragover="allowLogicDrop(event)"
+                         ondragleave="dragLogicLeave(event)">
+                        <div class="empty">
+                            <i class="fas fa-hand-pointer" style="margin-right: 8px;"></i>
+                            Arrastra variables y operadores para construir la expresión lógica
+                        </div>
                     </div>
-                    <div class="helper-text" style="margin-top: 8px;">
+
+                    <!-- Vista previa de la expresión lógica -->
+                    <div class="logic-expression-preview">
+                        <div class="logic-expression-preview-header">
+                            <i class="fas fa-eye"></i>
+                            <span>Vista Previa</span>
+                        </div>
+                        <div class="logic-expression-preview-content" id="logicExpressionPreview">
+                            <span class="preview-empty">Sin expresión configurada</span>
+                        </div>
+                    </div>
+
+                    <div class="helper-text" style="margin-top: 12px;">
                         <i class="fas fa-lightbulb"></i>
                         Esta es la expresión resultante que se evaluará
                     </div>
+
+                    <asp:HiddenField ID="hdnExpresionLogica" runat="server" />
                 </div>
             </div>
 
