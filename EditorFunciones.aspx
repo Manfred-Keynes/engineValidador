@@ -2679,6 +2679,192 @@
             background: var(--primary);
             color: white;
         }
+
+        /* Toolbar para expresión lógica */
+        .logic-expression-toolbar {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 12px;
+            background: var(--gray-50);
+            border: 1px solid var(--gray-200);
+            border-bottom: none;
+            border-radius: var(--border-radius) var(--border-radius) 0 0;
+            margin-top: 12px;
+        }
+
+        .btn-insert-value {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            background: #fffbeb;
+            border: 2px solid #fbbf24;
+            border-radius: 6px;
+            color: #92400e;
+            font-weight: 600;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-insert-value:hover {
+            background: #fbbf24;
+            color: white;
+            transform: translateY(-1px);
+        }
+
+        .btn-insert-value i {
+            font-size: 11px;
+        }
+
+        /* Input inline para valores en expresión lógica */
+        .inline-value-input-logic {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 4px 8px;
+            background: #fffbeb;
+            border: 2px solid #fbbf24;
+            border-radius: 6px;
+            box-shadow: 0 4px 12px rgba(251, 191, 36, 0.3);
+            animation: slideIn 0.2s ease-out;
+        }
+
+        .inline-value-input-logic .inline-value-label {
+            color: #d97706;
+            font-size: 14px;
+        }
+
+        .inline-value-input-logic input {
+            border: 1px solid #fbbf24;
+            border-radius: 4px;
+            padding: 6px 10px;
+            font-size: 13px;
+            font-weight: 600;
+            font-family: 'Courier New', monospace;
+            width: 150px;
+            outline: none;
+            transition: all 0.2s;
+        }
+
+        .inline-value-input-logic input:focus {
+            border-color: #f59e0b;
+            box-shadow: 0 0 0 3px rgba(251, 191, 36, 0.2);
+        }
+
+        .inline-value-input-logic button {
+            padding: 6px 10px;
+            border: none;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .inline-value-input-logic .btn-accept {
+            background: #10b981;
+            color: white;
+        }
+
+        .inline-value-input-logic .btn-accept:hover {
+            background: #059669;
+        }
+
+        .inline-value-input-logic .btn-cancel {
+            background: #ef4444;
+            color: white;
+        }
+
+        .inline-value-input-logic .btn-cancel:hover {
+            background: #dc2626;
+        }
+
+        /* Estilos para el constructor de expresión lógica */
+        .logic-expression-builder {
+            background: white;
+            border: 2px solid var(--gray-300);
+            border-radius: 0 0 var(--border-radius) var(--border-radius);
+            padding: 16px;
+            min-height: 80px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            align-items: center;
+            transition: all 0.2s;
+        }
+
+        .logic-expression-builder.drag-over {
+            background: var(--primary-light);
+            border-color: var(--primary);
+        }
+
+        .logic-expression-builder .empty {
+            width: 100%;
+            text-align: center;
+            color: var(--gray-500);
+            font-size: 13px;
+            padding: 20px;
+        }
+
+        /* Pills de componentes en la expresión lógica */
+        .logic-component {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 10px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            font-family: 'Courier New', monospace;
+            cursor: default;
+            transition: all 0.2s;
+        }
+
+        .logic-component .remove-btn {
+            background: transparent;
+            border: none;
+            color: inherit;
+            opacity: 0.6;
+            cursor: pointer;
+            padding: 2px 4px;
+            font-size: 10px;
+            transition: all 0.2s;
+        }
+
+        .logic-component .remove-btn:hover {
+            opacity: 1;
+            transform: scale(1.2);
+        }
+
+        /* Tipo: Variable */
+        .logic-component.variable {
+            background: linear-gradient(135deg, #eff6ff 0%, white 100%);
+            border: 2px solid #3b82f6;
+            color: #1e40af;
+        }
+
+        /* Tipo: Operador */
+        .logic-component.operator {
+            background: linear-gradient(135deg, #f0fdf4 0%, white 100%);
+            border: 2px solid #10b981;
+            color: #065f46;
+        }
+
+        /* Tipo: Paréntesis */
+        .logic-component.parenthesis {
+            background: linear-gradient(135deg, #f5f3ff 0%, white 100%);
+            border: 2px solid #8b5cf6;
+            color: #5b21b6;
+        }
+
+        /* Tipo: Valor (número o texto) */
+        .logic-component.value {
+            background: linear-gradient(135deg, #fffbeb 0%, white 100%);
+            border: 2px solid #fbbf24;
+            color: #92400e;
+        }
     </style>
 </asp:Content>
 
@@ -2795,6 +2981,26 @@
                         <span>Expresión Lógica</span>
                         <span class="badge badge-primary">Resultado final</span>
                     </div>
+
+                    <!-- Barra de herramientas para insertar valores -->
+                    <div class="logic-expression-toolbar">
+                        <button type="button" class="btn-insert-value" onclick="mostrarInputValorLogico()" id="btnInsertarValorLogico">
+                            <i class="fas fa-hashtag"></i> Insertar Valor
+                        </button>
+                        <!-- Input inline para capturar valor -->
+                        <div class="inline-value-input-logic" id="inlineValueInputLogico" style="display: none;">
+                            <span class="inline-value-label"><i class="fas fa-hashtag"></i></span>
+                            <input type="text" id="inputValorLogicoExpr" placeholder="Numero o texto..."
+                                   onkeypress="if(event.key==='Enter') aceptarValorLogicoExpr()">
+                            <button type="button" class="btn-accept" onclick="aceptarValorLogicoExpr()" title="Aceptar">
+                                <i class="fas fa-check"></i>
+                            </button>
+                            <button type="button" class="btn-cancel" onclick="cancelarValorLogicoExpr()" title="Cancelar">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                    </div>
+
                     <div class="logic-expression-builder" id="logicExprBuilder"
                          ondrop="dropIntoLogicExpression(event)"
                          ondragover="allowLogicDrop(event)"

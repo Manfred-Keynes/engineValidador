@@ -1096,6 +1096,74 @@ function dropIntoLogicExpression(event) {
     });
 }
 
+// =============================================
+// INSERTAR VALORES EN EXPRESIÓN LÓGICA
+// =============================================
+
+/**
+ * Muestra el input inline para insertar un valor en la expresión lógica
+ */
+function mostrarInputValorLogico() {
+    const inputContainer = document.getElementById('inlineValueInputLogico');
+    const input = document.getElementById('inputValorLogicoExpr');
+    const btn = document.getElementById('btnInsertarValorLogico');
+
+    if (inputContainer && btn && input) {
+        inputContainer.style.display = 'inline-flex';
+        btn.style.display = 'none';
+        input.value = '';
+        input.focus();
+    }
+}
+
+/**
+ * Acepta el valor ingresado y lo agrega a la expresión lógica
+ */
+function aceptarValorLogicoExpr() {
+    const input = document.getElementById('inputValorLogicoExpr');
+    let value = input.value.trim();
+
+    if (!value) {
+        alert('Por favor ingrese un valor');
+        return;
+    }
+
+    let displayText = value;
+
+    // Determinar si es número o texto
+    if (!/^-?\d+(\.\d+)?$/.test(value)) {
+        // Es texto, agregar comillas
+        value = `"${value}"`;
+        displayText = `"${value.replace(/"/g, '')}"`;
+    }
+
+    // Agregar el valor a la expresión lógica
+    const component = {
+        type: 'value',
+        value: value,
+        html: displayText
+    };
+
+    logicComponents.push(component);
+    console.log('   📊 Valor agregado:', value);
+
+    cancelarValorLogicoExpr();
+    renderLogicExpression();
+}
+
+/**
+ * Cancela la inserción de valor y oculta el input
+ */
+function cancelarValorLogicoExpr() {
+    const inputContainer = document.getElementById('inlineValueInputLogico');
+    const btn = document.getElementById('btnInsertarValorLogico');
+
+    if (inputContainer && btn) {
+        inputContainer.style.display = 'none';
+        btn.style.display = 'inline-flex';
+    }
+}
+
 // Renderizar la expresión lógica
 function renderLogicExpression() {
     const builder = document.getElementById('logicExprBuilder');
@@ -1158,6 +1226,9 @@ function updateLogicExpressionString() {
             // Las variables se representan con su nombre entre llaves
             return `{${comp.name}}`;
         } else if (comp.type === 'operator' || comp.type === 'parenthesis') {
+            return comp.value;
+        } else if (comp.type === 'value') {
+            // Los valores se agregan tal cual (números o texto con comillas)
             return comp.value;
         }
         return '';
