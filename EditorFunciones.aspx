@@ -1805,22 +1805,194 @@
             transform: rotate(90deg);
         }
 
-        .config-panel-breadcrumb {
-            padding: 12px 20px;
-            background: #f8f9fa;
-            border-bottom: 1px solid var(--gray-200);
+        .config-panel-body {
+            flex: 1;
+            padding: 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* ===== MINI-BUILDERS COLAPSABLES ===== */
+        .collapsible-mini-builder {
+            border: 2px solid var(--gray-200);
+            border-radius: 8px;
+            margin-bottom: 16px;
+            background: white;
+            transition: all 0.3s ease;
+            position: relative;
+            z-index: 0;
+        }
+
+        .collapsible-mini-builder.collapsed {
+            border-color: var(--gray-300);
+            background: var(--gray-50);
+        }
+
+        .mini-builder-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 16px;
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+            border-bottom: 2px solid var(--gray-200);
+            cursor: pointer;
+            user-select: none;
+            border-radius: 6px 6px 0 0;
+            transition: all 0.2s;
+        }
+
+        .mini-builder-header:hover {
+            background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+        }
+
+        .collapsible-mini-builder.collapsed .mini-builder-header {
+            border-radius: 6px;
+            border-bottom: none;
+        }
+
+        .mini-builder-header-left {
             display: flex;
             align-items: center;
             gap: 8px;
-            font-size: 13px;
-            color: var(--gray-600);
         }
 
-        .config-panel-body {
+        .mini-builder-header-title {
+            font-weight: 600;
+            font-size: 13px;
+            color: var(--gray-800);
+        }
+
+        .mini-builder-toggle {
+            background: none;
+            border: none;
+            color: var(--primary);
+            cursor: pointer;
+            padding: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.3s ease;
+        }
+
+        .mini-builder-toggle i {
+            font-size: 14px;
+        }
+
+        .collapsible-mini-builder.collapsed .mini-builder-toggle {
+            transform: rotate(-90deg);
+        }
+
+        .mini-builder-content {
+            padding: 16px;
+            transition: all 0.3s ease;
+            max-height: 2000px;
+            overflow: visible;
+        }
+
+        .collapsible-mini-builder.collapsed .mini-builder-content {
+            max-height: 0;
+            padding: 0 16px;
+            overflow: hidden;
+        }
+
+        /* Breadcrumb individual para cada mini-builder */
+        .mini-builder-breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            flex-wrap: wrap;
+            margin-bottom: 12px;
+            padding: 8px 12px;
+            background: var(--gray-50);
+            border-radius: 6px;
+            border: 1px solid var(--gray-200);
+            font-size: 11px;
+            overflow-x: auto;
+            max-width: 100%;
+        }
+
+        /* ===== TABS PARA "SI ENTONCES" ===== */
+        .si-entonces-tabs-container {
+            background: white;
+            border: 2px solid var(--gray-200);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .si-entonces-tabs-header {
+            display: flex;
+            background: linear-gradient(to bottom, #f8f9fa, #e9ecef);
+            border-bottom: 2px solid var(--gray-300);
+            gap: 0;
+        }
+
+        .si-entonces-tab-button {
             flex: 1;
-            overflow-y: auto;
+            padding: 14px 20px;
+            background: transparent;
+            border: none;
+            border-right: 1px solid var(--gray-300);
+            color: var(--gray-600);
+            font-weight: 600;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .si-entonces-tab-button:last-child {
+            border-right: none;
+        }
+
+        .si-entonces-tab-button:hover {
+            background: rgba(102, 126, 234, 0.1);
+            color: var(--primary);
+        }
+
+        .si-entonces-tab-button.active {
+            background: white;
+            color: var(--primary);
+            border-bottom: 3px solid var(--primary);
+            font-weight: 700;
+        }
+
+        .si-entonces-tab-button.active::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--primary);
+        }
+
+        .si-entonces-tabs-content {
             padding: 20px;
-            max-height: 400px;
+            background: white;
+            min-height: 100px;
+        }
+
+        .si-entonces-tab-panel {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .si-entonces-tab-panel.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .config-panel-footer {
@@ -2301,6 +2473,18 @@
 
         .op-pill.dragging {
             opacity: 0.5;
+        }
+
+        /* ✅ Estilos especiales para Valor y Paréntesis */
+        .op-pill-special {
+            background-color: #dbeafe !important;
+            color: #1e40af !important;
+            border-color: #60a5fa;
+        }
+
+        .op-pill-special:hover {
+            background-color: #bfdbfe !important;
+            border-color: #3b82f6;
         }
 
         /* Símbolo del operador - inline con texto */
@@ -3121,6 +3305,20 @@
                     <div class="op-pill draggable-operator-item" draggable="true" data-operator="!=" ondragstart="dragOperatorStart(event)" ondragend="dragOperatorEnd(event)">
                         <span class="op-pill-symbol">≠</span>
                         <span class="op-pill-name">Diferente</span>
+                    </div>
+
+                    <!-- ✅ NUEVOS: Valor y Paréntesis -->
+                    <div class="op-pill op-pill-special draggable-value-item" draggable="true" data-type="value" ondragstart="dragValueStart(event)" ondragend="dragValueEnd(event)">
+                        <span class="op-pill-symbol">#</span>
+                        <span class="op-pill-name">Valor</span>
+                    </div>
+                    <div class="op-pill op-pill-special draggable-parenthesis-item" draggable="true" data-type="parenthesis" data-value="(" ondragstart="dragParenthesisStart(event)" ondragend="dragParenthesisEnd(event)">
+                        <span class="op-pill-symbol">(</span>
+                        <span class="op-pill-name">Abrir</span>
+                    </div>
+                    <div class="op-pill op-pill-special draggable-parenthesis-item" draggable="true" data-type="parenthesis" data-value=")" ondragstart="dragParenthesisStart(event)" ondragend="dragParenthesisEnd(event)">
+                        <span class="op-pill-symbol">)</span>
+                        <span class="op-pill-name">Cerrar</span>
                     </div>
                 </div>
             </div>

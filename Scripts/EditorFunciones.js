@@ -74,6 +74,46 @@ function dragOperatorEnd(event) {
     // ✅ CORREGIDO: No limpiar draggedOperator aquí porque el evento 'drop' puede no haber ejecutado aún
     // draggedOperator se limpia en dropIntoMiniBuilder() o dropIntoExpression() después de usarlo
 }
+
+// ===== ✅ DRAG & DROP DE VALOR =====
+let draggedValue = null;
+
+function dragValueStart(event) {
+    draggedValue = 'value';  // Marcador para identificar que es un valor
+    event.dataTransfer.effectAllowed = 'copy';
+    event.dataTransfer.setData('text/plain', 'value');
+    event.target.closest('.draggable-value-item').classList.add('dragging');
+    console.log('🎯 DRAG START Valor');
+}
+
+function dragValueEnd(event) {
+    console.log('🏁 DRAG END Valor');
+    const valueItem = event.target.closest('.draggable-value-item');
+    if (valueItem) {
+        valueItem.classList.remove('dragging');
+    }
+}
+
+// ===== ✅ DRAG & DROP DE PARÉNTESIS =====
+let draggedParenthesis = null;
+
+function dragParenthesisStart(event) {
+    const parenthesisValue = event.target.closest('.draggable-parenthesis-item').getAttribute('data-value') || '(';
+    draggedParenthesis = parenthesisValue;
+    event.dataTransfer.effectAllowed = 'copy';
+    event.dataTransfer.setData('text/plain', parenthesisValue);
+    event.target.closest('.draggable-parenthesis-item').classList.add('dragging');
+    console.log('🎯 DRAG START Paréntesis:', parenthesisValue);
+}
+
+function dragParenthesisEnd(event) {
+    console.log('🏁 DRAG END Paréntesis');
+    const parenthesisItem = event.target.closest('.draggable-parenthesis-item');
+    if (parenthesisItem) {
+        parenthesisItem.classList.remove('dragging');
+    }
+}
+
 function dragStart(event) {
     const type = event.target.getAttribute('data-type');
     const value = event.target.getAttribute('data-value');
@@ -141,7 +181,7 @@ function dropItem(event, varId) {
     event.currentTarget.classList.remove('drag-over');
 
     // Remover clase dragging de todos los items
-    document.querySelectorAll('.draggable-function-item.dragging, .draggable-operator-item.dragging, .draggable-field-item.dragging').forEach(item => {
+    document.querySelectorAll('.draggable-function-item.dragging, .draggable-operator-item.dragging, .draggable-field-item.dragging, .draggable-value-item.dragging, .draggable-parenthesis-item.dragging').forEach(item => {
         item.classList.remove('dragging');
     });
 
@@ -178,6 +218,22 @@ function dropItem(event, varId) {
         targetVarId = null;
         return;
     }
+
+    // ✅ Manejar drop de valor
+    if (draggedValue) {
+        addValueComponent(varId);
+        draggedValue = null;
+        targetVarId = null;
+        return;
+    }
+
+    // ✅ Manejar drop de paréntesis (drag & drop directo, sin prompt)
+    if (draggedParenthesis) {
+        addExprComponent(varId, 'parenthesis', draggedParenthesis, `<span class="expr-value">${draggedParenthesis}</span>`);
+        draggedParenthesis = null;
+        targetVarId = null;
+        return;
+    }
 }
 
 // ===== DROP EN MINI BUILDERS (DENTRO DEL CONFIG PANEL) =====
@@ -205,7 +261,7 @@ function dropIntoMiniBuilder(event, builderId) {
     builder.classList.remove('drag-over');
 
     // Remover clase dragging de todos los items
-    document.querySelectorAll('.draggable-function-item.dragging, .draggable-operator-item.dragging, .draggable-field-item.dragging, .palette-item.dragging').forEach(item => {
+    document.querySelectorAll('.draggable-function-item.dragging, .draggable-operator-item.dragging, .draggable-field-item.dragging, .draggable-value-item.dragging, .draggable-parenthesis-item.dragging, .palette-item.dragging').forEach(item => {
         item.classList.remove('dragging');
     });
 
@@ -276,19 +332,44 @@ function dropIntoMiniBuilder(event, builderId) {
         return; // Salir temprano porque renderMiniBuilder ya fue llamado
     }
 
+    // ✅ Manejar drop de valor en mini-builder
+    if (draggedValue) {
+        console.log('🔢 Valor arrastrado (mini-builder)');
+        draggedValue = null;
+        // Mostrar cajita inline igual que en expression builder
+        addValueComponentToMiniBuilder(builderId);
+        return; // Salir porque la cajita manejará el renderizado
+    }
+
+    // ✅ Manejar drop de paréntesis en mini-builder
+    if (draggedParenthesis) {
+        console.log('📎 Paréntesis arrastrado (mini-builder):', draggedParenthesis);
+        miniBuilderComponents[builderId].push({
+            type: 'parenthesis',
+            value: draggedParenthesis,
+            html: `<span class="expr-value">${draggedParenthesis}</span>`
+        });
+        componentAdded = true;
+        draggedParenthesis = null;
+    }
+
     if (componentAdded) {
         console.log('✅ Componente agregado, renderizando...');
         renderMiniBuilder(builderId);
+
+        // ✅ Guardar el estado del nivel actual para que persista al editar
+        saveCurrentLevelState();
     } else {
         console.warn('⚠️ No se detectó ningún componente arrastrado');
     }
 }
 // ✨ NUEVA FUNCIÓN: Abrir configuración de función anidada desde mini-builder
 // ✨ MEJORADA: Abrir configuración de función anidada (navegación in-place)
-function openNestedFunctionConfig(functionName, parentBuilderId, functionId) {
+function openNestedFunctionConfig(functionName, parentBuilderId, functionId, functionComponent = null) {
     console.log('📂 Navegando a función anidada:', functionName);
     console.log('   parentBuilderId:', parentBuilderId);
     console.log('   functionId:', functionId);
+    console.log('   Componente:', functionComponent);
 
     if (!functionName) {
         console.error('❌ ERROR: functionName es null o undefined');
@@ -319,6 +400,28 @@ function openNestedFunctionConfig(functionName, parentBuilderId, functionId) {
     // No existe, crear nuevo nivel
     const newLevel = createConfigLevel(functionName, parentBuilderId, functionId, varId);
     console.log('🆕 Nuevo nivel creado:', newLevel);
+
+    // ✅ NUEVO: Si la función ya está configurada, cargar sus parámetros en el nivel
+    if (functionComponent && functionComponent.configured && functionComponent.params) {
+        console.log('   📥 Cargando parámetros existentes:', functionComponent.params);
+
+        // Crear mini-builders con los parámetros guardados
+        functionComponent.params.forEach((paramExpression, index) => {
+            if (paramExpression && paramExpression.trim() !== '') {
+                const builderId = `miniBuilder_level${navigationStack.levels.length}_param${index + 1}`;
+                console.log(`   🔧 Parseando parámetro ${index + 1}:`, paramExpression);
+
+                // Parsear la expresión a componentes
+                const components = parseExpressionToComponents(paramExpression);
+
+                if (components.length > 0) {
+                    // Guardar en el nivel
+                    newLevel.miniBuilderStates[builderId] = components;
+                    console.log(`   ✅ Parámetro ${index + 1} cargado en ${builderId}:`, components);
+                }
+            }
+        });
+    }
 
     navigationStack.levels.push(newLevel);
     navigationStack.currentLevel = navigationStack.levels.length - 1;
@@ -368,7 +471,7 @@ function renderCurrentConfigLevel() {
 
     title.innerHTML = `<i class="fas ${icons[currentLevel.functionName] || 'fa-cog'}"></i> ${currentLevel.functionName} ${levelIndicator}`;
 
-    // Actualizar breadcrumb con navegación
+    // ✅ Actualizar breadcrumb global con navegación (sin mezclar ramas)
     updateNavigationBreadcrumb(breadcrumb);
 
     // Restaurar HTML guardado o generar nuevo
@@ -377,7 +480,9 @@ function renderCurrentConfigLevel() {
         body.innerHTML = currentLevel.savedHTML;
 
         // Restaurar estados de mini-builders
+        console.log('   📦 miniBuilderStates disponibles:', Object.keys(currentLevel.miniBuilderStates));
         Object.keys(currentLevel.miniBuilderStates).forEach(builderId => {
+            console.log(`   ♻️ Restaurando ${builderId}:`, currentLevel.miniBuilderStates[builderId].length, 'componentes');
             miniBuilderComponents[builderId] = JSON.parse(
                 JSON.stringify(currentLevel.miniBuilderStates[builderId])
             );
@@ -385,19 +490,24 @@ function renderCurrentConfigLevel() {
         });
     } else {
         console.log('🆕 Generando formulario nuevo');
+        console.log('   📦 miniBuilderStates antes de generar HTML:', Object.keys(currentLevel.miniBuilderStates));
         availableFields = getAvailableFields();
         body.innerHTML = generateFunctionForm(currentLevel.functionName);
 
         // ✨ NUEVO: Restaurar componentes desde miniBuilderStates si existen
         if (Object.keys(currentLevel.miniBuilderStates).length > 0) {
             console.log('   🔄 Restaurando componentes desde miniBuilderStates');
+            console.log('   📋 Builder IDs en miniBuilderStates:', Object.keys(currentLevel.miniBuilderStates));
             Object.keys(currentLevel.miniBuilderStates).forEach(builderId => {
+                console.log(`      🔍 Procesando ${builderId}:`, currentLevel.miniBuilderStates[builderId]);
                 miniBuilderComponents[builderId] = JSON.parse(
                     JSON.stringify(currentLevel.miniBuilderStates[builderId])
                 );
-                console.log(`      Restaurando ${builderId}:`, miniBuilderComponents[builderId].length, 'componentes');
+                console.log(`      ✅ Restaurando ${builderId}:`, miniBuilderComponents[builderId].length, 'componentes', miniBuilderComponents[builderId]);
                 renderMiniBuilder(builderId);
             });
+        } else {
+            console.log('   ⚠️ No hay miniBuilderStates para restaurar');
         }
     }
 
@@ -412,15 +522,24 @@ function renderCurrentConfigLevel() {
     setTimeout(() => {
         updateCurrentLevelPreview();
 
-        // ✨ NUEVO: Actualizar breadcrumbs individuales para "Si entonces"
-        if (currentLevel.functionName === 'Si entonces') {
-            console.log('🥖 Actualizando breadcrumbs individuales para Si entonces');
-            const levelIndex = navigationStack.currentLevel;
+        // ✨ NUEVO: Actualizar breadcrumbs individuales si el nivel RAÍZ es "Si entonces"
+        const rootLevel = navigationStack.levels[0];
+        if (rootLevel && rootLevel.functionName === 'Si entonces') {
+            console.log('🥖 Actualizando breadcrumbs individuales (nivel raíz es Si entonces)');
 
-            // Actualizar breadcrumb para cada mini-builder del nivel
-            for (let paramNum = 1; paramNum <= 3; paramNum++) {
-                const builderId = `miniBuilder_level${levelIndex}_param${paramNum}`;
-                updateMiniBreadcrumb(builderId);
+            // Actualizar breadcrumbs para TODOS los niveles de "Si entonces"
+            // Esto incluye el nivel raíz (0) y cualquier nivel anidado
+            for (let levelIndex = 0; levelIndex < navigationStack.levels.length; levelIndex++) {
+                const level = navigationStack.levels[levelIndex];
+
+                // Si es el nivel raíz de "Si entonces", actualizar sus 3 mini-builders
+                if (level.functionName === 'Si entonces') {
+                    for (let paramNum = 1; paramNum <= 3; paramNum++) {
+                        const builderId = `miniBuilder_level${levelIndex}_param${paramNum}`;
+                        console.log('   📍 Actualizando breadcrumb:', builderId);
+                        updateMiniBreadcrumb(builderId);
+                    }
+                }
             }
         }
     }, 100);
@@ -457,59 +576,99 @@ function getParameterLabel(parentBuilderId, parentFunctionName) {
 }
 
 // ✨ NUEVA FUNCIÓN: Actualizar breadcrumb específico de un mini-builder
-// Filtra los niveles de navegación para mostrar solo los relevantes a ese mini-builder
+// Construye la jerarquía de funciones anidadas dentro de un mini-builder específico
 function updateMiniBreadcrumb(builderId) {
     const breadcrumb = document.getElementById('breadcrumb_' + builderId);
-    if (!breadcrumb) return;
+    if (!breadcrumb) {
+        console.log('⚠️ Breadcrumb no encontrado para:', builderId);
+        return;
+    }
 
     console.log('🥖 Actualizando breadcrumb para:', builderId);
 
-    // Filtrar niveles que pertenecen a la cadena de este mini-builder
-    const relevantLevels = [];
-
-    // Encontrar el nivel que contiene este mini-builder
+    // 1. Encontrar el nivel que contiene este mini-builder
+    let parentLevel = null;
     for (let i = 0; i < navigationStack.levels.length; i++) {
         const level = navigationStack.levels[i];
-
-        // Verificar si este nivel tiene este builderId en sus miniBuilderStates
         if (level.miniBuilderStates && level.miniBuilderStates[builderId]) {
-            // Encontrado - ahora reconstruir la cadena desde el inicio
-            let chainLevel = i;
-            while (chainLevel >= 0) {
-                relevantLevels.unshift(navigationStack.levels[chainLevel]);
-
-                // Buscar el nivel padre
-                const currentLevel = navigationStack.levels[chainLevel];
-                if (!currentLevel.parentBuilderId) {
-                    break; // Llegamos al nivel raíz
-                }
-
-                // Buscar el nivel que contiene el parentBuilderId
-                let found = false;
-                for (let j = chainLevel - 1; j >= 0; j--) {
-                    if (navigationStack.levels[j].miniBuilderStates &&
-                        navigationStack.levels[j].miniBuilderStates[currentLevel.parentBuilderId]) {
-                        chainLevel = j;
-                        found = true;
-                        break;
-                    }
-                }
-
-                if (!found) break;
-            }
+            parentLevel = level;
+            console.log('   📍 Nivel padre encontrado:', i, level.functionName);
             break;
         }
     }
 
-    console.log('   Niveles relevantes encontrados:', relevantLevels.length);
-
-    // Si no hay niveles anidados, ocultar breadcrumb
-    if (relevantLevels.length <= 1) {
+    if (!parentLevel) {
+        console.log('   ⚠️ No se encontró nivel padre para', builderId);
         breadcrumb.style.display = 'none';
         return;
     }
 
-    // Generar HTML del breadcrumb
+    // 2. Ver qué componente está en este mini-builder
+    const componentArray = parentLevel.miniBuilderStates[builderId];
+    if (!componentArray || !Array.isArray(componentArray) || componentArray.length === 0) {
+        console.log('   ⚠️ No hay componentes en', builderId);
+        breadcrumb.style.display = 'none';
+        return;
+    }
+
+    // Obtener el primer componente (debería ser la función)
+    const firstComponent = componentArray[0];
+    if (!firstComponent || !firstComponent.type) {
+        console.log('   ⚠️ Primer componente no válido en', builderId);
+        breadcrumb.style.display = 'none';
+        return;
+    }
+
+    // 3. Si no es una función, no hay breadcrumb
+    if (firstComponent.type !== 'function') {
+        console.log('   ⚠️ Componente no es función:', firstComponent.type);
+        breadcrumb.style.display = 'none';
+        return;
+    }
+
+    // 4. Construir la cadena de niveles anidados dentro de esta función
+    const functionId = firstComponent.functionId;
+    console.log('   🔍 Función encontrada:', firstComponent.functionName, 'ID:', functionId);
+    const relevantLevels = [];
+
+    // Función recursiva para construir la cadena
+    function buildChainFromLevel(startFunctionId, currentBuilderId) {
+        // Buscar el nivel que tiene este functionId
+        for (let i = 0; i < navigationStack.levels.length; i++) {
+            const level = navigationStack.levels[i];
+
+            if (level.functionId === startFunctionId && level.parentBuilderId === currentBuilderId) {
+                relevantLevels.push(level);
+                console.log('   ➕ Agregado nivel:', level.functionName);
+
+                // Buscar funciones anidadas en los mini-builders de este nivel
+                if (level.miniBuilderStates) {
+                    for (const [childBuilderId, childData] of Object.entries(level.miniBuilderStates)) {
+                        if (childData.type === 'function' && childData.functionId) {
+                            // Recursivamente buscar niveles anidados
+                            buildChainFromLevel(childData.functionId, childBuilderId);
+                        }
+                    }
+                }
+                break;
+            }
+        }
+    }
+
+    // Iniciar construcción de la cadena
+    buildChainFromLevel(functionId, builderId);
+
+    console.log('   📊 Niveles relevantes:', relevantLevels.length);
+
+    // 5. Si no hay niveles (la función no ha sido configurada), ocultar breadcrumb
+    if (relevantLevels.length === 0) {
+        console.log('   ⚠️ Ocultando breadcrumb (función no configurada)');
+        breadcrumb.style.display = 'none';
+        return;
+    }
+
+    // 6. Generar HTML del breadcrumb
+    console.log('   ✅ Mostrando breadcrumb con', relevantLevels.length, 'niveles');
     breadcrumb.style.display = 'flex';
 
     let html = '<i class="fas fa-sitemap" style="color: var(--gray-400); margin-right: 4px; font-size: 11px;"></i>';
@@ -522,7 +681,7 @@ function updateMiniBreadcrumb(builderId) {
 
         // Obtener etiqueta del parámetro si existe
         let displayLabel = level.functionName;
-        if (level.parentBuilderId) {
+        if (level.parentBuilderId && index > 0) {
             const parentLevel = relevantLevels[index - 1];
             if (parentLevel) {
                 const paramLabel = getParameterLabel(level.parentBuilderId, parentLevel.functionName);
@@ -555,10 +714,11 @@ function updateMiniBreadcrumb(builderId) {
     });
 
     breadcrumb.innerHTML = html;
+    console.log('   📝 Breadcrumb actualizado para', builderId, '→', relevantLevels.map(l => l.functionName).join(' → '));
 }
 
 // ✨ NUEVA FUNCIÓN: Actualizar breadcrumb con navegación funcional
-// ✅ MEJORADO: Muestra contexto del parámetro para cada nivel
+// ✅ MEJORADO: Muestra solo la cadena de ancestros del nivel actual (sin mezclar ramas)
 function updateNavigationBreadcrumb(breadcrumb) {
     if (!breadcrumb) return;
 
@@ -567,21 +727,57 @@ function updateNavigationBreadcrumb(breadcrumb) {
         return;
     }
 
+    console.log('🥖 === ACTUALIZANDO BREADCRUMB GLOBAL ===');
+    console.log('   Total de niveles:', navigationStack.levels.length);
+    console.log('   Nivel actual:', navigationStack.currentLevel);
+    console.log('   Todos los niveles:', navigationStack.levels.map((l, i) =>
+        `[${i}] ${l.functionName} (parent: ${l.parentBuilderId || 'raíz'})`
+    ));
+
     breadcrumb.style.display = 'flex';
     breadcrumb.style.alignItems = 'center';
     breadcrumb.style.gap = '4px';
     breadcrumb.style.flexWrap = 'wrap';
 
+    // ✅ NUEVO: Construir solo la cadena de ancestros del nivel actual
+    // En lugar de mostrar todos los niveles, rastrea desde el nivel actual hacia atrás
+    const ancestorChain = [];
+    let currentLevelIndex = navigationStack.currentLevel;
+
+    // Construir cadena desde el nivel actual hacia el raíz
+    while (currentLevelIndex >= 0 && currentLevelIndex < navigationStack.levels.length) {
+        ancestorChain.unshift(currentLevelIndex); // Agregar al inicio
+        const currentLevel = navigationStack.levels[currentLevelIndex];
+
+        if (!currentLevel.parentBuilderId) {
+            // Llegamos al nivel raíz
+            break;
+        }
+
+        // Buscar el nivel padre basándose en parentBuilderId
+        const levelMatch = currentLevel.parentBuilderId.match(/level(\d+)_/);
+        if (!levelMatch) break;
+
+        const parentLevelIndex = parseInt(levelMatch[1]);
+        if (parentLevelIndex < 0 || parentLevelIndex >= currentLevelIndex) break;
+
+        currentLevelIndex = parentLevelIndex;
+    }
+
+    console.log('🥖 Cadena de ancestros:', ancestorChain.map(i => navigationStack.levels[i].functionName).join(' → '));
+
     let html = '<i class="fas fa-layer-group" style="color: var(--gray-400); margin-right: 8px; font-size: 14px;"></i>';
 
-    navigationStack.levels.forEach((level, index) => {
-        const isLast = index === navigationStack.currentLevel;
-        const isCurrent = index === navigationStack.currentLevel;
+    ancestorChain.forEach((levelIndex, chainIndex) => {
+        const level = navigationStack.levels[levelIndex];
+        const isLast = levelIndex === navigationStack.currentLevel;
+        const isCurrent = levelIndex === navigationStack.currentLevel;
 
-        // ✅ NUEVO: Obtener contexto del parámetro padre si existe
+        // ✅ Obtener contexto del parámetro padre si existe
         let displayLabel = level.functionName;
-        if (level.parentBuilderId && index > 0) {
-            const parentLevel = navigationStack.levels[index - 1];
+        if (level.parentBuilderId && chainIndex > 0) {
+            const parentLevelIndex = ancestorChain[chainIndex - 1];
+            const parentLevel = navigationStack.levels[parentLevelIndex];
             const paramLabel = getParameterLabel(level.parentBuilderId, parentLevel.functionName);
             if (paramLabel) {
                 displayLabel = `${level.functionName} <span style="color: ${isCurrent ? 'rgba(255,255,255,0.7)' : 'var(--gray-500)'}; font-size: 10px;">(${paramLabel})</span>`;
@@ -592,7 +788,7 @@ function updateNavigationBreadcrumb(breadcrumb) {
         html += `
             <button type="button"
                     class="breadcrumb-nav-item ${isCurrent ? 'active' : ''}"
-                    onclick="navigateToLevel(${index})"
+                    onclick="navigateToLevel(${levelIndex})"
                     style="
                         background: ${isCurrent ? 'var(--primary)' : 'var(--gray-100)'};
                         color: ${isCurrent ? 'white' : 'var(--gray-700)'};
@@ -620,7 +816,7 @@ function updateNavigationBreadcrumb(breadcrumb) {
                     border-radius: 50%;
                     font-size: 10px;
                     font-weight: 700;
-                ">${index + 1}</span>
+                ">${levelIndex + 1}</span>
                 ${displayLabel}
             </button>
         `;
@@ -643,50 +839,79 @@ function navigateToLevel(targetLevel) {
     // Guardar estado actual antes de navegar
     saveCurrentLevelState();
 
-    // ✨ NUEVO: Si estamos navegando hacia un nivel padre, actualizar la expresión completa de la función anidada
+    // ✨ NUEVO: Si estamos navegando hacia un nivel padre, actualizar TODOS los niveles intermedios
     if (targetLevel < navigationStack.currentLevel) {
-        const childLevel = navigationStack.levels[navigationStack.currentLevel];
-        if (childLevel.parentBuilderId && childLevel.functionId) {
-            console.log('🔄 Actualizando expresión completa de función anidada:', childLevel.functionName);
+        console.log('🔄 Actualizando expresiones desde nivel', navigationStack.currentLevel, 'hasta nivel', targetLevel);
 
-            // Construir la expresión completa del nivel hijo
-            let childExpression = buildLevelExpression(childLevel);
-            console.log('   Expresión construida del hijo:', childExpression);
+        // Iterar desde el nivel actual hacia atrás hasta el nivel objetivo
+        for (let levelIndex = navigationStack.currentLevel; levelIndex > targetLevel; levelIndex--) {
+            const childLevel = navigationStack.levels[levelIndex];
 
-            // Actualizar el componente de función en el nivel padre
-            const parentComponents = miniBuilderComponents[childLevel.parentBuilderId];
-            if (parentComponents) {
-                const functionComp = parentComponents.find(c => c.functionId === childLevel.functionId);
-                if (functionComp) {
-                    functionComp.fullExpression = childExpression;
-                    functionComp.configured = true;
+            if (childLevel.parentBuilderId && childLevel.functionId) {
+                // ✅ CORREGIDO: Encontrar el nivel padre REAL usando parentBuilderId
+                // No asumir que es levelIndex - 1 (árbol ramificado, no secuencial)
+                let parentLevel = null;
+                let parentLevelIndex = -1;
 
-                    // Actualizar el HTML del componente para reflejar los parámetros
-                    const paramsPreview = childExpression.length > 50 ?
-                        childExpression.substring(0, 47) + '...' :
-                        childExpression;
-                    functionComp.html = `<i class="fas fa-magic expr-icon"></i><span class="expr-value">${paramsPreview}</span>`;
+                const levelMatch = childLevel.parentBuilderId.match(/level(\d+)_/);
+                if (levelMatch) {
+                    parentLevelIndex = parseInt(levelMatch[1]);
+                    parentLevel = navigationStack.levels[parentLevelIndex];
+                }
 
-                    console.log('   ✅ Componente actualizado en memoria:', functionComp);
+                if (!parentLevel) {
+                    console.warn(`   ⚠️ No se encontró nivel padre para ${childLevel.functionName}`);
+                    continue;
+                }
 
-                    // ✨ CRÍTICO: También actualizar el estado guardado del nivel padre
-                    const parentLevel = navigationStack.levels[targetLevel];
-                    if (parentLevel) {
-                        // Actualizar miniBuilderStates
-                        if (parentLevel.miniBuilderStates[childLevel.parentBuilderId]) {
-                            const savedComponents = parentLevel.miniBuilderStates[childLevel.parentBuilderId];
-                            const savedFunctionComp = savedComponents.find(c => c.functionId === childLevel.functionId);
-                            if (savedFunctionComp) {
-                                savedFunctionComp.fullExpression = childExpression;
-                                savedFunctionComp.configured = true;
-                                savedFunctionComp.html = functionComp.html;
-                                console.log('   ✅ Estado guardado del padre también actualizado');
+                console.log(`   🔄 Actualizando nivel ${levelIndex} (${childLevel.functionName}) en nivel ${parentLevelIndex} (${parentLevel.functionName})`);
+
+                // Construir la expresión completa del nivel hijo
+                let childExpression = buildLevelExpression(childLevel);
+                console.log(`      Expresión construida: ${childExpression}`);
+
+                // ✅ NUEVO: Asegurar que los componentes del nivel padre estén en memoria
+                if (!miniBuilderComponents[childLevel.parentBuilderId] && parentLevel.miniBuilderStates[childLevel.parentBuilderId]) {
+                    console.log(`      📥 Restaurando componentes del padre desde miniBuilderStates`);
+                    miniBuilderComponents[childLevel.parentBuilderId] = JSON.parse(
+                        JSON.stringify(parentLevel.miniBuilderStates[childLevel.parentBuilderId])
+                    );
+                }
+
+                // Actualizar el componente de función en el nivel padre
+                const parentComponents = miniBuilderComponents[childLevel.parentBuilderId];
+                if (parentComponents) {
+                    const functionComp = parentComponents.find(c => c.functionId === childLevel.functionId);
+                    if (functionComp) {
+                        functionComp.fullExpression = childExpression;
+                        functionComp.configured = true;
+
+                        // Actualizar el HTML del componente para reflejar los parámetros
+                        const paramsPreview = childExpression.length > 50 ?
+                            childExpression.substring(0, 47) + '...' :
+                            childExpression;
+                        functionComp.html = `<i class="fas fa-magic expr-icon"></i><span class="expr-value">${paramsPreview}</span>`;
+
+                        console.log(`      ✅ Componente actualizado en memoria`);
+
+                        // ✨ CRÍTICO: También actualizar el estado guardado del nivel padre
+                        if (parentLevel) {
+                            // Actualizar miniBuilderStates
+                            if (parentLevel.miniBuilderStates[childLevel.parentBuilderId]) {
+                                const savedComponents = parentLevel.miniBuilderStates[childLevel.parentBuilderId];
+                                const savedFunctionComp = savedComponents.find(c => c.functionId === childLevel.functionId);
+                                if (savedFunctionComp) {
+                                    savedFunctionComp.fullExpression = childExpression;
+                                    savedFunctionComp.configured = true;
+                                    savedFunctionComp.html = functionComp.html;
+                                    console.log(`      ✅ Estado guardado del nivel ${parentLevelIndex} actualizado`);
+                                }
                             }
-                        }
 
-                        // ✅ NUEVO: Invalidar savedHTML para forzar re-generación con componentes actualizados
-                        console.log('   🔄 Invalidando savedHTML del nivel padre para re-generar DOM');
-                        parentLevel.savedHTML = null;
+                            // ✅ NUEVO: Invalidar savedHTML para forzar re-generación con componentes actualizados
+                            console.log(`      🔄 Invalidando savedHTML del nivel ${parentLevelIndex}`);
+                            parentLevel.savedHTML = null;
+                        }
                     }
                 }
             }
@@ -853,6 +1078,9 @@ function removeMiniBuilderComponent(builderId, index) {
 
     // Re-renderizar el mini-builder (esto llama a updateCurrentLevelPreview)
     renderMiniBuilder(builderId);
+
+    // ✅ Guardar el estado del nivel actual para que persista al editar
+    saveCurrentLevelState();
 }
 
 // ✅ Actualizar vista previa global del nivel actual
@@ -921,8 +1149,21 @@ function updateCurrentLevelPreview() {
 
         console.log('📦 Parámetros recopilados:', params);
 
+        // ✨ NUEVO: Manejo especial para "Si entonces" con formato IF/THEN/ELSE
+        if (currentLevel.functionName === 'Si entonces') {
+            console.log('🔀 Construyendo vista previa para Si entonces con formato IF/THEN/ELSE');
+
+            const ifContent = params[0] || '';
+            const thenContent = params[1] || '';
+            const elseContent = params[2] || '';
+
+            fullExpression = `#IF(${ifContent})# #THEN(${thenContent})TH# #ELSE(${elseContent})EL#`;
+            console.log('   IF:', ifContent);
+            console.log('   THEN:', thenContent);
+            console.log('   ELSE:', elseContent);
+        }
         // Construir expresión completa
-        if (params.length > 0) {
+        else if (params.length > 0) {
             // Unir parámetros con comas
             const paramsText = params.filter(p => p.trim() !== '').join(',');
             fullExpression = `#${currentLevel.functionName}(${paramsText})#`;
@@ -1485,6 +1726,111 @@ function addValueComponent(varId) {
     setTimeout(() => inputField.focus(), 100);
 }
 
+// ✅ Agregar valor a mini-builder con cajita inline
+function addValueComponentToMiniBuilder(builderId) {
+    const builder = document.getElementById(builderId);
+    if (!builder) return;
+
+    // Verificar si ya hay un input inline activo
+    const existingInput = builder.querySelector('.inline-value-input');
+    if (existingInput) {
+        existingInput.querySelector('input').focus();
+        return;
+    }
+
+    // Remover la clase 'empty' si existe
+    const emptyDiv = builder.querySelector('.empty');
+    if (emptyDiv) {
+        emptyDiv.style.display = 'none';
+    }
+
+    // Crear el contenedor de componentes si no existe
+    let componentsContainer = builder.querySelector('.expression-components');
+    if (!componentsContainer) {
+        componentsContainer = document.createElement('div');
+        componentsContainer.className = 'expression-components';
+        builder.appendChild(componentsContainer);
+    }
+
+    // Crear el input inline
+    const inlineInputContainer = document.createElement('div');
+    inlineInputContainer.className = 'inline-value-input';
+
+    const inputField = document.createElement('input');
+    inputField.type = 'text';
+    inputField.placeholder = '18, "TEXTO", 3.14';
+    inputField.autocomplete = 'off';
+
+    const btnAccept = document.createElement('button');
+    btnAccept.className = 'btn-accept';
+    btnAccept.innerHTML = '✓';
+    btnAccept.title = 'Aceptar';
+
+    const btnCancel = document.createElement('button');
+    btnCancel.className = 'btn-cancel';
+    btnCancel.innerHTML = '✕';
+    btnCancel.title = 'Cancelar';
+
+    // Función para aceptar el valor
+    const acceptValue = () => {
+        const value = inputField.value.trim();
+        if (value !== '') {
+            // Agregar al array de componentes del mini-builder
+            if (!miniBuilderComponents[builderId]) {
+                miniBuilderComponents[builderId] = [];
+            }
+            miniBuilderComponents[builderId].push({
+                type: 'value',
+                value: value,
+                html: `<i class="fas fa-hashtag expr-icon"></i><span class="expr-value">${value}</span>`
+            });
+            renderMiniBuilder(builderId);
+
+            // ✅ Guardar el estado del nivel actual para que persista al editar
+            saveCurrentLevelState();
+        }
+        inlineInputContainer.remove();
+
+        // Mostrar empty si no hay componentes
+        if (!miniBuilderComponents[builderId] || miniBuilderComponents[builderId].length === 0) {
+            if (emptyDiv) emptyDiv.style.display = 'flex';
+        }
+    };
+
+    // Función para cancelar
+    const cancelInput = () => {
+        inlineInputContainer.remove();
+
+        // Mostrar empty si no hay componentes
+        if (!miniBuilderComponents[builderId] || miniBuilderComponents[builderId].length === 0) {
+            if (emptyDiv) emptyDiv.style.display = 'flex';
+        }
+    };
+
+    // Event listeners
+    btnAccept.onclick = acceptValue;
+    btnCancel.onclick = cancelInput;
+
+    inputField.onkeydown = (e) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            acceptValue();
+        } else if (e.key === 'Escape') {
+            e.preventDefault();
+            cancelInput();
+        }
+    };
+
+    // Ensamblar
+    inlineInputContainer.appendChild(inputField);
+    inlineInputContainer.appendChild(btnAccept);
+    inlineInputContainer.appendChild(btnCancel);
+    componentsContainer.appendChild(inlineInputContainer);
+
+    // Focus automático
+    setTimeout(() => inputField.focus(), 100);
+}
+
 // Agregar paréntesis
 function addParenthesis(varId, type) {
     const choice = prompt('() SELECCIONAR PARÉNTESIS\n\nOpciones:\n\n  1. ( Abrir paréntesis\n  2. ) Cerrar paréntesis\n\n💡 Ingrese el número:');
@@ -1633,6 +1979,73 @@ function editExprComponent(compId, varId) {
     }, 300);
 }
 
+// ✨ NUEVA FUNCIÓN: Parsear expresión "Si entonces" en tokens IF, THEN, ELSE
+// ✅ MEJORADO: Manejar paréntesis anidados correctamente
+function parseSiEntoncesExpression(fullExpression) {
+    console.log('   🔀 Parseando expresión Si entonces:', fullExpression);
+
+    // Expresión esperada: "#IF(...)# #THEN(...)TH# #ELSE(...)EL#"
+    const result = {
+        ifContent: '',
+        thenContent: '',
+        elseContent: ''
+    };
+
+    try {
+        // Función auxiliar para extraer contenido entre paréntesis manejando anidación
+        function extractContent(text, startPattern, endPattern) {
+            const startIdx = text.indexOf(startPattern);
+            if (startIdx === -1) return '';
+
+            const contentStart = startIdx + startPattern.length;
+            let depth = 1; // Empezamos dentro del primer paréntesis
+            let i = contentStart;
+
+            while (i < text.length && depth > 0) {
+                if (text[i] === '(') {
+                    depth++;
+                } else if (text[i] === ')') {
+                    depth--;
+                }
+                i++;
+            }
+
+            // Ahora i está después del paréntesis de cierre
+            // Buscar el endPattern
+            const content = text.substring(contentStart, i - 1);
+            const actualEnd = text.substring(i - 1, i - 1 + endPattern.length);
+
+            if (actualEnd === endPattern) {
+                return content;
+            }
+
+            return '';
+        }
+
+        // Extraer IF: desde #IF( hasta )#
+        result.ifContent = extractContent(fullExpression, '#IF(', ')#');
+        if (result.ifContent) {
+            console.log('   ✅ IF extraído:', result.ifContent);
+        }
+
+        // Extraer THEN: desde #THEN( hasta )TH#
+        result.thenContent = extractContent(fullExpression, '#THEN(', ')TH#');
+        if (result.thenContent) {
+            console.log('   ✅ THEN extraído:', result.thenContent);
+        }
+
+        // Extraer ELSE: desde #ELSE( hasta )EL#
+        result.elseContent = extractContent(fullExpression, '#ELSE(', ')EL#');
+        if (result.elseContent) {
+            console.log('   ✅ ELSE extraído:', result.elseContent);
+        }
+    } catch (error) {
+        console.error('   ❌ Error parseando Si entonces:', error);
+    }
+
+    return result;
+}
+
 // ✨ NUEVA FUNCIÓN: Cargar parámetros guardados en el panel de configuración para editar
 function loadParamsIntoConfigPanel(metadata, varId) {
     console.log('📥 Cargando parámetros para editar:', metadata);
@@ -1656,6 +2069,60 @@ function loadParamsIntoConfigPanel(metadata, varId) {
             updateBlockPreview();
         }, 100);
 
+        return;
+    }
+
+    // ✨ NUEVO: Manejo especial para "Si entonces" usando tokens guardados
+    if (metadata.functionName === 'Si entonces' && metadata.siEntonces) {
+        console.log('   🔀 Cargando Si entonces desde tokens guardados:', metadata.siEntonces);
+
+        const body = document.getElementById('configPanelBody' + varId);
+        if (!body) return;
+
+        const miniBuilders = body.querySelectorAll('.mini-expression-builder');
+        console.log('   Mini-builders encontrados:', miniBuilders.length);
+
+        // Cargar IF en param1 (Condición)
+        if (miniBuilders[0] && metadata.siEntonces.ifContent) {
+            const builderId = miniBuilders[0].id;
+            console.log(`   Cargando IF en ${builderId}:`, metadata.siEntonces.ifContent);
+            const components = parseExpressionToComponents(metadata.siEntonces.ifContent);
+            if (components.length > 0) {
+                miniBuilderComponents[builderId] = components;
+                renderMiniBuilder(builderId);
+                console.log(`      ✅ ${components.length} componentes cargados en IF`);
+            }
+        }
+
+        // Cargar THEN en param2 (Verdadero)
+        if (miniBuilders[1] && metadata.siEntonces.thenContent) {
+            const builderId = miniBuilders[1].id;
+            console.log(`   Cargando THEN en ${builderId}:`, metadata.siEntonces.thenContent);
+            const components = parseExpressionToComponents(metadata.siEntonces.thenContent);
+            if (components.length > 0) {
+                miniBuilderComponents[builderId] = components;
+                renderMiniBuilder(builderId);
+                console.log(`      ✅ ${components.length} componentes cargados en THEN`);
+            }
+        }
+
+        // Cargar ELSE en param3 (Falso)
+        if (miniBuilders[2] && metadata.siEntonces.elseContent) {
+            const builderId = miniBuilders[2].id;
+            console.log(`   Cargando ELSE en ${builderId}:`, metadata.siEntonces.elseContent);
+            const components = parseExpressionToComponents(metadata.siEntonces.elseContent);
+            if (components.length > 0) {
+                miniBuilderComponents[builderId] = components;
+                renderMiniBuilder(builderId);
+                console.log(`      ✅ ${components.length} componentes cargados en ELSE`);
+            }
+        }
+
+        setTimeout(() => {
+            updateCurrentLevelPreview();
+        }, 100);
+
+        console.log('   ✅ Si entonces cargado correctamente desde tokens');
         return;
     }
 
@@ -1699,6 +2166,12 @@ function loadParamsIntoConfigPanel(metadata, varId) {
         }
     });
 
+    console.log('   📊 Estado final del navigationStack después de cargar params:');
+    console.log('      Total niveles:', navigationStack.levels.length);
+    navigationStack.levels.forEach((level, index) => {
+        console.log(`      Nivel ${index} (${level.functionName}):`, Object.keys(level.miniBuilderStates));
+    });
+
     // Actualizar vista previa
     setTimeout(() => {
         updateCurrentLevelPreview();
@@ -1736,11 +2209,12 @@ function recreateNestedLevel(functionName, parentBuilderId, functionId, params, 
 
         // Parsear componentes del parámetro
         const paramComponents = parseExpressionToComponents(paramExpression);
+        console.log(`         🔍 Componentes parseados:`, paramComponents);
 
         if (paramComponents.length > 0) {
             // Guardar componentes en el estado del nivel
             newLevel.miniBuilderStates[paramBuilderId] = paramComponents;
-            console.log(`         💾 Guardados ${paramComponents.length} componentes en ${paramBuilderId}`);
+            console.log(`         💾 Guardados ${paramComponents.length} componentes en ${paramBuilderId}:`, paramComponents);
 
             // Recursivamente recrear sub-niveles si hay funciones anidadas
             paramComponents.forEach(comp => {
@@ -1753,6 +2227,8 @@ function recreateNestedLevel(functionName, parentBuilderId, functionId, params, 
                     return;
                 }
             });
+        } else {
+            console.log(`         ⚠️ No se parsearon componentes para ${paramBuilderId}`);
         }
     });
 
@@ -1761,9 +2237,13 @@ function recreateNestedLevel(functionName, parentBuilderId, functionId, params, 
         navigationStack.levels.push(newLevel);
         console.log('      ✅ Nivel recreado y agregado al stack');
     }
+
+    console.log('      📊 Estado final del nivel:', functionName);
+    console.log('         miniBuilderStates:', newLevel.miniBuilderStates);
 }
 
 // ✨ NUEVA FUNCIÓN: Parsear parámetros respetando funciones anidadas
+// ✅ CORREGIDO: Contar niveles de anidamiento correctamente en lugar de alternar
 function parseNestedParams(paramsStr) {
     if (!paramsStr || paramsStr.trim() === '') {
         return [];
@@ -1777,13 +2257,25 @@ function parseNestedParams(paramsStr) {
         const char = paramsStr[i];
 
         if (char === '#') {
-            // Alternar depth cuando encontramos #
+            // Determinar si es apertura o cierre
             if (i > 0 && paramsStr[i - 1] !== '\\') { // No contar \# escapado
-                depth = depth === 0 ? 1 : 0;
+                // Es apertura si está seguido por una letra (inicio de nombre de función)
+                // Es cierre si está precedido por ) o es el final
+                const nextChar = i + 1 < paramsStr.length ? paramsStr[i + 1] : '';
+                const isOpening = /[A-Za-z]/.test(nextChar);
+
+                if (isOpening) {
+                    depth++; // Abre una función
+                } else {
+                    depth--; // Cierra una función
+                }
+
+                console.log(`      [parseNestedParams] char='#' pos=${i} nextChar='${nextChar}' isOpening=${isOpening} depth=${depth}`);
             }
             current += char;
         } else if (char === ',' && depth === 0) {
             // Solo dividir por coma si no estamos dentro de una función (#...#)
+            console.log(`      [parseNestedParams] Dividiendo parámetro en pos=${i}, depth=${depth}`);
             if (current.trim() !== '') {
                 params.push(current.trim());
             }
@@ -1798,6 +2290,7 @@ function parseNestedParams(paramsStr) {
         params.push(current.trim());
     }
 
+    console.log(`   ✅ parseNestedParams resultado: ${params.length} parámetros`, params);
     return params;
 }
 
@@ -1880,6 +2373,17 @@ function parseExpressionToComponents(expression) {
                 i = endIdx + 1;
                 continue;
             }
+        }
+
+        // ✅ Detectar paréntesis
+        if (char === '(' || char === ')') {
+            components.push({
+                type: 'parenthesis',
+                value: char,
+                html: `<span class="expr-value">${char}</span>`
+            });
+            i++;
+            continue;
         }
 
         // Detectar operadores
@@ -2156,23 +2660,8 @@ function agregarVariable() {
                                 Arrastra funciones u operadores o usa los componentes
                             </div>
                         </div>
-                        
-                        <div class="component-palette">
-                            <div class="component-palette-title">
-                                <i class="fas fa-cubes"></i>
-                                Componentes Disponibles
-                            </div>
-                            <div class="component-palette-items">
-                                <div class="component-palette-item" data-type="value" onclick="addValueComponent(${variablesCounter})">
-                                    <i class="fas fa-hashtag"></i>
-                                    Valor
-                                </div>
-                                <div class="component-palette-item" data-type="parenthesis" onclick="addParenthesis(${variablesCounter}, '(')">
-                                    <i class="fas fa-bracket-curly"></i>
-                                    ( )
-                                </div>
-                            </div>
-                        </div>
+
+                        <!-- ✅ Component-palette ELIMINADO - Los botones ahora están en el sidebar de operadores -->
 
                         <!-- Panel de configuración inline para funciones -->
                         <div class="config-panel" id="configPanel${variablesCounter}">
@@ -3772,9 +4261,24 @@ function addBackButtonToPanel(varId) {
 // ✨ NUEVA FUNCIÓN: Guardar toda la estructura con niveles anidados de una vez
 function acceptAllNestedLevels(varId) {
     console.log('🔄 Procesando todos los niveles anidados...');
+    console.log('   📊 Estado inicial del navigationStack:');
+    navigationStack.levels.forEach((level, idx) => {
+        console.log(`      Nivel ${idx} (${level.functionName}):`, Object.keys(level.miniBuilderStates));
+        Object.keys(level.miniBuilderStates).forEach(builderId => {
+            console.log(`         ${builderId}:`, level.miniBuilderStates[builderId]);
+        });
+    });
 
     // Guardar el estado actual del nivel raíz
     saveCurrentLevelState();
+
+    console.log('   📊 Estado después de guardar nivel actual:');
+    navigationStack.levels.forEach((level, idx) => {
+        console.log(`      Nivel ${idx} (${level.functionName}):`, Object.keys(level.miniBuilderStates));
+        Object.keys(level.miniBuilderStates).forEach(builderId => {
+            console.log(`         ${builderId}:`, level.miniBuilderStates[builderId]);
+        });
+    });
 
     // ✅ NUEVO: Restaurar TODOS los mini-builders de TODOS los niveles desde sus estados guardados
     // Esto asegura que todos los componentes estén en memoria antes de procesarlos
@@ -3782,6 +4286,7 @@ function acceptAllNestedLevels(varId) {
     navigationStack.levels.forEach((level, idx) => {
         console.log(`   Restaurando mini-builders del nivel ${idx}:`, Object.keys(level.miniBuilderStates));
         Object.keys(level.miniBuilderStates).forEach(builderId => {
+            console.log(`      ${builderId}: ${level.miniBuilderStates[builderId].length} componentes`);
             miniBuilderComponents[builderId] = JSON.parse(
                 JSON.stringify(level.miniBuilderStates[builderId])
             );
@@ -3792,9 +4297,28 @@ function acceptAllNestedLevels(varId) {
     // Comenzar desde el nivel más alto (más anidado) hacia el nivel 0
     for (let levelIndex = navigationStack.levels.length - 1; levelIndex > 0; levelIndex--) {
         const currentLevel = navigationStack.levels[levelIndex];
-        const parentLevel = navigationStack.levels[levelIndex - 1];
 
         console.log(`   Procesando nivel ${levelIndex}: ${currentLevel.functionName}`);
+
+        // ✅ CORREGIDO: Encontrar el nivel padre REAL usando parentBuilderId
+        // No asumir que es levelIndex - 1 (árbol ramificado, no secuencial)
+        let parentLevel = null;
+        let parentLevelIndex = -1;
+
+        if (currentLevel.parentBuilderId) {
+            // Extraer el nivel del parentBuilderId (ej: "miniBuilder_level0_param3" → 0)
+            const levelMatch = currentLevel.parentBuilderId.match(/level(\d+)_/);
+            if (levelMatch) {
+                parentLevelIndex = parseInt(levelMatch[1]);
+                parentLevel = navigationStack.levels[parentLevelIndex];
+                console.log(`      🔍 Padre real encontrado: nivel ${parentLevelIndex} (${parentLevel?.functionName})`);
+            }
+        }
+
+        if (!parentLevel) {
+            console.warn(`      ⚠️ No se encontró nivel padre para ${currentLevel.functionName}`);
+            continue;
+        }
 
         // Construir expresión completa del nivel actual
         const levelExpression = buildLevelExpression(currentLevel);
@@ -3816,9 +4340,9 @@ function acceptAllNestedLevels(varId) {
                         levelExpression;
                     functionComp.html = `<i class="fas fa-magic expr-icon"></i><span class="expr-value">${shortPreview}</span>`;
 
-                    console.log(`      ✅ Componente actualizado en nivel ${levelIndex - 1}:`, functionComp.value);
+                    console.log(`      ✅ Componente actualizado en nivel ${parentLevelIndex}:`, functionComp.value);
 
-                    // Actualizar estado guardado del padre
+                    // Actualizar estado guardado del padre REAL
                     parentLevel.miniBuilderStates[currentLevel.parentBuilderId] = JSON.parse(
                         JSON.stringify(miniBuilderComponents[currentLevel.parentBuilderId])
                     );
@@ -3842,6 +4366,9 @@ function acceptAllNestedLevels(varId) {
     let functionText;
     let displayPreview;
     let params = []; // ✅ CORREGIDO: Declarar params fuera del bloque para que esté disponible en metadata
+    let ifContent = '';     // ✅ Para "Si entonces"
+    let thenContent = '';   // ✅ Para "Si entonces"
+    let elseContent = '';   // ✅ Para "Si entonces"
 
     // Manejo especial para "Calcular edad"
     if (rootLevel.functionName === 'Calcular edad' && typeof droppedBlocks !== 'undefined') {
@@ -3850,7 +4377,45 @@ function acceptAllNestedLevels(varId) {
         displayPreview = buildCalculaEdadPreview();   // Vista previa con lo arrastrado
         console.log('   💾 Valor guardado:', functionText);
         console.log('   👁️ Vista previa:', displayPreview);
-    } else {
+    }
+    // ✨ NUEVO: Manejo especial para "Si entonces" con formato IF/THEN/ELSE
+    else if (rootLevel.functionName === 'Si entonces') {
+        console.log('   🔀 Si entonces detectado, construyendo formato IF/THEN/ELSE');
+
+        // Obtener componentes de cada mini-builder
+        const builders = Object.keys(rootLevel.miniBuilderStates).sort();
+        console.log('   📋 Mini-builders encontrados:', builders);
+
+        // Resetear variables (ya declaradas en el scope externo)
+        ifContent = '';
+        thenContent = '';
+        elseContent = '';
+
+        // Extraer contenido de cada parámetro
+        builders.forEach((builderId, index) => {
+            const components = rootLevel.miniBuilderStates[builderId];
+            if (components && components.length > 0) {
+                const expression = buildComponentsExpression(components);
+                params.push(expression);
+
+                // Asignar a IF, THEN o ELSE según el índice
+                if (index === 0) ifContent = expression;
+                else if (index === 1) thenContent = expression;
+                else if (index === 2) elseContent = expression;
+            }
+        });
+
+        // Construir expresión en formato IF/THEN/ELSE
+        functionText = `#IF(${ifContent})# #THEN(${thenContent})TH# #ELSE(${elseContent})EL#`;
+        displayPreview = functionText;
+
+        console.log('   ✅ Expresión Si entonces construida:');
+        console.log('      IF:', ifContent);
+        console.log('      THEN:', thenContent);
+        console.log('      ELSE:', elseContent);
+        console.log('      Final:', functionText);
+    }
+    else {
         // Funciones normales con mini-builders
         for (let builderId in rootLevel.miniBuilderStates) {
             const components = rootLevel.miniBuilderStates[builderId];
@@ -3884,6 +4449,16 @@ function acceptAllNestedLevels(varId) {
     if (rootLevel.functionName === 'Calcular edad' && droppedBlocks && droppedBlocks.length > 0) {
         metadata.blocks = JSON.parse(JSON.stringify(droppedBlocks));
         console.log('📦 Guardando blocks en metadata (nested):', metadata.blocks);
+    }
+
+    // ✨ NUEVO: Agregar tokens separados para "Si entonces"
+    if (rootLevel.functionName === 'Si entonces') {
+        metadata.siEntonces = {
+            ifContent: ifContent || '',
+            thenContent: thenContent || '',
+            elseContent: elseContent || ''
+        };
+        console.log('📦 Guardando tokens Si entonces en metadata:', metadata.siEntonces);
     }
 
     console.log('📋 Metadata final (nested):', metadata);
@@ -3964,10 +4539,27 @@ function acceptFunctionConfig(varId) {
     if (navigationStack.currentLevel > 0) {
         // Estamos en un nivel anidado, guardar y volver al nivel anterior
         const currentLevel = navigationStack.levels[navigationStack.currentLevel];
-        const parentLevel = navigationStack.levels[navigationStack.currentLevel - 1];
-
         const parentBuilderId = currentLevel.parentBuilderId;
         const functionId = currentLevel.functionId;
+
+        // ✅ NUEVO: Encontrar el nivel padre correcto basándose en parentBuilderId
+        // El nivel padre no siempre es currentLevel - 1 cuando hay múltiples ramas
+        let parentLevelIndex = -1;
+        if (parentBuilderId) {
+            // Extraer el número de nivel del parentBuilderId (ej: miniBuilder_level0_param2 → 0)
+            const levelMatch = parentBuilderId.match(/level(\d+)_/);
+            if (levelMatch) {
+                parentLevelIndex = parseInt(levelMatch[1]);
+            }
+        }
+
+        if (parentLevelIndex === -1 || parentLevelIndex >= navigationStack.levels.length) {
+            console.error('❌ No se pudo encontrar el nivel padre para', parentBuilderId);
+            return;
+        }
+
+        const parentLevel = navigationStack.levels[parentLevelIndex];
+        console.log(`🔍 Nivel padre encontrado: ${parentLevelIndex} (${parentLevel.functionName})`);
 
         console.log('💾 Guardando función anidada:', {
             functionName: currentLevel.functionName,
@@ -4011,8 +4603,8 @@ function acceptFunctionConfig(varId) {
         // Guardar el estado actual antes de navegar
         saveCurrentLevelState();
 
-        // Navegar al nivel padre usando navigateToLevel en lugar de eliminar el nivel
-        navigateToLevel(navigationStack.currentLevel - 1);
+        // ✅ CORREGIDO: Navegar al nivel padre correcto usando parentLevelIndex
+        navigateToLevel(parentLevelIndex);
 
         // Renderizar el mini-builder padre para reflejar cambios
         setTimeout(() => {
@@ -4110,6 +4702,7 @@ function acceptFunctionConfig(varId) {
 // ✨ NUEVA FUNCIÓN: Construir expresión completa de un nivel con todos sus parámetros
 function buildLevelExpression(level) {
     console.log('🔨 Construyendo expresión para nivel:', level.functionName);
+    console.log('   📋 miniBuilderStates disponibles:', Object.keys(level.miniBuilderStates));
 
     // Recopilar parámetros de todos los mini-builders del nivel
     let params = [];
@@ -4117,11 +4710,13 @@ function buildLevelExpression(level) {
     // Iterar por todos los mini-builders guardados en el nivel
     for (let builderId in level.miniBuilderStates) {
         const components = level.miniBuilderStates[builderId];
+        console.log(`   🔍 Procesando ${builderId}:`, components);
         if (components && components.length > 0) {
             const expression = buildComponentsExpression(components);
-            console.log('   Builder', builderId, '→', expression);
+            console.log(`   Builder ${builderId} → ${expression} (${components.length} componentes)`);
             params.push(expression);
         } else {
+            console.log(`   ⚠️ Builder ${builderId} está vacío o no tiene componentes`);
             params.push('');
         }
     }
@@ -4138,6 +4733,7 @@ function buildComponentsExpression(components) {
         if (comp.type === 'field') return `[${comp.value}]`;
         if (comp.type === 'operator') return comp.value;
         if (comp.type === 'value') return comp.value;
+        if (comp.type === 'parenthesis') return comp.value;  // ✅ Agregado soporte para paréntesis
         if (comp.type === 'function') {
             // Si la función está configurada, usar su expresión completa
             if (comp.configured && comp.fullExpression) {
@@ -4220,8 +4816,8 @@ function editNestedFunction(builderId, componentIndex) {
     console.log('   Parámetros guardados:', funcComponent.params);
 
     // ✅ Abrir configuración de esta función
-    // openNestedFunctionConfig ahora busca si el nivel ya existe y recupera sus parámetros automáticamente
-    openNestedFunctionConfig(funcComponent.value, builderId, funcComponent.functionId);
+    // Pasar el componente completo para poder cargar sus parámetros si ya está configurada
+    openNestedFunctionConfig(funcComponent.value, builderId, funcComponent.functionId, funcComponent);
 }
 
 // ✅ ELIMINADO: Segunda función closeConfigPanel duplicada - Ya existe una versión en línea 2590
@@ -4263,6 +4859,63 @@ function generateFieldOptions() {
 
 // Generar mini expression builder para parámetros de función
 let paramBuilderCounter = 0;
+
+// ✨ NUEVA FUNCIÓN: Toggle colapsar/expandir mini-builder
+function toggleMiniBuilder(containerId) {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+
+    container.classList.toggle('collapsed');
+
+    // Log para debug
+    const isCollapsed = container.classList.contains('collapsed');
+    console.log(`📦 Mini-builder ${containerId} ${isCollapsed ? 'colapsado' : 'expandido'}`);
+}
+
+// ✨ NUEVA FUNCIÓN: Generar mini-builder colapsable con breadcrumb individual (para "Si entonces")
+function generateCollapsibleMiniBuilder(paramId, label, placeholder, icon = '📋') {
+    const levelId = navigationStack.currentLevel >= 0 ? navigationStack.currentLevel : 0;
+    const builderId = `miniBuilder_level${levelId}_${paramId}`;
+    const containerId = `collapsible_${builderId}`;
+
+    console.log('🔨 Generando mini-builder colapsable:', builderId, 'para nivel:', levelId);
+
+    return `
+        <div class="collapsible-mini-builder" id="${containerId}">
+            <!-- Header con título y botón colapsar -->
+            <div class="mini-builder-header" onclick="toggleMiniBuilder('${containerId}')">
+                <div class="mini-builder-header-left">
+                    <span style="font-size: 16px;">${icon}</span>
+                    <span class="mini-builder-header-title">${label}</span>
+                </div>
+                <button type="button" class="mini-builder-toggle" onclick="event.stopPropagation(); toggleMiniBuilder('${containerId}')">
+                    <i class="fas fa-chevron-down"></i>
+                </button>
+            </div>
+
+            <!-- Contenido -->
+            <div class="mini-builder-content">
+                <!-- Breadcrumb individual para este mini-builder -->
+                <div id="breadcrumb_${builderId}" class="mini-builder-breadcrumb" style="display: none;">
+                    <!-- Dinámico: se llena con updateMiniBreadcrumb() -->
+                </div>
+
+                <!-- Mini Expression Builder -->
+                <div class="mini-expression-builder"
+                     id="${builderId}"
+                     ondrop="dropIntoMiniBuilder(event, '${builderId}')"
+                     ondragover="allowMiniBuilderDrop(event)"
+                     ondragleave="dragMiniBuilderLeave(event)"
+                     data-param-id="${paramId}">
+                    <div class="empty" style="font-size: 13px; color: var(--gray-500); display: flex; align-items: center; justify-content: center; min-height: 60px;">
+                        <i class="fas fa-hand-pointer" style="margin-right: 6px;"></i>
+                        ${placeholder}
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+}
 
 function generateMiniBuilder(paramId, label, placeholder = "Arrastra campos, operadores o funciones", includeBreadcrumb = false) {
     // ✅ CORREGIDO: ID predecible basado en nivel actual y paramId
@@ -4326,6 +4979,95 @@ function dragMiniBuilderLeave(event) {
         target.classList.remove('drag-over');
     }
 }
+
+// ✨ NUEVA FUNCIÓN: Generar interfaz de tabs para "Si entonces"
+function generateSiEntoncesTabs() {
+    const levelId = navigationStack.currentLevel >= 0 ? navigationStack.currentLevel : 0;
+
+    const tabs = [
+        { id: 'param1', icon: '🔀', label: 'Condición', placeholder: 'Arrastra campos y operadores de comparación' },
+        { id: 'param2', icon: '✅', label: 'Verdadero', placeholder: 'Arrastra un campo o usa el botón Valor' },
+        { id: 'param3', icon: '❌', label: 'Falso', placeholder: 'Arrastra un campo o usa el botón Valor' }
+    ];
+
+    // Headers de tabs
+    let tabHeadersHtml = '<div class="si-entonces-tabs-header">';
+    tabs.forEach((tab, index) => {
+        const activeClass = index === 0 ? 'active' : '';
+        tabHeadersHtml += `
+            <button type="button" class="si-entonces-tab-button ${activeClass}"
+                    onclick="switchSiEntoncesTab('${tab.id}')"
+                    data-tab="${tab.id}">
+                <span style="font-size: 16px; margin-right: 6px;">${tab.icon}</span>
+                ${tab.label}
+            </button>
+        `;
+    });
+    tabHeadersHtml += '</div>';
+
+    // Contenido de tabs
+    let tabContentHtml = '<div class="si-entonces-tabs-content">';
+    tabs.forEach((tab, index) => {
+        const activeClass = index === 0 ? 'active' : '';
+        const builderId = `miniBuilder_level${levelId}_${tab.id}`;
+
+        tabContentHtml += `
+            <div class="si-entonces-tab-panel ${activeClass}" data-tab="${tab.id}">
+                <!-- Breadcrumb individual para este mini-builder -->
+                <div id="breadcrumb_${builderId}" class="mini-builder-breadcrumb" style="display: none;">
+                    <!-- Dinámico: se llena con updateMiniBreadcrumb() -->
+                </div>
+
+                <!-- Mini Expression Builder -->
+                <div class="mini-expression-builder"
+                     id="${builderId}"
+                     ondrop="dropIntoMiniBuilder(event, '${builderId}')"
+                     ondragover="allowMiniBuilderDrop(event)"
+                     ondragleave="dragMiniBuilderLeave(event)"
+                     data-param-id="${tab.id}">
+                    <div class="empty" style="font-size: 13px; color: var(--gray-500); display: flex; align-items: center; justify-content: center; min-height: 60px;">
+                        <i class="fas fa-hand-pointer" style="margin-right: 6px;"></i>
+                        ${tab.placeholder}
+                    </div>
+                </div>
+            </div>
+        `;
+    });
+    tabContentHtml += '</div>';
+
+    return `
+        <div class="si-entonces-tabs-container">
+            ${tabHeadersHtml}
+            ${tabContentHtml}
+        </div>
+    `;
+}
+
+// ✨ NUEVA FUNCIÓN: Cambiar entre tabs de "Si entonces"
+function switchSiEntoncesTab(tabId) {
+    console.log('🔄 Cambiando a tab:', tabId);
+
+    // Actualizar botones
+    const buttons = document.querySelectorAll('.si-entonces-tab-button');
+    buttons.forEach(btn => {
+        if (btn.dataset.tab === tabId) {
+            btn.classList.add('active');
+        } else {
+            btn.classList.remove('active');
+        }
+    });
+
+    // Actualizar paneles
+    const panels = document.querySelectorAll('.si-entonces-tab-panel');
+    panels.forEach(panel => {
+        if (panel.dataset.tab === tabId) {
+            panel.classList.add('active');
+        } else {
+            panel.classList.remove('active');
+        }
+    });
+}
+
 // Generar formulario según la función (código extenso - lo resumo)
 function generateFunctionForm(functionName) {
     let html = '';
@@ -4449,9 +5191,7 @@ function generateFunctionForm(functionName) {
                     `;
             break;
         case 'Si entonces':
-            html = generateMiniBuilder('param1', 'Condición', 'Arrastra campos y operadores de comparación', true);
-            html += generateMiniBuilder('param2', 'Valor si es Verdadero', 'Arrastra un campo o usa el botón Valor', true);
-            html += generateMiniBuilder('param3', 'Valor si es Falso', 'Arrastra un campo o usa el botón Valor', true);
+            html = generateSiEntoncesTabs();
             break;
         default:
             // Funciones simples que necesitan 1 o más parámetros de campo/expresión
