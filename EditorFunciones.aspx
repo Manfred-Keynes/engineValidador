@@ -1923,21 +1923,27 @@
             display: block;
         }
 
-        /* ===== PANEL LATERAL DE RECURSOS (Campos + Operadores) - SIEMPRE VISIBLE ===== */
+        /* ===== PANEL LATERAL DE OPERADORES - SIEMPRE VISIBLE ===== */
         .resources-sidebar {
             position: fixed;
-            left: 20px;
+            right: 20px;           /* Por defecto a la derecha (solo) */
             top: 120px;
-            width: 320px;
+            width: 300px;          /* Ancho ajustado */
             background: white;
             border: 1px solid var(--gray-200);
             border-radius: var(--border-radius);
             box-shadow: var(--shadow-lg);
-            z-index: 99; /* Menor que funciones para no tapar */
+            z-index: 99;
             max-height: calc(100vh - 140px);
             display: flex;
             flex-direction: column;
             overflow: hidden;
+            transition: right 0.3s ease;  /* ✅ Animación solo en la posición derecha */
+        }
+
+        /* Cuando hay una variable expandida, correrse a la izquierda */
+        .resources-sidebar.shift-left {
+            right: 336px;          /* ✅ Se corre para dejar espacio (300px + 16px gap + 20px) */
         }
 
         .resources-sidebar-header {
@@ -2019,21 +2025,21 @@
             padding: 4px 8px;
         }
 
-        /* Panel lateral fijo de funciones */
+        /* Panel lateral de funciones - SE MUESTRA/OCULTA A LA DERECHA */
         .functions-sidebar {
             position: fixed;
-            right: 20px;
-            top: 120px;
-            width: 320px;
+            right: 20px;             /* ✅ Siempre en el extremo derecho */
+            top: 120px;              /* Misma altura que operadores */
+            width: 300px;            /* Mismo ancho que operadores */
             background: white;
             border: 1px solid var(--gray-200);
             border-radius: var(--border-radius);
             box-shadow: var(--shadow-lg);
             z-index: 100;
-            max-height: calc(100vh - 140px);
-            display: none; /* Oculto por defecto */
+            max-height: calc(100vh - 140px);  /* Altura completa disponible */
+            display: none;           /* Oculto por defecto */
             flex-direction: column;
-            transition: opacity 0.3s ease-in-out;
+            overflow: hidden;        /* ✅ Importante para que el contenido tenga altura */
         }
 
         .functions-sidebar-header {

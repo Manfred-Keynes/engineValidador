@@ -2296,6 +2296,7 @@ function agregarVariable() {
 function toggleCard(id) {
     const card = document.getElementById('varCard' + id);
     const functionsSidebar = document.querySelector('.functions-sidebar');
+    const operatorsSidebar = document.querySelector('.resources-sidebar');
 
     // Si esta card ya está expandida, cerrarla
     if (card.classList.contains('expanded')) {
@@ -2305,6 +2306,11 @@ function toggleCard(id) {
         // Ocultar panel de funciones
         if (functionsSidebar) {
             functionsSidebar.style.display = 'none';
+        }
+
+        // ✅ Devolver operadores a la derecha
+        if (operatorsSidebar) {
+            operatorsSidebar.classList.remove('shift-left');
         }
         return;
     }
@@ -2321,9 +2327,21 @@ function toggleCard(id) {
     card.classList.add('expanded');
     currentExpandedCard = id;
 
+    // ✅ Mover operadores a la izquierda
+    if (operatorsSidebar) {
+        operatorsSidebar.classList.add('shift-left');
+    }
+
     // Mostrar panel de funciones
     if (functionsSidebar) {
+        console.log('🔵 Mostrando functions-sidebar');
+        console.log('   Display antes:', window.getComputedStyle(functionsSidebar).display);
         functionsSidebar.style.display = 'flex';
+        console.log('   Display después:', window.getComputedStyle(functionsSidebar).display);
+        console.log('   Altura:', window.getComputedStyle(functionsSidebar).height);
+        console.log('   Posición:', window.getComputedStyle(functionsSidebar).top);
+    } else {
+        console.log('❌ No se encontró .functions-sidebar');
     }
 
     // Scroll suave a la card expandida
@@ -2388,6 +2406,12 @@ function eliminarVariable(id) {
             const functionsSidebar = document.querySelector('.functions-sidebar');
             if (functionsSidebar) {
                 functionsSidebar.style.display = 'none';
+            }
+
+            // ✅ Devolver operadores a la derecha
+            const operatorsSidebar = document.querySelector('.resources-sidebar');
+            if (operatorsSidebar) {
+                operatorsSidebar.classList.remove('shift-left');
             }
         }
 
