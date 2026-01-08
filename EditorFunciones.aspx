@@ -2095,16 +2095,16 @@
             display: block;
         }
 
-        /* ===== PANEL LATERAL DE OPERADORES - DISEÑO PROFESIONAL ===== */
+        /* ===== PANEL LATERAL DE OPERADORES - DISEÑO MODERNO ===== */
         .resources-sidebar {
             position: fixed;
             right: 20px;
             top: 120px;
-            width: 320px;
+            width: 280px;
             background: #ffffff;
             border: none;
-            border-radius: 16px;
-            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.04);
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08), 0 2px 8px rgba(0, 0, 0, 0.04);
             z-index: 99;
             max-height: calc(100vh - 140px);
             display: flex;
@@ -2119,13 +2119,12 @@
         }
 
         .resources-sidebar-header {
-            padding: 20px 20px 16px 20px;
-            border-bottom: 1px solid #f1f5f9;
+            padding: 18px 20px;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border-radius: 16px 16px 0 0;
+            background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+            border-radius: 20px 20px 0 0;
         }
 
         .resources-sidebar-header-left {
@@ -2135,15 +2134,32 @@
         }
 
         .resources-sidebar-header i {
-            color: rgba(255, 255, 255, 0.9);
-            font-size: 20px;
+            color: #ffffff;
+            font-size: 18px;
         }
 
         .resources-sidebar-title {
-            font-size: 15px;
+            font-size: 16px;
             font-weight: 700;
             color: #ffffff;
-            letter-spacing: 0.3px;
+        }
+
+        .resources-sidebar-info {
+            width: 28px;
+            height: 28px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ffffff;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .resources-sidebar-info:hover {
+            background: rgba(255, 255, 255, 0.3);
         }
 
         /* Sección dentro del panel de recursos */
@@ -2183,10 +2199,10 @@
         }
 
         .resources-section-content {
-            padding: 16px 20px;
+            padding: 16px;
             max-height: 400px;
             overflow-y: auto;
-            background: #fafbfc;
+            background: #ffffff;
         }
 
         /* Selector de segmento compacto */
@@ -2422,26 +2438,39 @@
             border-radius: var(--border-radius);
         }
 
-        .operators-static-title {
+        /* ===== DISEÑO MINIMALISTA DE OPERADORES ===== */
+
+        /* Categorías de operadores */
+        .op-category {
+            margin-bottom: 16px;
+        }
+
+        .op-category:last-child {
+            margin-bottom: 0;
+        }
+
+        .op-category-header {
             display: flex;
             align-items: center;
-            gap: 6px;
-            margin-bottom: 10px;
-            font-size: 12px;
+            gap: 8px;
+            font-size: 11px;
             font-weight: 600;
-            color: var(--gray-700);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #64748b;
+            margin-bottom: 10px;
+            padding-bottom: 6px;
+            border-bottom: 1px solid #e2e8f0;
         }
 
-        .operators-static-title i {
-            color: #f59e0b;
-            font-size: 14px;
+        .op-category-header i {
+            font-size: 12px;
         }
 
-        .operators-grid {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 6px;
-        }
+        .op-category-header.arithmetic i { color: #8b5cf6; }
+        .op-category-header.comparison i { color: #06b6d4; }
+        .op-category-header.logic i { color: #ec4899; }
+        .op-category-header.special i { color: #f59e0b; }
 
         /* Grid de operadores */
         .operators-grid {
@@ -2450,158 +2479,137 @@
             gap: 8px;
         }
 
-        /* Separador de categoría */
-        .op-category-label {
-            width: 100%;
-            font-size: 10px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.8px;
-            color: #94a3b8;
-            margin: 12px 0 6px 0;
-            padding-bottom: 4px;
-            border-bottom: 1px solid #e2e8f0;
-        }
-
-        .op-category-label:first-child {
-            margin-top: 0;
-        }
-
-        /* Operador Pill - Diseño Profesional */
+        /* Operador Pill - Diseño Cuadrado Minimalista */
         .op-pill {
-            display: inline-flex;
+            display: flex;
             align-items: center;
-            gap: 6px;
-            padding: 8px 14px;
-            font-size: 12px;
+            justify-content: center;
+            width: 42px;
+            height: 42px;
+            font-size: 18px;
             font-weight: 600;
-            line-height: 1;
-            color: #475569;
-            background: #ffffff;
-            border: 1px solid #e2e8f0;
-            border-radius: 8px;
+            font-family: 'SF Mono', 'Consolas', monospace;
+            color: #ffffff;
+            background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+            border: none;
+            border-radius: 10px;
             cursor: grab;
             transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-            text-align: center;
-            white-space: nowrap;
-            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+            box-shadow: 0 2px 8px rgba(139, 92, 246, 0.3);
         }
 
         .op-pill:active {
             cursor: grabbing;
-            transform: scale(0.98);
+            transform: scale(0.95);
         }
 
         .op-pill:hover {
-            background: #f8fafc;
-            border-color: #cbd5e1;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            transform: translateY(-3px);
+            box-shadow: 0 6px 16px rgba(139, 92, 246, 0.4);
         }
 
         .op-pill.dragging {
-            opacity: 0.6;
-            transform: scale(1.02);
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+            opacity: 0.7;
+            transform: scale(1.05);
         }
 
-        /* Símbolo del operador */
-        .op-pill-symbol {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 22px;
-            height: 22px;
-            font-size: 14px;
-            font-weight: 700;
-            font-family: 'SF Mono', 'Consolas', monospace;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: #ffffff;
-            border-radius: 6px;
-            line-height: 1;
-        }
-
-        /* Nombre del operador */
-        .op-pill-name {
-            font-size: 12px;
-            font-weight: 500;
-            color: #334155;
-            line-height: 1;
-        }
-
-        /* ===== Variantes de color por categoría ===== */
-
-        /* Operadores Aritméticos - Morado */
-        .op-pill[data-operator="+"] .op-pill-symbol,
-        .op-pill[data-operator="-"] .op-pill-symbol,
-        .op-pill[data-operator="*"] .op-pill-symbol,
-        .op-pill[data-operator="/"] .op-pill-symbol {
+        /* Operadores Aritméticos - Morado sólido */
+        .op-pill.arithmetic {
             background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+            box-shadow: 0 2px 8px rgba(139, 92, 246, 0.3);
         }
 
-        /* Operadores de Comparación - Azul */
-        .op-pill[data-operator=">"] .op-pill-symbol,
-        .op-pill[data-operator="<"] .op-pill-symbol,
-        .op-pill[data-operator=">="] .op-pill-symbol,
-        .op-pill[data-operator="<="] .op-pill-symbol,
-        .op-pill[data-operator="="] .op-pill-symbol,
-        .op-pill[data-operator="!="] .op-pill-symbol {
-            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+        .op-pill.arithmetic:hover {
+            box-shadow: 0 6px 16px rgba(139, 92, 246, 0.4);
         }
 
-        /* Estilos especiales para Valor */
-        .op-pill-special {
-            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%) !important;
-            border-color: #fcd34d !important;
+        /* Operadores de Comparación - Cyan sólido */
+        .op-pill.comparison {
+            background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);
+            box-shadow: 0 2px 8px rgba(6, 182, 212, 0.3);
         }
 
-        .op-pill-special .op-pill-symbol {
-            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%) !important;
+        .op-pill.comparison:hover {
+            box-shadow: 0 6px 16px rgba(6, 182, 212, 0.4);
         }
 
-        .op-pill-special .op-pill-name {
-            color: #92400e !important;
+        /* Operadores de Comparación con borde (>=, <=, !=) */
+        .op-pill.comparison-outline {
+            background: transparent;
+            color: #06b6d4;
+            border: 2px solid #06b6d4;
+            box-shadow: none;
         }
 
-        .op-pill-special:hover {
-            background: linear-gradient(135deg, #fde68a 0%, #fcd34d 100%) !important;
-            border-color: #f59e0b !important;
+        .op-pill.comparison-outline:hover {
+            background: rgba(6, 182, 212, 0.1);
+            box-shadow: 0 4px 12px rgba(6, 182, 212, 0.2);
         }
 
-        /* Estilos para Paréntesis */
-        .op-pill-parenthesis {
-            background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%) !important;
-            border-color: #6ee7b7 !important;
+        /* Operadores Lógicos - Rosa/Magenta */
+        .op-pill.logic {
+            width: auto;
+            padding: 0 14px;
+            font-size: 13px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #ec4899 0%, #db2777 100%);
+            box-shadow: 0 2px 8px rgba(236, 72, 153, 0.3);
         }
 
-        .op-pill-parenthesis .op-pill-symbol {
-            background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
+        .op-pill.logic:hover {
+            box-shadow: 0 6px 16px rgba(236, 72, 153, 0.4);
         }
 
-        .op-pill-parenthesis .op-pill-name {
-            color: #065f46 !important;
+        /* Especiales - Valor */
+        .op-pill.special-value {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            box-shadow: 0 2px 8px rgba(245, 158, 11, 0.3);
         }
 
-        .op-pill-parenthesis:hover {
-            background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%) !important;
-            border-color: #34d399 !important;
+        .op-pill.special-value:hover {
+            box-shadow: 0 6px 16px rgba(245, 158, 11, 0.4);
+        }
+
+        /* Especiales - Paréntesis */
+        .op-pill.special-parenthesis {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+        }
+
+        .op-pill.special-parenthesis:hover {
+            box-shadow: 0 6px 16px rgba(16, 185, 129, 0.4);
+        }
+
+        /* Especiales - Where */
+        .op-pill.special-where {
+            width: auto;
+            padding: 0 14px;
+            font-size: 13px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+            box-shadow: 0 2px 8px rgba(99, 102, 241, 0.3);
+        }
+
+        .op-pill.special-where:hover {
+            box-shadow: 0 6px 16px rgba(99, 102, 241, 0.4);
         }
 
         /* Hint del sidebar */
         .operators-sidebar-hint {
-            padding: 14px 20px;
+            padding: 12px 16px;
             background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
             border-top: 1px solid #bbf7d0;
             font-size: 11px;
             color: #166534;
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
+            border-radius: 0 0 16px 16px;
         }
 
         .operators-sidebar-hint i {
             color: #22c55e;
-            font-size: 14px;
+            font-size: 12px;
         }
 
         /* ===== MODAL ANIDADO PARA CONFIGURAR FUNCIONES ===== */
@@ -3343,66 +3351,59 @@
 
         <!-- Contenido de Operadores -->
         <div class="resources-section-content">
-            <div class="operators-grid">
-                <!-- Categoría: Aritméticos -->
-                <div class="op-category-label">Aritméticos</div>
-                <div class="op-pill draggable-operator-item" draggable="true" data-operator="+" ondragstart="dragOperatorStart(event)" ondragend="dragOperatorEnd(event)">
-                    <span class="op-pill-symbol">+</span>
-                    <span class="op-pill-name">Suma</span>
+            <!-- Categoría: Aritméticos -->
+            <div class="op-category">
+                <div class="op-category-header arithmetic">
+                    <i class="fas fa-calculator"></i>
+                    <span>Aritméticos</span>
                 </div>
-                <div class="op-pill draggable-operator-item" draggable="true" data-operator="-" ondragstart="dragOperatorStart(event)" ondragend="dragOperatorEnd(event)">
-                    <span class="op-pill-symbol">−</span>
-                    <span class="op-pill-name">Resta</span>
+                <div class="operators-grid">
+                    <div class="op-pill arithmetic draggable-operator-item" draggable="true" data-operator="+" ondragstart="dragOperatorStart(event)" ondragend="dragOperatorEnd(event)" title="Suma">+</div>
+                    <div class="op-pill arithmetic draggable-operator-item" draggable="true" data-operator="-" ondragstart="dragOperatorStart(event)" ondragend="dragOperatorEnd(event)" title="Resta">−</div>
+                    <div class="op-pill arithmetic draggable-operator-item" draggable="true" data-operator="*" ondragstart="dragOperatorStart(event)" ondragend="dragOperatorEnd(event)" title="Multiplicación">×</div>
+                    <div class="op-pill arithmetic draggable-operator-item" draggable="true" data-operator="/" ondragstart="dragOperatorStart(event)" ondragend="dragOperatorEnd(event)" title="División">÷</div>
                 </div>
-                <div class="op-pill draggable-operator-item" draggable="true" data-operator="*" ondragstart="dragOperatorStart(event)" ondragend="dragOperatorEnd(event)">
-                    <span class="op-pill-symbol">×</span>
-                    <span class="op-pill-name">Multiplicación</span>
-                </div>
-                <div class="op-pill draggable-operator-item" draggable="true" data-operator="/" ondragstart="dragOperatorStart(event)" ondragend="dragOperatorEnd(event)">
-                    <span class="op-pill-symbol">÷</span>
-                    <span class="op-pill-name">División</span>
-                </div>
+            </div>
 
-                <!-- Categoría: Comparación -->
-                <div class="op-category-label">Comparación</div>
-                <div class="op-pill draggable-operator-item" draggable="true" data-operator=">" ondragstart="dragOperatorStart(event)" ondragend="dragOperatorEnd(event)">
-                    <span class="op-pill-symbol">&gt;</span>
-                    <span class="op-pill-name">Mayor</span>
+            <!-- Categoría: Comparación -->
+            <div class="op-category">
+                <div class="op-category-header comparison">
+                    <i class="fas fa-not-equal"></i>
+                    <span>Comparación</span>
                 </div>
-                <div class="op-pill draggable-operator-item" draggable="true" data-operator="<" ondragstart="dragOperatorStart(event)" ondragend="dragOperatorEnd(event)">
-                    <span class="op-pill-symbol">&lt;</span>
-                    <span class="op-pill-name">Menor</span>
+                <div class="operators-grid">
+                    <div class="op-pill comparison draggable-operator-item" draggable="true" data-operator=">" ondragstart="dragOperatorStart(event)" ondragend="dragOperatorEnd(event)" title="Mayor que">&gt;</div>
+                    <div class="op-pill comparison draggable-operator-item" draggable="true" data-operator="<" ondragstart="dragOperatorStart(event)" ondragend="dragOperatorEnd(event)" title="Menor que">&lt;</div>
+                    <div class="op-pill comparison draggable-operator-item" draggable="true" data-operator="=" ondragstart="dragOperatorStart(event)" ondragend="dragOperatorEnd(event)" title="Igual">=</div>
+                    <div class="op-pill comparison-outline draggable-operator-item" draggable="true" data-operator=">=" ondragstart="dragOperatorStart(event)" ondragend="dragOperatorEnd(event)" title="Mayor o igual">≥</div>
+                    <div class="op-pill comparison-outline draggable-operator-item" draggable="true" data-operator="<=" ondragstart="dragOperatorStart(event)" ondragend="dragOperatorEnd(event)" title="Menor o igual">≤</div>
+                    <div class="op-pill comparison-outline draggable-operator-item" draggable="true" data-operator="!=" ondragstart="dragOperatorStart(event)" ondragend="dragOperatorEnd(event)" title="Diferente">≠</div>
                 </div>
-                <div class="op-pill draggable-operator-item" draggable="true" data-operator=">=" ondragstart="dragOperatorStart(event)" ondragend="dragOperatorEnd(event)">
-                    <span class="op-pill-symbol">≥</span>
-                    <span class="op-pill-name">Mayor o igual</span>
-                </div>
-                <div class="op-pill draggable-operator-item" draggable="true" data-operator="<=" ondragstart="dragOperatorStart(event)" ondragend="dragOperatorEnd(event)">
-                    <span class="op-pill-symbol">≤</span>
-                    <span class="op-pill-name">Menor o igual</span>
-                </div>
-                <div class="op-pill draggable-operator-item" draggable="true" data-operator="=" ondragstart="dragOperatorStart(event)" ondragend="dragOperatorEnd(event)">
-                    <span class="op-pill-symbol">=</span>
-                    <span class="op-pill-name">Igual</span>
-                </div>
-                <div class="op-pill draggable-operator-item" draggable="true" data-operator="!=" ondragstart="dragOperatorStart(event)" ondragend="dragOperatorEnd(event)">
-                    <span class="op-pill-symbol">≠</span>
-                    <span class="op-pill-name">Diferente</span>
-                </div>
+            </div>
 
-                <!-- Categoría: Especiales -->
-                <div class="op-category-label">Especiales</div>
-                <div class="op-pill op-pill-special draggable-value-item" draggable="true" data-type="value" ondragstart="dragValueStart(event)" ondragend="dragValueEnd(event)">
-                    <span class="op-pill-symbol">#</span>
-                    <span class="op-pill-name">Valor</span>
+            <!-- Categoría: Lógicos -->
+            <div class="op-category">
+                <div class="op-category-header logic">
+                    <i class="fas fa-code-branch"></i>
+                    <span>Lógicos</span>
                 </div>
-                <div class="op-pill op-pill-parenthesis draggable-parenthesis-item" draggable="true" data-type="parenthesis" data-value="(" ondragstart="dragParenthesisStart(event)" ondragend="dragParenthesisEnd(event)">
-                    <span class="op-pill-symbol">(</span>
-                    <span class="op-pill-name">Abrir</span>
+                <div class="operators-grid">
+                    <div class="op-pill logic draggable-logic-item" draggable="true" data-operator="AND" data-type="logic" ondragstart="dragLogicOperatorStart(event)" ondragend="dragLogicOperatorEnd(event)" title="Y lógico">AND</div>
+                    <div class="op-pill logic draggable-logic-item" draggable="true" data-operator="OR" data-type="logic" ondragstart="dragLogicOperatorStart(event)" ondragend="dragLogicOperatorEnd(event)" title="O lógico">OR</div>
                 </div>
-                <div class="op-pill op-pill-parenthesis draggable-parenthesis-item" draggable="true" data-type="parenthesis" data-value=")" ondragstart="dragParenthesisStart(event)" ondragend="dragParenthesisEnd(event)">
-                    <span class="op-pill-symbol">)</span>
-                    <span class="op-pill-name">Cerrar</span>
+            </div>
+
+            <!-- Categoría: Especiales -->
+            <div class="op-category">
+                <div class="op-category-header special">
+                    <i class="fas fa-asterisk"></i>
+                    <span>Especiales</span>
+                </div>
+                <div class="operators-grid">
+                    <div class="op-pill special-value draggable-value-item" draggable="true" data-type="value" ondragstart="dragValueStart(event)" ondragend="dragValueEnd(event)" title="Insertar valor">#</div>
+                    <div class="op-pill special-parenthesis draggable-parenthesis-item" draggable="true" data-type="parenthesis" data-value="(" ondragstart="dragParenthesisStart(event)" ondragend="dragParenthesisEnd(event)" title="Abrir paréntesis">(</div>
+                    <div class="op-pill special-parenthesis draggable-parenthesis-item" draggable="true" data-type="parenthesis" data-value=")" ondragstart="dragParenthesisStart(event)" ondragend="dragParenthesisEnd(event)" title="Cerrar paréntesis">)</div>
+                    <div class="op-pill special-where draggable-operator-item" draggable="true" data-operator="where" ondragstart="dragOperatorStart(event)" ondragend="dragOperatorEnd(event)" title="Cláusula where">where</div>
                 </div>
             </div>
         </div>

@@ -154,9 +154,25 @@ const DragDropManager = (() => {
         event.target.classList.add('dragging');
     };
 
+    const dragLogicOperatorStart = (event) => {
+        const logicItem = event.target.closest('.draggable-logic-item');
+        if (!logicItem) {
+            console.error('No se encontro .draggable-logic-item');
+            return;
+        }
+        const operator = logicItem.getAttribute('data-operator');
+        console.log('DRAG START Logic Operator:', operator);
+        EF.State.draggedLogicOperator = operator;
+        event.dataTransfer.effectAllowed = 'copy';
+        event.dataTransfer.setData('text/plain', operator);
+        logicItem.classList.add('dragging');
+    };
+
     const dragLogicOperatorEnd = (event) => {
         console.log('DRAG END Logic Operator');
-        event.target.classList.remove('dragging');
+        const logicItem = event.target.closest('.draggable-logic-item');
+        if (logicItem) logicItem.classList.remove('dragging');
+        else event.target.classList.remove('dragging');
     };
 
     const dragBlockStart = (event) => {
@@ -208,7 +224,7 @@ const DragDropManager = (() => {
         event.preventDefault();
         event.currentTarget.classList.remove('drag-over');
 
-        limpiarClaseDragging('.draggable-function-item.dragging, .draggable-operator-item.dragging, .draggable-field-item.dragging, .draggable-value-item.dragging, .draggable-parenthesis-item.dragging');
+        limpiarClaseDragging('.draggable-function-item.dragging, .draggable-operator-item.dragging, .draggable-field-item.dragging, .draggable-value-item.dragging, .draggable-parenthesis-item.dragging, .draggable-logic-item.dragging');
 
         if (EF.State.draggedField) {
             addExprComponent(varId, 'field', EF.State.draggedField, `<i class="fas fa-database expr-icon"></i><span class="expr-value">${EF.State.draggedField}</span>`);
@@ -251,6 +267,13 @@ const DragDropManager = (() => {
         if (EF.State.draggedParenthesis) {
             addExprComponent(varId, 'parenthesis', EF.State.draggedParenthesis, `<span class="expr-value">${EF.State.draggedParenthesis}</span>`);
             EF.State.draggedParenthesis = null;
+            EF.State.targetVarId = null;
+            return;
+        }
+
+        if (EF.State.draggedLogicOperator) {
+            addExprComponent(varId, 'operator', EF.State.draggedLogicOperator, `<span class="expr-value">${EF.State.draggedLogicOperator}</span>`);
+            EF.State.draggedLogicOperator = null;
             EF.State.targetVarId = null;
             return;
         }
@@ -342,6 +365,7 @@ const DragDropManager = (() => {
         dragVariable,
         dragEnd,
         dragLogicOperator,
+        dragLogicOperatorStart,
         dragLogicOperatorEnd,
         dragBlockStart,
         allowOperatorDrop,
