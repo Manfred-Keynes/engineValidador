@@ -2095,54 +2095,55 @@
             display: block;
         }
 
-        /* ===== PANEL LATERAL DE OPERADORES - SIEMPRE VISIBLE ===== */
+        /* ===== PANEL LATERAL DE OPERADORES - DISEÑO PROFESIONAL ===== */
         .resources-sidebar {
             position: fixed;
-            right: 20px;           /* Por defecto a la derecha (solo) */
+            right: 20px;
             top: 120px;
-            width: 300px;          /* Ancho ajustado */
-            background: white;
-            border: 1px solid var(--gray-200);
-            border-radius: var(--border-radius);
-            box-shadow: var(--shadow-lg);
+            width: 320px;
+            background: #ffffff;
+            border: none;
+            border-radius: 16px;
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.04);
             z-index: 99;
             max-height: calc(100vh - 140px);
             display: flex;
             flex-direction: column;
             overflow: hidden;
-            transition: right 0.3s ease;  /* ✅ Animación solo en la posición derecha */
+            transition: right 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         /* Cuando hay una variable expandida, correrse a la izquierda */
         .resources-sidebar.shift-left {
-            right: 336px;          /* ✅ Se corre para dejar espacio (300px + 16px gap + 20px) */
+            right: 340px;
         }
 
         .resources-sidebar-header {
-            padding: 16px;
-            border-bottom: 2px solid var(--gray-100);
+            padding: 20px 20px 16px 20px;
+            border-bottom: 1px solid #f1f5f9;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
-            border-radius: var(--border-radius) var(--border-radius) 0 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 16px 16px 0 0;
         }
 
         .resources-sidebar-header-left {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
         }
 
         .resources-sidebar-header i {
-            color: #0284c7;
-            font-size: 18px;
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 20px;
         }
 
         .resources-sidebar-title {
-            font-size: 14px;
+            font-size: 15px;
             font-weight: 700;
-            color: var(--gray-900);
+            color: #ffffff;
+            letter-spacing: 0.3px;
         }
 
         /* Sección dentro del panel de recursos */
@@ -2182,9 +2183,10 @@
         }
 
         .resources-section-content {
-            padding: 12px;
-            max-height: 300px;
+            padding: 16px 20px;
+            max-height: 400px;
             overflow-y: auto;
+            background: #fafbfc;
         }
 
         /* Selector de segmento compacto */
@@ -2441,80 +2443,165 @@
             gap: 6px;
         }
 
-        /* Operador Pill Badge - Estilo Bootstrap 5 */
+        /* Grid de operadores */
+        .operators-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        /* Separador de categoría */
+        .op-category-label {
+            width: 100%;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            color: #94a3b8;
+            margin: 12px 0 6px 0;
+            padding-bottom: 4px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .op-category-label:first-child {
+            margin-top: 0;
+        }
+
+        /* Operador Pill - Diseño Profesional */
         .op-pill {
             display: inline-flex;
             align-items: center;
-            gap: 4px;
-            padding: 4px 10px;
-            font-size: 11px;
+            gap: 6px;
+            padding: 8px 14px;
+            font-size: 12px;
             font-weight: 600;
             line-height: 1;
-            color: #92400e;
-            background-color: #fed7aa;
-            border: none;
-            border-radius: 50rem;
+            color: #475569;
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
             cursor: grab;
-            transition: all 0.15s ease-in-out;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
             text-align: center;
             white-space: nowrap;
-            vertical-align: baseline;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
         }
 
         .op-pill:active {
             cursor: grabbing;
+            transform: scale(0.98);
         }
 
         .op-pill:hover {
-            background-color: #fdba74;
-            transform: translateY(-1px);
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            background: #f8fafc;
+            border-color: #cbd5e1;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
         }
 
         .op-pill.dragging {
-            opacity: 0.5;
+            opacity: 0.6;
+            transform: scale(1.02);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
         }
 
-        /* ✅ Estilos especiales para Valor y Paréntesis */
+        /* Símbolo del operador */
+        .op-pill-symbol {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 22px;
+            height: 22px;
+            font-size: 14px;
+            font-weight: 700;
+            font-family: 'SF Mono', 'Consolas', monospace;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #ffffff;
+            border-radius: 6px;
+            line-height: 1;
+        }
+
+        /* Nombre del operador */
+        .op-pill-name {
+            font-size: 12px;
+            font-weight: 500;
+            color: #334155;
+            line-height: 1;
+        }
+
+        /* ===== Variantes de color por categoría ===== */
+
+        /* Operadores Aritméticos - Morado */
+        .op-pill[data-operator="+"] .op-pill-symbol,
+        .op-pill[data-operator="-"] .op-pill-symbol,
+        .op-pill[data-operator="*"] .op-pill-symbol,
+        .op-pill[data-operator="/"] .op-pill-symbol {
+            background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+        }
+
+        /* Operadores de Comparación - Azul */
+        .op-pill[data-operator=">"] .op-pill-symbol,
+        .op-pill[data-operator="<"] .op-pill-symbol,
+        .op-pill[data-operator=">="] .op-pill-symbol,
+        .op-pill[data-operator="<="] .op-pill-symbol,
+        .op-pill[data-operator="="] .op-pill-symbol,
+        .op-pill[data-operator="!="] .op-pill-symbol {
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+        }
+
+        /* Estilos especiales para Valor */
         .op-pill-special {
-            background-color: #dbeafe !important;
-            color: #1e40af !important;
-            border-color: #60a5fa;
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%) !important;
+            border-color: #fcd34d !important;
+        }
+
+        .op-pill-special .op-pill-symbol {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%) !important;
+        }
+
+        .op-pill-special .op-pill-name {
+            color: #92400e !important;
         }
 
         .op-pill-special:hover {
-            background-color: #bfdbfe !important;
-            border-color: #3b82f6;
+            background: linear-gradient(135deg, #fde68a 0%, #fcd34d 100%) !important;
+            border-color: #f59e0b !important;
         }
 
-        /* Símbolo del operador - inline con texto */
-        .op-pill-symbol {
-            font-size: 13px;
-            font-weight: 700;
-            font-family: 'Courier New', monospace;
-            line-height: 1;
+        /* Estilos para Paréntesis */
+        .op-pill-parenthesis {
+            background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%) !important;
+            border-color: #6ee7b7 !important;
         }
 
-        /* Nombre del operador - inline con símbolo */
-        .op-pill-name {
-            font-size: 11px;
-            font-weight: 600;
-            line-height: 1;
+        .op-pill-parenthesis .op-pill-symbol {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
         }
 
+        .op-pill-parenthesis .op-pill-name {
+            color: #065f46 !important;
+        }
+
+        .op-pill-parenthesis:hover {
+            background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%) !important;
+            border-color: #34d399 !important;
+        }
+
+        /* Hint del sidebar */
         .operators-sidebar-hint {
-            padding: 12px 16px;
-            background: #fef3c7;
-            border-top: 1px solid #fde68a;
+            padding: 14px 20px;
+            background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+            border-top: 1px solid #bbf7d0;
             font-size: 11px;
-            color: #92400e;
+            color: #166534;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
         }
 
         .operators-sidebar-hint i {
-            color: #f59e0b;
+            color: #22c55e;
+            font-size: 14px;
         }
 
         /* ===== MODAL ANIDADO PARA CONFIGURAR FUNCIONES ===== */
@@ -3172,23 +3259,17 @@
                         <span class="badge badge-primary">Resultado final</span>
                     </div>
 
-                    <!-- Barra de herramientas para insertar valores -->
-                    <div class="logic-expression-toolbar">
-                        <button type="button" class="btn-insert-value" onclick="mostrarInputValorLogico()" id="btnInsertarValorLogico">
-                            <i class="fas fa-hashtag"></i> Insertar Valor
+                    <!-- Input inline para capturar valor (se muestra al arrastrar #valor desde paleta) -->
+                    <div class="inline-value-input-logic" id="inlineValueInputLogico" style="display: none;">
+                        <span class="inline-value-label"><i class="fas fa-hashtag"></i></span>
+                        <input type="text" id="inputValorLogicoExpr" placeholder="Numero o texto..."
+                               onkeypress="if(event.key==='Enter') aceptarValorLogicoExpr()">
+                        <button type="button" class="btn-accept" onclick="aceptarValorLogicoExpr()" title="Aceptar">
+                            <i class="fas fa-check"></i>
                         </button>
-                        <!-- Input inline para capturar valor -->
-                        <div class="inline-value-input-logic" id="inlineValueInputLogico" style="display: none;">
-                            <span class="inline-value-label"><i class="fas fa-hashtag"></i></span>
-                            <input type="text" id="inputValorLogicoExpr" placeholder="Numero o texto..."
-                                   onkeypress="if(event.key==='Enter') aceptarValorLogicoExpr()">
-                            <button type="button" class="btn-accept" onclick="aceptarValorLogicoExpr()" title="Aceptar">
-                                <i class="fas fa-check"></i>
-                            </button>
-                            <button type="button" class="btn-cancel" onclick="cancelarValorLogicoExpr()" title="Cancelar">
-                                <i class="fas fa-times"></i>
-                            </button>
-                        </div>
+                        <button type="button" class="btn-cancel" onclick="cancelarValorLogicoExpr()" title="Cancelar">
+                            <i class="fas fa-times"></i>
+                        </button>
                     </div>
 
                     <div class="logic-expression-builder" id="logicExprBuilder"
@@ -3263,7 +3344,8 @@
         <!-- Contenido de Operadores -->
         <div class="resources-section-content">
             <div class="operators-grid">
-                <!-- Operadores Aritméticos -->
+                <!-- Categoría: Aritméticos -->
+                <div class="op-category-label">Aritméticos</div>
                 <div class="op-pill draggable-operator-item" draggable="true" data-operator="+" ondragstart="dragOperatorStart(event)" ondragend="dragOperatorEnd(event)">
                     <span class="op-pill-symbol">+</span>
                     <span class="op-pill-name">Suma</span>
@@ -3280,48 +3362,55 @@
                     <span class="op-pill-symbol">÷</span>
                     <span class="op-pill-name">División</span>
                 </div>
-                
-                    <!-- Operadores de Comparación -->
-                    <div class="op-pill draggable-operator-item" draggable="true" data-operator=">" ondragstart="dragOperatorStart(event)" ondragend="dragOperatorEnd(event)">
-                        <span class="op-pill-symbol">&gt;</span>
-                        <span class="op-pill-name">Mayor que</span>
-                    </div>
-                    <div class="op-pill draggable-operator-item" draggable="true" data-operator="<" ondragstart="dragOperatorStart(event)" ondragend="dragOperatorEnd(event)">
-                        <span class="op-pill-symbol">&lt;</span>
-                        <span class="op-pill-name">Menor que</span>
-                    </div>
-                    <div class="op-pill draggable-operator-item" draggable="true" data-operator=">=" ondragstart="dragOperatorStart(event)" ondragend="dragOperatorEnd(event)">
-                        <span class="op-pill-symbol">≥</span>
-                        <span class="op-pill-name">Mayor o igual</span>
-                    </div>
-                    <div class="op-pill draggable-operator-item" draggable="true" data-operator="<=" ondragstart="dragOperatorStart(event)" ondragend="dragOperatorEnd(event)">
-                        <span class="op-pill-symbol">≤</span>
-                        <span class="op-pill-name">Menor o igual</span>
-                    </div>
-                    <div class="op-pill draggable-operator-item" draggable="true" data-operator="=" ondragstart="dragOperatorStart(event)" ondragend="dragOperatorEnd(event)">
-                        <span class="op-pill-symbol">=</span>
-                        <span class="op-pill-name">Igual</span>
-                    </div>
-                    <div class="op-pill draggable-operator-item" draggable="true" data-operator="!=" ondragstart="dragOperatorStart(event)" ondragend="dragOperatorEnd(event)">
-                        <span class="op-pill-symbol">≠</span>
-                        <span class="op-pill-name">Diferente</span>
-                    </div>
 
-                    <!-- ✅ NUEVOS: Valor y Paréntesis -->
-                    <div class="op-pill op-pill-special draggable-value-item" draggable="true" data-type="value" ondragstart="dragValueStart(event)" ondragend="dragValueEnd(event)">
-                        <span class="op-pill-symbol">#</span>
-                        <span class="op-pill-name">Valor</span>
-                    </div>
-                    <div class="op-pill op-pill-special draggable-parenthesis-item" draggable="true" data-type="parenthesis" data-value="(" ondragstart="dragParenthesisStart(event)" ondragend="dragParenthesisEnd(event)">
-                        <span class="op-pill-symbol">(</span>
-                        <span class="op-pill-name">Abrir</span>
-                    </div>
-                    <div class="op-pill op-pill-special draggable-parenthesis-item" draggable="true" data-type="parenthesis" data-value=")" ondragstart="dragParenthesisStart(event)" ondragend="dragParenthesisEnd(event)">
-                        <span class="op-pill-symbol">)</span>
-                        <span class="op-pill-name">Cerrar</span>
-                    </div>
+                <!-- Categoría: Comparación -->
+                <div class="op-category-label">Comparación</div>
+                <div class="op-pill draggable-operator-item" draggable="true" data-operator=">" ondragstart="dragOperatorStart(event)" ondragend="dragOperatorEnd(event)">
+                    <span class="op-pill-symbol">&gt;</span>
+                    <span class="op-pill-name">Mayor</span>
+                </div>
+                <div class="op-pill draggable-operator-item" draggable="true" data-operator="<" ondragstart="dragOperatorStart(event)" ondragend="dragOperatorEnd(event)">
+                    <span class="op-pill-symbol">&lt;</span>
+                    <span class="op-pill-name">Menor</span>
+                </div>
+                <div class="op-pill draggable-operator-item" draggable="true" data-operator=">=" ondragstart="dragOperatorStart(event)" ondragend="dragOperatorEnd(event)">
+                    <span class="op-pill-symbol">≥</span>
+                    <span class="op-pill-name">Mayor o igual</span>
+                </div>
+                <div class="op-pill draggable-operator-item" draggable="true" data-operator="<=" ondragstart="dragOperatorStart(event)" ondragend="dragOperatorEnd(event)">
+                    <span class="op-pill-symbol">≤</span>
+                    <span class="op-pill-name">Menor o igual</span>
+                </div>
+                <div class="op-pill draggable-operator-item" draggable="true" data-operator="=" ondragstart="dragOperatorStart(event)" ondragend="dragOperatorEnd(event)">
+                    <span class="op-pill-symbol">=</span>
+                    <span class="op-pill-name">Igual</span>
+                </div>
+                <div class="op-pill draggable-operator-item" draggable="true" data-operator="!=" ondragstart="dragOperatorStart(event)" ondragend="dragOperatorEnd(event)">
+                    <span class="op-pill-symbol">≠</span>
+                    <span class="op-pill-name">Diferente</span>
+                </div>
+
+                <!-- Categoría: Especiales -->
+                <div class="op-category-label">Especiales</div>
+                <div class="op-pill op-pill-special draggable-value-item" draggable="true" data-type="value" ondragstart="dragValueStart(event)" ondragend="dragValueEnd(event)">
+                    <span class="op-pill-symbol">#</span>
+                    <span class="op-pill-name">Valor</span>
+                </div>
+                <div class="op-pill op-pill-parenthesis draggable-parenthesis-item" draggable="true" data-type="parenthesis" data-value="(" ondragstart="dragParenthesisStart(event)" ondragend="dragParenthesisEnd(event)">
+                    <span class="op-pill-symbol">(</span>
+                    <span class="op-pill-name">Abrir</span>
+                </div>
+                <div class="op-pill op-pill-parenthesis draggable-parenthesis-item" draggable="true" data-type="parenthesis" data-value=")" ondragstart="dragParenthesisStart(event)" ondragend="dragParenthesisEnd(event)">
+                    <span class="op-pill-symbol">)</span>
+                    <span class="op-pill-name">Cerrar</span>
                 </div>
             </div>
+        </div>
+
+        <!-- Hint -->
+        <div class="operators-sidebar-hint">
+            <i class="fas fa-lightbulb"></i>
+            <span>Arrastra los operadores a las expresiones</span>
         </div>
     </div>
 

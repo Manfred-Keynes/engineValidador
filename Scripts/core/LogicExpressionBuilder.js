@@ -25,6 +25,7 @@ const LogicExpressionModule = (() => {
 
         let component = null;
 
+        // Variables
         if (EF.State.draggedVariableId !== null && EF.State.draggedVariableId !== undefined) {
             const nameElement = document.getElementById(`varName${EF.State.draggedVariableId}`);
             const varName = nameElement ? nameElement.textContent : `Variable ${EF.State.draggedVariableId}`;
@@ -39,6 +40,7 @@ const LogicExpressionModule = (() => {
             EF.State.draggedVariableId = null;
             EF.State.draggedVariableName = '';
         }
+        // Operadores logicos (AND, OR, etc)
         else if (EF.State.draggedLogicOperator !== null && EF.State.draggedLogicOperator !== undefined) {
             const isParenthesis = EF.State.draggedLogicOperator === '(' || EF.State.draggedLogicOperator === ')';
 
@@ -50,6 +52,7 @@ const LogicExpressionModule = (() => {
 
             EF.State.draggedLogicOperator = null;
         }
+        // Operadores regulares (>, <, =, etc)
         else if (EF.State.draggedOperator !== null && EF.State.draggedOperator !== undefined) {
             const isParenthesisOp = EF.State.draggedOperator === '(' || EF.State.draggedOperator === ')';
 
@@ -60,6 +63,26 @@ const LogicExpressionModule = (() => {
             };
 
             EF.State.draggedOperator = null;
+        }
+        // Parentesis (arrastrados desde paleta de parentesis)
+        else if (EF.State.draggedParenthesis !== null && EF.State.draggedParenthesis !== undefined) {
+            component = {
+                type: 'parenthesis',
+                value: EF.State.draggedParenthesis,
+                html: EF.State.draggedParenthesis
+            };
+
+            EF.State.draggedParenthesis = null;
+        }
+        // Valor (arrastrado desde boton #valor)
+        else if (EF.State.draggedValue !== null && EF.State.draggedValue !== undefined) {
+            EF.State.draggedValue = null;
+            // Mostrar input para ingresar valor
+            document.querySelectorAll('.dragging').forEach(el => {
+                el.classList.remove('dragging');
+            });
+            mostrarInputValorLogico();
+            return;
         }
 
         if (component) {
@@ -75,11 +98,9 @@ const LogicExpressionModule = (() => {
     const mostrarInputValorLogico = () => {
         const inputContainer = document.getElementById('inlineValueInputLogico');
         const input = document.getElementById('inputValorLogicoExpr');
-        const btn = document.getElementById('btnInsertarValorLogico');
 
-        if (inputContainer && btn && input) {
+        if (inputContainer && input) {
             inputContainer.style.display = 'inline-flex';
-            btn.style.display = 'none';
             input.value = '';
             input.focus();
         }
@@ -115,11 +136,9 @@ const LogicExpressionModule = (() => {
 
     const cancelarValorLogicoExpr = () => {
         const inputContainer = document.getElementById('inlineValueInputLogico');
-        const btn = document.getElementById('btnInsertarValorLogico');
 
-        if (inputContainer && btn) {
+        if (inputContainer) {
             inputContainer.style.display = 'none';
-            btn.style.display = 'inline-flex';
         }
     };
 
