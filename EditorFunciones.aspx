@@ -1757,7 +1757,7 @@
         .config-panel-content {
             display: flex;
             flex-direction: column;
-            max-height: 600px;
+            /* Altura automática según contenido */
         }
 
         .config-panel-header {
@@ -3489,6 +3489,44 @@
 </asp:Content>
 
 <asp:Content ID="Content3" ContentPlaceHolderID="scripts" runat="server">
+<!-- ==========================================
+     SISTEMA MODULAR DE FUNCIONES (IIFE Pattern)
+     Orden: Namespace -> Base -> Registry -> Core -> Funciones -> Editor
+     Namespace: EF (Editor Funciones)
+     ========================================== -->
+
+<!-- Namespace principal - DEBE SER PRIMERO -->
+<script src="Scripts/core/Namespace.js"></script>
+
+<!-- Infraestructura base -->
+<script src="Scripts/FunctionBase.js"></script>
+<script src="Scripts/FunctionRegistry.js"></script>
+
+<!-- Core modular (drag & drop, navegacion, mini-builders, expresiones, panel config) -->
+<script src="Scripts/core/DragDropManager.js"></script>
+<script src="Scripts/core/NavigationStack.js"></script>
+<script src="Scripts/core/MiniBuilderManager.js"></script>
+<script src="Scripts/core/ExpressionBuilder.js"></script>
+<script src="Scripts/core/ConfigPanel.js"></script>
+<script src="Scripts/core/FunctionCatalog.js"></script>
+<script src="Scripts/core/AutocompleteManager.js"></script>
+<script src="Scripts/core/LogicExpressionBuilder.js"></script>
+<script src="Scripts/core/InputHandlers.js"></script>
+<script src="Scripts/core/VariableCardManager.js"></script>
+
+<!-- Funciones modulares (se auto-registran) -->
+<script src="Scripts/functions/Minimo.js"></script>
+<script src="Scripts/functions/Maximo.js"></script>
+<script src="Scripts/functions/Suma.js"></script>
+<script src="Scripts/functions/Promedio.js"></script>
+<script src="Scripts/functions/Conteo.js"></script>
+<script src="Scripts/functions/ConteoCaracteres.js"></script>
+<script src="Scripts/functions/DifFechaHoy.js"></script>
+<script src="Scripts/functions/ExpresionRegular.js"></script>
+<script src="Scripts/functions/SiEntonces.js"></script>
+<script src="Scripts/functions/CalcularEdad.js"></script>
+
+<!-- Core del editor (debe ir al final) -->
 <script src="Scripts/EditorFunciones.js"></script>
 
 </asp:Content>

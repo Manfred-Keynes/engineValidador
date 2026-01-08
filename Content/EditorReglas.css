@@ -560,6 +560,108 @@ body {
     cursor: grabbing;
 }
 
+/* Variable Card Header Layout Fix */
+.variable-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 16px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.variable-card-header:hover {
+    background-color: var(--gray-50);
+}
+
+.variable-card-content {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex: 1;
+    min-width: 0; /* Importante para que flex children puedan truncar */
+    overflow: hidden;
+}
+
+.variable-number {
+    flex-shrink: 0;
+    width: 36px;
+    height: 36px;
+    background: var(--primary);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 14px;
+}
+
+.variable-info {
+    flex: 1;
+    min-width: 0; /* Permite truncado */
+    overflow: hidden;
+}
+
+.variable-name-preview {
+    font-weight: 600;
+    color: var(--gray-800);
+    font-size: 14px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.variable-expression-preview {
+    font-size: 12px;
+    color: var(--gray-500);
+    font-family: 'Courier New', monospace;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+}
+
+.variable-card-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0; /* No permite que se comprima */
+}
+
+.variable-btn {
+    width: 32px;
+    height: 32px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    background: var(--gray-100);
+    color: var(--gray-600);
+}
+
+.variable-btn:hover {
+    background: var(--gray-200);
+    color: var(--gray-800);
+}
+
+.variable-btn.delete:hover {
+    background: #fee2e2;
+    color: var(--danger);
+}
+
+.variable-btn.expand {
+    transition: transform 0.3s;
+}
+
+.variable-card.expanded .variable-btn.expand {
+    transform: rotate(180deg);
+}
+
 /* Logic Expression Preview */
 .logic-expression-preview {
     background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
