@@ -92,7 +92,8 @@ function createConfigLevel(functionName, parentBuilderId, functionId, varId) {
 function generateSelectorMiniBuilder(paramId, label, varId) {
     const levelId = editorState.navigationStack.currentLevel >= 0
         ? editorState.navigationStack.currentLevel : 0;
-    const builderId = `miniBuilder_level${levelId}_${paramId}`;
+    const safeVarId = varId || window.currentConfigVarId || 'default';
+    const builderId = `miniBuilder_var${safeVarId}_level${levelId}_${paramId}`;
 
     // Inicializar array de componentes si no existe
     if (!editorState.miniBuilderComponents[builderId]) {

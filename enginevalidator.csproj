@@ -154,8 +154,31 @@
     <Content Include="packages\Newtonsoft.Json.13.0.4\lib\netstandard2.0\Newtonsoft.Json.xml" />
     <Content Include="packages\Newtonsoft.Json.13.0.4\packageIcon.png" />
     <Content Include="RegistroCliente.aspx" />
+    <Content Include="Scripts\core\AutocompleteManager.js" />
+    <Content Include="Scripts\core\ConfigPanel.js" />
+    <Content Include="Scripts\core\DragDropManager.js" />
+    <Content Include="Scripts\core\ExpressionBuilder.js" />
+    <Content Include="Scripts\core\FunctionCatalog.js" />
+    <Content Include="Scripts\core\InputHandlers.js" />
+    <Content Include="Scripts\core\LogicExpressionBuilder.js" />
+    <Content Include="Scripts\core\MiniBuilderManager.js" />
+    <Content Include="Scripts\core\Namespace.js" />
+    <Content Include="Scripts\core\NavigationStack.js" />
+    <Content Include="Scripts\core\VariableCardManager.js" />
     <Content Include="Scripts\EditorFunciones.js" />
     <Content Include="Scripts\EditorReglasSelector.js" />
+    <Content Include="Scripts\FunctionBase.js" />
+    <Content Include="Scripts\FunctionRegistry.js" />
+    <Content Include="Scripts\functions\CalcularEdad.js" />
+    <Content Include="Scripts\functions\Conteo.js" />
+    <Content Include="Scripts\functions\ConteoCaracteres.js" />
+    <Content Include="Scripts\functions\DifFechaHoy.js" />
+    <Content Include="Scripts\functions\ExpresionRegular.js" />
+    <Content Include="Scripts\functions\Maximo.js" />
+    <Content Include="Scripts\functions\Minimo.js" />
+    <Content Include="Scripts\functions\Promedio.js" />
+    <Content Include="Scripts\functions\SiEntonces.js" />
+    <Content Include="Scripts\functions\Suma.js" />
     <Content Include="Scripts\Validaciones\reglas.js" />
     <Content Include="Scripts\Validaciones\validaciones.js" />
     <Content Include="Scripts\Validaciones\ValidadorFrontendWebForms.js" />
@@ -240,6 +263,11 @@
     <None Include="Web.Release.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Scripts\components\" />
+    <Folder Include="Scripts\hooks\" />
+    <Folder Include="Scripts\legacy\" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

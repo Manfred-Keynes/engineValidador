@@ -38,7 +38,8 @@
             background: var(--gray-50);
             color: var(--gray-900);
             line-height: 1.6;
-            padding: 24px 0;
+            padding: 24px;
+            padding-right: 450px; /* Espacio para ambas paletas */
         }
 
         .header {
@@ -64,9 +65,7 @@
         }
 
         .main-grid {
-            display: grid;
-            grid-template-columns: 1fr 400px;
-            gap: 24px;
+            display: block;
             margin-bottom: 24px;
         }
 
@@ -199,7 +198,7 @@
         /* Accordion Variable Cards */
         .variable-card {
             background: white;
-            border: 2px solid var(--gray-200);
+            border: 2px solid #bfdbfe;
             border-radius: var(--border-radius);
             margin-bottom: 12px;
             overflow: hidden;
@@ -208,12 +207,12 @@
 
         .variable-card.expanded {
             border-color: var(--primary);
-            box-shadow: var(--shadow-md);
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
         }
 
         .variable-card-header {
             padding: 16px;
-            background: var(--gray-50);
+            background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -223,16 +222,16 @@
         }
 
         .variable-card.expanded .variable-card-header {
-            background: var(--primary);
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
             color: white;
         }
 
         .variable-card-header:hover {
-            background: var(--primary-light);
+            background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
         }
 
         .variable-card.expanded .variable-card-header:hover {
-            background: var(--primary-dark);
+            background: linear-gradient(135deg, var(--primary-dark) 0%, #1e3a8a 100%);
         }
 
         .variable-card-content {
@@ -300,18 +299,19 @@
             width: 32px;
             height: 32px;
             border: none;
-            background: white;
+            background: #dbeafe;
             border-radius: 6px;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
             transition: all 0.2s;
-            color: var(--gray-600);
+            color: var(--primary);
         }
 
         .variable-btn:hover {
             transform: scale(1.1);
+            background: #bfdbfe;
         }
 
         .variable-card.expanded .variable-btn {
@@ -1697,13 +1697,34 @@
             background: #059669;
         }
 
-        @media (max-width: 1024px) {
-            .main-grid {
-                grid-template-columns: 1fr;
+        @media (max-width: 1400px) {
+            .editor-funciones-container {
+                padding-right: 230px; /* Solo espacio para una paleta */
             }
-            
+        }
+
+        @media (max-width: 1024px) {
             .variable-fields-grid {
                 grid-template-columns: 1fr;
+            }
+
+            .editor-funciones-container {
+                padding-right: 24px;
+            }
+
+            .resources-sidebar,
+            .functions-sidebar {
+                position: relative;
+                right: auto;
+                top: auto;
+                width: 100%;
+                max-height: none;
+                margin-bottom: 20px;
+                border-radius: var(--border-radius);
+            }
+
+            .resources-sidebar.shift-left {
+                right: auto;
             }
         }
 
@@ -1757,7 +1778,7 @@
         .config-panel-content {
             display: flex;
             flex-direction: column;
-            max-height: 600px;
+            /* Altura automática según contenido */
         }
 
         .config-panel-header {
@@ -1805,22 +1826,194 @@
             transform: rotate(90deg);
         }
 
-        .config-panel-breadcrumb {
-            padding: 12px 20px;
-            background: #f8f9fa;
-            border-bottom: 1px solid var(--gray-200);
+        .config-panel-body {
+            flex: 1;
+            padding: 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* ===== MINI-BUILDERS COLAPSABLES ===== */
+        .collapsible-mini-builder {
+            border: 2px solid var(--gray-200);
+            border-radius: 8px;
+            margin-bottom: 16px;
+            background: white;
+            transition: all 0.3s ease;
+            position: relative;
+            z-index: 0;
+        }
+
+        .collapsible-mini-builder.collapsed {
+            border-color: var(--gray-300);
+            background: var(--gray-50);
+        }
+
+        .mini-builder-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 16px;
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+            border-bottom: 2px solid var(--gray-200);
+            cursor: pointer;
+            user-select: none;
+            border-radius: 6px 6px 0 0;
+            transition: all 0.2s;
+        }
+
+        .mini-builder-header:hover {
+            background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+        }
+
+        .collapsible-mini-builder.collapsed .mini-builder-header {
+            border-radius: 6px;
+            border-bottom: none;
+        }
+
+        .mini-builder-header-left {
             display: flex;
             align-items: center;
             gap: 8px;
-            font-size: 13px;
-            color: var(--gray-600);
         }
 
-        .config-panel-body {
+        .mini-builder-header-title {
+            font-weight: 600;
+            font-size: 13px;
+            color: var(--gray-800);
+        }
+
+        .mini-builder-toggle {
+            background: none;
+            border: none;
+            color: var(--primary);
+            cursor: pointer;
+            padding: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.3s ease;
+        }
+
+        .mini-builder-toggle i {
+            font-size: 14px;
+        }
+
+        .collapsible-mini-builder.collapsed .mini-builder-toggle {
+            transform: rotate(-90deg);
+        }
+
+        .mini-builder-content {
+            padding: 16px;
+            transition: all 0.3s ease;
+            max-height: 2000px;
+            overflow: visible;
+        }
+
+        .collapsible-mini-builder.collapsed .mini-builder-content {
+            max-height: 0;
+            padding: 0 16px;
+            overflow: hidden;
+        }
+
+        /* Breadcrumb individual para cada mini-builder */
+        .mini-builder-breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            flex-wrap: wrap;
+            margin-bottom: 12px;
+            padding: 8px 12px;
+            background: var(--gray-50);
+            border-radius: 6px;
+            border: 1px solid var(--gray-200);
+            font-size: 11px;
+            overflow-x: auto;
+            max-width: 100%;
+        }
+
+        /* ===== TABS PARA "SI ENTONCES" ===== */
+        .si-entonces-tabs-container {
+            background: white;
+            border: 2px solid var(--gray-200);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .si-entonces-tabs-header {
+            display: flex;
+            background: linear-gradient(to bottom, #f8f9fa, #e9ecef);
+            border-bottom: 2px solid var(--gray-300);
+            gap: 0;
+        }
+
+        .si-entonces-tab-button {
             flex: 1;
-            overflow-y: auto;
+            padding: 14px 20px;
+            background: transparent;
+            border: none;
+            border-right: 1px solid var(--gray-300);
+            color: var(--gray-600);
+            font-weight: 600;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .si-entonces-tab-button:last-child {
+            border-right: none;
+        }
+
+        .si-entonces-tab-button:hover {
+            background: rgba(102, 126, 234, 0.1);
+            color: var(--primary);
+        }
+
+        .si-entonces-tab-button.active {
+            background: white;
+            color: var(--primary);
+            border-bottom: 3px solid var(--primary);
+            font-weight: 700;
+        }
+
+        .si-entonces-tab-button.active::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--primary);
+        }
+
+        .si-entonces-tabs-content {
             padding: 20px;
-            max-height: 400px;
+            background: white;
+            min-height: 100px;
+        }
+
+        .si-entonces-tab-panel {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .si-entonces-tab-panel.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .config-panel-footer {
@@ -1923,48 +2116,71 @@
             display: block;
         }
 
-        /* ===== PANEL LATERAL DE RECURSOS (Campos + Operadores) - SIEMPRE VISIBLE ===== */
+        /* ===== PANEL LATERAL DE OPERADORES - DISEÑO MODERNO ===== */
         .resources-sidebar {
             position: fixed;
-            left: 20px;
+            right: 12px;
             top: 120px;
-            width: 320px;
-            background: white;
-            border: 1px solid var(--gray-200);
-            border-radius: var(--border-radius);
-            box-shadow: var(--shadow-lg);
-            z-index: 99; /* Menor que funciones para no tapar */
+            width: 200px;
+            background: #ffffff;
+            border: none;
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08), 0 2px 8px rgba(0, 0, 0, 0.04);
+            z-index: 99;
             max-height: calc(100vh - 140px);
             display: flex;
             flex-direction: column;
             overflow: hidden;
+            transition: right 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Cuando hay una variable expandida, correrse a la izquierda */
+        .resources-sidebar.shift-left {
+            right: 230px; /* 210px (ancho funciones) + 8px gap + 12px posicion */
         }
 
         .resources-sidebar-header {
-            padding: 16px;
-            border-bottom: 2px solid var(--gray-100);
+            padding: 12px 14px;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
-            border-radius: var(--border-radius) var(--border-radius) 0 0;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            border-radius: 16px 16px 0 0;
         }
 
         .resources-sidebar-header-left {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
         }
 
         .resources-sidebar-header i {
-            color: #0284c7;
+            color: #ffffff;
             font-size: 18px;
         }
 
         .resources-sidebar-title {
             font-size: 14px;
             font-weight: 700;
-            color: var(--gray-900);
+            color: #ffffff;
+        }
+
+        .resources-sidebar-info {
+            width: 28px;
+            height: 28px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ffffff;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .resources-sidebar-info:hover {
+            background: rgba(255, 255, 255, 0.3);
         }
 
         /* Sección dentro del panel de recursos */
@@ -2004,9 +2220,10 @@
         }
 
         .resources-section-content {
-            padding: 12px;
-            max-height: 300px;
+            padding: 10px;
+            max-height: 400px;
             overflow-y: auto;
+            background: #ffffff;
         }
 
         /* Selector de segmento compacto */
@@ -2019,46 +2236,46 @@
             padding: 4px 8px;
         }
 
-        /* Panel lateral fijo de funciones */
+        /* Panel lateral de funciones - SE MUESTRA/OCULTA A LA DERECHA */
         .functions-sidebar {
             position: fixed;
-            right: 20px;
-            top: 120px;
-            width: 320px;
+            right: 12px;             /* Siempre en el extremo derecho */
+            top: 120px;              /* Misma altura que operadores */
+            width: 210px;            /* Ancho compacto */
             background: white;
             border: 1px solid var(--gray-200);
-            border-radius: var(--border-radius);
+            border-radius: 16px;
             box-shadow: var(--shadow-lg);
             z-index: 100;
-            max-height: calc(100vh - 140px);
-            display: none; /* Oculto por defecto */
+            max-height: calc(100vh - 140px);  /* Altura completa disponible */
+            display: none;           /* Oculto por defecto */
             flex-direction: column;
-            transition: opacity 0.3s ease-in-out;
+            overflow: hidden;        /* Importante para que el contenido tenga altura */
         }
 
         .functions-sidebar-header {
-            padding: 16px;
+            padding: 12px 14px;
             border-bottom: 2px solid var(--gray-100);
             display: flex;
             align-items: center;
             gap: 8px;
-            background: var(--gray-50);
-            border-radius: var(--border-radius) var(--border-radius) 0 0;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            border-radius: 16px 16px 0 0;
         }
 
         .functions-sidebar-header i {
-            color: var(--primary);
-            font-size: 18px;
+            color: #ffffff;
+            font-size: 16px;
         }
 
         .functions-sidebar-title {
             font-size: 14px;
             font-weight: 700;
-            color: var(--gray-900);
+            color: #ffffff;
         }
 
         .functions-sidebar-search {
-            padding: 12px 16px;
+            padding: 8px 10px;
             border-bottom: 1px solid var(--gray-200);
         }
 
@@ -2148,7 +2365,7 @@
         .function-category-sidebar-title {
             font-size: 11px;
             font-weight: 700;
-            color: var(--gray-500);
+            color: var(--primary);
             text-transform: uppercase;
             letter-spacing: 0.05em;
             margin-bottom: 8px;
@@ -2157,11 +2374,11 @@
         .draggable-function-item {
             display: flex;
             align-items: center;
-            gap: 10px;
-            padding: 10px 12px;
-            margin-bottom: 6px;
+            gap: 8px;
+            padding: 8px 10px;
+            margin-bottom: 4px;
             background: white;
-            border: 2px solid var(--gray-200);
+            border: 1px solid #dbeafe;
             border-radius: var(--border-radius-sm);
             cursor: grab;
             transition: all 0.2s;
@@ -2173,7 +2390,7 @@
 
         .draggable-function-item:hover {
             border-color: var(--primary);
-            background: var(--primary-light);
+            background: #eff6ff;
             transform: translateX(4px);
         }
 
@@ -2183,15 +2400,15 @@
         }
 
         .draggable-function-icon {
-            width: 32px;
-            height: 32px;
+            width: 26px;
+            height: 26px;
             display: flex;
             align-items: center;
             justify-content: center;
             background: var(--primary-light);
             border-radius: 6px;
             color: var(--primary);
-            font-size: 14px;
+            font-size: 12px;
             flex-shrink: 0;
         }
 
@@ -2200,37 +2417,36 @@
         }
 
         .draggable-function-name {
-            font-size: 13px;
+            font-size: 12px;
             font-weight: 600;
             color: var(--gray-900);
-            margin-bottom: 2px;
+            margin-bottom: 0;
         }
 
         .draggable-function-desc {
-            font-size: 11px;
-            color: var(--gray-600);
-            line-height: 1.3;
+            display: none; /* Ocultar descripcion en paleta compacta */
         }
 
         .drag-handle {
-            color: var(--gray-400);
-            font-size: 16px;
+            color: #93c5fd;
+            font-size: 12px;
         }
 
         /* Hint de arrastre */
         .functions-sidebar-hint {
-            padding: 12px 16px;
-            background: #eff6ff;
-            border-top: 1px solid #dbeafe;
+            padding: 10px 12px;
+            background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+            border-top: 1px solid #bfdbfe;
             font-size: 11px;
             color: #1e40af;
             display: flex;
             align-items: center;
             gap: 8px;
+            border-radius: 0 0 16px 16px;
         }
 
         .functions-sidebar-hint i {
-            color: #3b82f6;
+            color: var(--primary);
         }
 
         /* Panel estático de operadores */
@@ -2242,89 +2458,178 @@
             border-radius: var(--border-radius);
         }
 
-        .operators-static-title {
+        /* ===== DISEÑO MINIMALISTA DE OPERADORES ===== */
+
+        /* Categorías de operadores */
+        .op-category {
+            margin-bottom: 12px;
+        }
+
+        .op-category:last-child {
+            margin-bottom: 0;
+        }
+
+        .op-category-header {
             display: flex;
             align-items: center;
-            gap: 6px;
-            margin-bottom: 10px;
-            font-size: 12px;
+            gap: 8px;
+            font-size: 11px;
             font-weight: 600;
-            color: var(--gray-700);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #64748b;
+            margin-bottom: 10px;
+            padding-bottom: 6px;
+            border-bottom: 1px solid #e2e8f0;
         }
 
-        .operators-static-title i {
-            color: #f59e0b;
-            font-size: 14px;
+        .op-category-header i {
+            font-size: 12px;
         }
 
+        .op-category-header.arithmetic i { color: var(--primary); }
+        .op-category-header.comparison i { color: #3b82f6; }
+        .op-category-header.logic i { color: #1d4ed8; }
+        .op-category-header.special i { color: #6366f1; }
+
+        /* Grid de operadores */
         .operators-grid {
             display: flex;
             flex-wrap: wrap;
             gap: 6px;
         }
 
-        /* Operador Pill Badge - Estilo Bootstrap 5 */
+        /* Operador Pill - Diseño Cuadrado Minimalista */
         .op-pill {
-            display: inline-flex;
+            display: flex;
             align-items: center;
-            gap: 4px;
-            padding: 4px 10px;
-            font-size: 11px;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            font-size: 14px;
             font-weight: 600;
-            line-height: 1;
-            color: #92400e;
-            background-color: #fed7aa;
+            font-family: 'SF Mono', 'Consolas', monospace;
+            color: #ffffff;
+            background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
             border: none;
-            border-radius: 50rem;
+            border-radius: 8px;
             cursor: grab;
-            transition: all 0.15s ease-in-out;
-            text-align: center;
-            white-space: nowrap;
-            vertical-align: baseline;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 2px 8px rgba(139, 92, 246, 0.3);
         }
 
         .op-pill:active {
             cursor: grabbing;
+            transform: scale(0.95);
         }
 
         .op-pill:hover {
-            background-color: #fdba74;
-            transform: translateY(-1px);
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            transform: translateY(-3px);
+            box-shadow: 0 6px 16px rgba(37, 99, 235, 0.4);
         }
 
         .op-pill.dragging {
-            opacity: 0.5;
+            opacity: 0.7;
+            transform: scale(1.05);
         }
 
-        /* Símbolo del operador - inline con texto */
-        .op-pill-symbol {
-            font-size: 13px;
+        /* Operadores Aritméticos - Azul primario */
+        .op-pill.arithmetic {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            box-shadow: 0 2px 8px rgba(37, 99, 235, 0.3);
+        }
+
+        .op-pill.arithmetic:hover {
+            box-shadow: 0 6px 16px rgba(37, 99, 235, 0.4);
+        }
+
+        /* Operadores de Comparación - Azul medio */
+        .op-pill.comparison {
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
+        }
+
+        .op-pill.comparison:hover {
+            box-shadow: 0 6px 16px rgba(59, 130, 246, 0.4);
+        }
+
+        /* Operadores de Comparación con borde (>=, <=, !=) */
+        .op-pill.comparison-outline {
+            background: transparent;
+            color: #3b82f6;
+            border: 2px solid #3b82f6;
+            box-shadow: none;
+        }
+
+        .op-pill.comparison-outline:hover {
+            background: rgba(59, 130, 246, 0.1);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
+        }
+
+        /* Operadores Lógicos - Azul oscuro */
+        .op-pill.logic {
+            width: auto;
+            padding: 0 10px;
+            font-size: 11px;
             font-weight: 700;
-            font-family: 'Courier New', monospace;
-            line-height: 1;
+            background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%);
+            box-shadow: 0 2px 8px rgba(29, 78, 216, 0.3);
         }
 
-        /* Nombre del operador - inline con símbolo */
-        .op-pill-name {
+        .op-pill.logic:hover {
+            box-shadow: 0 6px 16px rgba(29, 78, 216, 0.4);
+        }
+
+        /* Especiales - Valor */
+        .op-pill.special-value {
+            background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+            box-shadow: 0 2px 8px rgba(99, 102, 241, 0.3);
+        }
+
+        .op-pill.special-value:hover {
+            box-shadow: 0 6px 16px rgba(99, 102, 241, 0.4);
+        }
+
+        /* Especiales - Paréntesis */
+        .op-pill.special-parenthesis {
+            background: linear-gradient(135deg, #818cf8 0%, #6366f1 100%);
+            box-shadow: 0 2px 8px rgba(129, 140, 248, 0.3);
+        }
+
+        .op-pill.special-parenthesis:hover {
+            box-shadow: 0 6px 16px rgba(129, 140, 248, 0.4);
+        }
+
+        /* Especiales - Where */
+        .op-pill.special-where {
+            width: auto;
+            padding: 0 10px;
             font-size: 11px;
-            font-weight: 600;
-            line-height: 1;
+            font-weight: 700;
+            background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%);
+            box-shadow: 0 2px 8px rgba(79, 70, 229, 0.3);
         }
 
+        .op-pill.special-where:hover {
+            box-shadow: 0 6px 16px rgba(79, 70, 229, 0.4);
+        }
+
+        /* Hint del sidebar */
         .operators-sidebar-hint {
-            padding: 12px 16px;
-            background: #fef3c7;
-            border-top: 1px solid #fde68a;
+            padding: 10px 12px;
+            background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+            border-top: 1px solid #bfdbfe;
             font-size: 11px;
-            color: #92400e;
+            color: #1e40af;
             display: flex;
             align-items: center;
             gap: 8px;
+            border-radius: 0 0 16px 16px;
         }
 
         .operators-sidebar-hint i {
-            color: #f59e0b;
+            color: var(--primary);
+            font-size: 12px;
         }
 
         /* ===== MODAL ANIDADO PARA CONFIGURAR FUNCIONES ===== */
@@ -2909,54 +3214,6 @@
                         MaxLength="200" />
                 </div>
 
-                <!-- Función y Origen -->
-                <div class="form-row">
-                    <div class="form-group">
-                        <label class="form-label">Función <span class="required">*</span></label>
-                        <asp:DropDownList ID="ddlFuncion" runat="server" CssClass="form-select">
-                            <asp:ListItem Value="">Seleccione...</asp:ListItem>
-                            <asp:ListItem Value="expresion">Expresión Avanzada Recurrente</asp:ListItem>
-                            <asp:ListItem Value="simple">Expresión Simple</asp:ListItem>
-                            <asp:ListItem Value="lookup">Búsqueda en Tabla</asp:ListItem>
-                        </asp:DropDownList>
-                    </div>
-
-                    <div class="form-group">
-                        <label class="form-label">Origen de Datos</label>
-                        <asp:DropDownList ID="ddlOrigen" runat="server" CssClass="form-select">
-                            <asp:ListItem Value="">Seleccione...</asp:ListItem>
-                            <asp:ListItem Value="producto">Campos del Producto</asp:ListItem>
-                            <asp:ListItem Value="cliente">Campos del Cliente</asp:ListItem>
-                            <asp:ListItem Value="bureau">Datos de Buró</asp:ListItem>
-                        </asp:DropDownList>
-                    </div>
-                </div>
-
-                <!-- Operador Comparativo -->
-                <div class="form-row">
-                    <div class="form-group">
-                        <label class="form-label">Operador Comparativo</label>
-                        <asp:DropDownList ID="ddlOperador" runat="server" CssClass="form-select">
-                            <asp:ListItem Value="">Ninguno</asp:ListItem>
-                            <asp:ListItem Value=">">&gt; Mayor que</asp:ListItem>
-                            <asp:ListItem Value=">=">&gt;= Mayor o igual</asp:ListItem>
-                            <asp:ListItem Value="<">&lt; Menor que</asp:ListItem>
-                            <asp:ListItem Value="<=">&lt;= Menor o igual</asp:ListItem>
-                            <asp:ListItem Value="=">=  Igual</asp:ListItem>
-                            <asp:ListItem Value="!=">!= Diferente</asp:ListItem>
-                        </asp:DropDownList>
-                    </div>
-
-                    <div class="form-group">
-                        <label class="form-label">Valor Comparativo</label>
-                        <asp:TextBox 
-                            ID="txtValorComparativo" 
-                            runat="server" 
-                            CssClass="form-input" 
-                            placeholder="Ingrese valor a comparar" />
-                    </div>
-                </div>
-
                 <!-- Variables Section con Accordion -->
                 <div class="variables-section">
                     <div class="variables-header">
@@ -2982,23 +3239,17 @@
                         <span class="badge badge-primary">Resultado final</span>
                     </div>
 
-                    <!-- Barra de herramientas para insertar valores -->
-                    <div class="logic-expression-toolbar">
-                        <button type="button" class="btn-insert-value" onclick="mostrarInputValorLogico()" id="btnInsertarValorLogico">
-                            <i class="fas fa-hashtag"></i> Insertar Valor
+                    <!-- Input inline para capturar valor (se muestra al arrastrar #valor desde paleta) -->
+                    <div class="inline-value-input-logic" id="inlineValueInputLogico" style="display: none;">
+                        <span class="inline-value-label"><i class="fas fa-hashtag"></i></span>
+                        <input type="text" id="inputValorLogicoExpr" placeholder="Numero o texto..."
+                               onkeypress="if(event.key==='Enter') aceptarValorLogicoExpr()">
+                        <button type="button" class="btn-accept" onclick="aceptarValorLogicoExpr()" title="Aceptar">
+                            <i class="fas fa-check"></i>
                         </button>
-                        <!-- Input inline para capturar valor -->
-                        <div class="inline-value-input-logic" id="inlineValueInputLogico" style="display: none;">
-                            <span class="inline-value-label"><i class="fas fa-hashtag"></i></span>
-                            <input type="text" id="inputValorLogicoExpr" placeholder="Numero o texto..."
-                                   onkeypress="if(event.key==='Enter') aceptarValorLogicoExpr()">
-                            <button type="button" class="btn-accept" onclick="aceptarValorLogicoExpr()" title="Aceptar">
-                                <i class="fas fa-check"></i>
-                            </button>
-                            <button type="button" class="btn-cancel" onclick="cancelarValorLogicoExpr()" title="Cancelar">
-                                <i class="fas fa-times"></i>
-                            </button>
-                        </div>
+                        <button type="button" class="btn-cancel" onclick="cancelarValorLogicoExpr()" title="Cancelar">
+                            <i class="fas fa-times"></i>
+                        </button>
                     </div>
 
                     <div class="logic-expression-builder" id="logicExprBuilder"
@@ -3072,104 +3323,76 @@
 
         <!-- Contenido de Operadores -->
         <div class="resources-section-content">
-            <div class="operators-grid">
-                <!-- Operadores Aritméticos -->
-                <div class="op-pill draggable-operator-item" draggable="true" data-operator="+" ondragstart="dragOperatorStart(event)" ondragend="dragOperatorEnd(event)">
-                    <span class="op-pill-symbol">+</span>
-                    <span class="op-pill-name">Suma</span>
+            <!-- Categoría: Aritméticos -->
+            <div class="op-category">
+                <div class="op-category-header arithmetic">
+                    <i class="fas fa-calculator"></i>
+                    <span>Aritméticos</span>
                 </div>
-                <div class="op-pill draggable-operator-item" draggable="true" data-operator="-" ondragstart="dragOperatorStart(event)" ondragend="dragOperatorEnd(event)">
-                    <span class="op-pill-symbol">−</span>
-                    <span class="op-pill-name">Resta</span>
-                </div>
-                <div class="op-pill draggable-operator-item" draggable="true" data-operator="*" ondragstart="dragOperatorStart(event)" ondragend="dragOperatorEnd(event)">
-                    <span class="op-pill-symbol">×</span>
-                    <span class="op-pill-name">Multiplicación</span>
-                </div>
-                <div class="op-pill draggable-operator-item" draggable="true" data-operator="/" ondragstart="dragOperatorStart(event)" ondragend="dragOperatorEnd(event)">
-                    <span class="op-pill-symbol">÷</span>
-                    <span class="op-pill-name">División</span>
-                </div>
-                
-                    <!-- Operadores de Comparación -->
-                    <div class="op-pill draggable-operator-item" draggable="true" data-operator=">" ondragstart="dragOperatorStart(event)" ondragend="dragOperatorEnd(event)">
-                        <span class="op-pill-symbol">&gt;</span>
-                        <span class="op-pill-name">Mayor que</span>
-                    </div>
-                    <div class="op-pill draggable-operator-item" draggable="true" data-operator="<" ondragstart="dragOperatorStart(event)" ondragend="dragOperatorEnd(event)">
-                        <span class="op-pill-symbol">&lt;</span>
-                        <span class="op-pill-name">Menor que</span>
-                    </div>
-                    <div class="op-pill draggable-operator-item" draggable="true" data-operator=">=" ondragstart="dragOperatorStart(event)" ondragend="dragOperatorEnd(event)">
-                        <span class="op-pill-symbol">≥</span>
-                        <span class="op-pill-name">Mayor o igual</span>
-                    </div>
-                    <div class="op-pill draggable-operator-item" draggable="true" data-operator="<=" ondragstart="dragOperatorStart(event)" ondragend="dragOperatorEnd(event)">
-                        <span class="op-pill-symbol">≤</span>
-                        <span class="op-pill-name">Menor o igual</span>
-                    </div>
-                    <div class="op-pill draggable-operator-item" draggable="true" data-operator="=" ondragstart="dragOperatorStart(event)" ondragend="dragOperatorEnd(event)">
-                        <span class="op-pill-symbol">=</span>
-                        <span class="op-pill-name">Igual</span>
-                    </div>
-                    <div class="op-pill draggable-operator-item" draggable="true" data-operator="!=" ondragstart="dragOperatorStart(event)" ondragend="dragOperatorEnd(event)">
-                        <span class="op-pill-symbol">≠</span>
-                        <span class="op-pill-name">Diferente</span>
-                    </div>
+                <div class="operators-grid">
+                    <div class="op-pill arithmetic draggable-operator-item" draggable="true" data-operator="+" ondragstart="dragOperatorStart(event)" ondragend="dragOperatorEnd(event)" title="Suma">+</div>
+                    <div class="op-pill arithmetic draggable-operator-item" draggable="true" data-operator="-" ondragstart="dragOperatorStart(event)" ondragend="dragOperatorEnd(event)" title="Resta">−</div>
+                    <div class="op-pill arithmetic draggable-operator-item" draggable="true" data-operator="*" ondragstart="dragOperatorStart(event)" ondragend="dragOperatorEnd(event)" title="Multiplicación">×</div>
+                    <div class="op-pill arithmetic draggable-operator-item" draggable="true" data-operator="/" ondragstart="dragOperatorStart(event)" ondragend="dragOperatorEnd(event)" title="División">÷</div>
                 </div>
             </div>
+
+            <!-- Categoría: Comparación -->
+            <div class="op-category">
+                <div class="op-category-header comparison">
+                    <i class="fas fa-not-equal"></i>
+                    <span>Comparación</span>
+                </div>
+                <div class="operators-grid">
+                    <div class="op-pill comparison draggable-operator-item" draggable="true" data-operator=">" ondragstart="dragOperatorStart(event)" ondragend="dragOperatorEnd(event)" title="Mayor que">&gt;</div>
+                    <div class="op-pill comparison draggable-operator-item" draggable="true" data-operator="<" ondragstart="dragOperatorStart(event)" ondragend="dragOperatorEnd(event)" title="Menor que">&lt;</div>
+                    <div class="op-pill comparison draggable-operator-item" draggable="true" data-operator="=" ondragstart="dragOperatorStart(event)" ondragend="dragOperatorEnd(event)" title="Igual">=</div>
+                    <div class="op-pill comparison-outline draggable-operator-item" draggable="true" data-operator=">=" ondragstart="dragOperatorStart(event)" ondragend="dragOperatorEnd(event)" title="Mayor o igual">≥</div>
+                    <div class="op-pill comparison-outline draggable-operator-item" draggable="true" data-operator="<=" ondragstart="dragOperatorStart(event)" ondragend="dragOperatorEnd(event)" title="Menor o igual">≤</div>
+                    <div class="op-pill comparison-outline draggable-operator-item" draggable="true" data-operator="!=" ondragstart="dragOperatorStart(event)" ondragend="dragOperatorEnd(event)" title="Diferente">≠</div>
+                </div>
+            </div>
+
+            <!-- Categoría: Lógicos -->
+            <div class="op-category">
+                <div class="op-category-header logic">
+                    <i class="fas fa-code-branch"></i>
+                    <span>Lógicos</span>
+                </div>
+                <div class="operators-grid">
+                    <div class="op-pill logic draggable-logic-item" draggable="true" data-operator="AND" data-type="logic" ondragstart="dragLogicOperatorStart(event)" ondragend="dragLogicOperatorEnd(event)" title="Y lógico">AND</div>
+                    <div class="op-pill logic draggable-logic-item" draggable="true" data-operator="OR" data-type="logic" ondragstart="dragLogicOperatorStart(event)" ondragend="dragLogicOperatorEnd(event)" title="O lógico">OR</div>
+                </div>
+            </div>
+
+            <!-- Categoría: Especiales -->
+            <div class="op-category">
+                <div class="op-category-header special">
+                    <i class="fas fa-asterisk"></i>
+                    <span>Especiales</span>
+                </div>
+                <div class="operators-grid">
+                    <div class="op-pill special-value draggable-value-item" draggable="true" data-type="value" ondragstart="dragValueStart(event)" ondragend="dragValueEnd(event)" title="Insertar valor">#</div>
+                    <div class="op-pill special-parenthesis draggable-parenthesis-item" draggable="true" data-type="parenthesis" data-value="(" ondragstart="dragParenthesisStart(event)" ondragend="dragParenthesisEnd(event)" title="Abrir paréntesis">(</div>
+                    <div class="op-pill special-parenthesis draggable-parenthesis-item" draggable="true" data-type="parenthesis" data-value=")" ondragstart="dragParenthesisStart(event)" ondragend="dragParenthesisEnd(event)" title="Cerrar paréntesis">)</div>
+                    <div class="op-pill special-where draggable-operator-item" draggable="true" data-operator="where" ondragstart="dragOperatorStart(event)" ondragend="dragOperatorEnd(event)" title="Cláusula where">where</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Hint -->
+        <div class="operators-sidebar-hint">
+            <i class="fas fa-lightbulb"></i>
+            <span>Arrastra los operadores a las expresiones</span>
         </div>
     </div>
 
     <!-- Panel lateral de funciones y campos arrastrables -->
     <div class="functions-sidebar">
         <div class="functions-sidebar-header">
-            <i class="fas fa-layer-group"></i>
-            <span class="functions-sidebar-title">Componentes</span>
+            <i class="fas fa-magic"></i>
+            <span class="functions-sidebar-title">Funciones</span>
         </div>
-        
-        <!-- Sección de Campos Disponibles -->
-        <div class="sidebar-section">
-            <div class="sidebar-section-header">
-                <i class="fas fa-database"></i>
-                <span>Campos Disponibles</span>
-                <span class="sidebar-badge">
-                    <asp:Label ID="lblCantidadCampos" runat="server" Text="0" />
-                </span>
-            </div>
-            <div class="sidebar-section-content">
-                <!-- Selector de segmento -->
-                <div class="sidebar-segment-selector">
-                    <asp:DropDownList 
-                        ID="ddlSegmentos" 
-                        runat="server" 
-                        CssClass="form-select form-select-sm"
-                        AutoPostBack="True"
-                        OnSelectedIndexChanged="ddlSegmentos_SelectedIndexChanged">
-                    </asp:DropDownList>
-                </div>
-
-                <!-- Pills de campos -->
-                <div class="fields-grid">
-                    <asp:Repeater ID="rptCampos" runat="server">
-                        <ItemTemplate>
-                            <div class="field-pill draggable-field-item" 
-                                 draggable="true" 
-                                 data-field='<%# Eval("Campo") %>'
-                                 title='<%# Eval("Descripcion") %>'
-                                 ondragstart="dragFieldStart(event)" 
-                                 ondragend="dragFieldEnd(event)">
-                                <span class="field-pill-icon">📊</span>
-                                <span class="field-pill-name"><%# Eval("Campo") %></span>
-                            </div>
-                        </ItemTemplate>
-                    </asp:Repeater>
-                </div>
-            </div>
-        </div>
-
-        <!-- Separador -->
-        <div class="sidebar-separator"></div>
 
         <!-- Búsqueda de funciones -->
         <div class="functions-sidebar-search">
@@ -3285,6 +3508,44 @@
 </asp:Content>
 
 <asp:Content ID="Content3" ContentPlaceHolderID="scripts" runat="server">
+<!-- ==========================================
+     SISTEMA MODULAR DE FUNCIONES (IIFE Pattern)
+     Orden: Namespace -> Base -> Registry -> Core -> Funciones -> Editor
+     Namespace: EF (Editor Funciones)
+     ========================================== -->
+
+<!-- Namespace principal - DEBE SER PRIMERO -->
+<script src="Scripts/core/Namespace.js"></script>
+
+<!-- Infraestructura base -->
+<script src="Scripts/FunctionBase.js"></script>
+<script src="Scripts/FunctionRegistry.js"></script>
+
+<!-- Core modular (drag & drop, navegacion, mini-builders, expresiones, panel config) -->
+<script src="Scripts/core/DragDropManager.js"></script>
+<script src="Scripts/core/NavigationStack.js"></script>
+<script src="Scripts/core/MiniBuilderManager.js"></script>
+<script src="Scripts/core/ExpressionBuilder.js"></script>
+<script src="Scripts/core/ConfigPanel.js"></script>
+<script src="Scripts/core/FunctionCatalog.js"></script>
+<script src="Scripts/core/AutocompleteManager.js"></script>
+<script src="Scripts/core/LogicExpressionBuilder.js"></script>
+<script src="Scripts/core/InputHandlers.js"></script>
+<script src="Scripts/core/VariableCardManager.js"></script>
+
+<!-- Funciones modulares (se auto-registran) -->
+<script src="Scripts/functions/Minimo.js"></script>
+<script src="Scripts/functions/Maximo.js"></script>
+<script src="Scripts/functions/Suma.js"></script>
+<script src="Scripts/functions/Promedio.js"></script>
+<script src="Scripts/functions/Conteo.js"></script>
+<script src="Scripts/functions/ConteoCaracteres.js"></script>
+<script src="Scripts/functions/DifFechaHoy.js"></script>
+<script src="Scripts/functions/ExpresionRegular.js"></script>
+<script src="Scripts/functions/SiEntonces.js"></script>
+<script src="Scripts/functions/CalcularEdad.js"></script>
+
+<!-- Core del editor (debe ir al final) -->
 <script src="Scripts/EditorFunciones.js"></script>
 
 </asp:Content>

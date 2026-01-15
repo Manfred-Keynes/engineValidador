@@ -10,13 +10,14 @@ namespace enginevalidator
     {
         protected void Page_Load(object sender, EventArgs e)
         {
-            if (!IsPostBack)
-            {
-                CargarSegmentos();
-                CargarCampos();
-            }
+            // Los campos ahora se cargan dinámicamente desde JavaScript (VariableCardManager.js)
+            // con datos demo, no se requiere carga desde el servidor
         }
 
+        // NOTA: Los siguientes métodos fueron deshabilitados porque los campos
+        // ahora se manejan en el cliente con JavaScript (origen de datos en cada variable)
+
+        /*
         private void CargarSegmentos()
         {
             ddlSegmentos.Items.Clear();
@@ -28,7 +29,6 @@ namespace enginevalidator
 
         private void CargarCampos()
         {
-            // Aquí cargarías desde tu BD
             var campos = new List<CampoInfo>
             {
                 new CampoInfo { Campo = "NIT", Descripcion = "Número de Identificación Tributaria" },
@@ -53,10 +53,10 @@ namespace enginevalidator
 
             if (!string.IsNullOrEmpty(segmento))
             {
-                // Filtrar campos según segmento
                 CargarCampos();
             }
         }
+        */
 
         protected void btnGuardar_Click(object sender, EventArgs e)
         {
@@ -66,12 +66,6 @@ namespace enginevalidator
                 if (string.IsNullOrWhiteSpace(txtNombre.Text))
                 {
                     MostrarMensaje("El nombre del factor es requerido", "warning");
-                    return;
-                }
-
-                if (ddlFuncion.SelectedValue == "")
-                {
-                    MostrarMensaje("Debe seleccionar una función", "warning");
                     return;
                 }
 
@@ -96,10 +90,6 @@ namespace enginevalidator
                 {
                     Nombre = txtNombre.Text,
                     Descripcion = txtDescripcion.Text,
-                    Funcion = ddlFuncion.SelectedValue,
-                    Origen = ddlOrigen.SelectedValue,
-                    OperadorComparativo = ddlOperador.SelectedValue,
-                    ValorComparativo = txtValorComparativo.Text,
                     Variables = variables,
                     ExpresionLogica = lblExpresionLogica.Text
                 };
