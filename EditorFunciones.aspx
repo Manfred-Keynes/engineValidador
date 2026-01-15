@@ -38,7 +38,8 @@
             background: var(--gray-50);
             color: var(--gray-900);
             line-height: 1.6;
-            padding: 24px 0;
+            padding: 24px;
+            padding-right: 450px; /* Espacio para ambas paletas */
         }
 
         .header {
@@ -64,9 +65,7 @@
         }
 
         .main-grid {
-            display: grid;
-            grid-template-columns: 1fr 400px;
-            gap: 24px;
+            display: block;
             margin-bottom: 24px;
         }
 
@@ -199,7 +198,7 @@
         /* Accordion Variable Cards */
         .variable-card {
             background: white;
-            border: 2px solid var(--gray-200);
+            border: 2px solid #bfdbfe;
             border-radius: var(--border-radius);
             margin-bottom: 12px;
             overflow: hidden;
@@ -208,12 +207,12 @@
 
         .variable-card.expanded {
             border-color: var(--primary);
-            box-shadow: var(--shadow-md);
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
         }
 
         .variable-card-header {
             padding: 16px;
-            background: var(--gray-50);
+            background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -223,16 +222,16 @@
         }
 
         .variable-card.expanded .variable-card-header {
-            background: var(--primary);
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
             color: white;
         }
 
         .variable-card-header:hover {
-            background: var(--primary-light);
+            background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
         }
 
         .variable-card.expanded .variable-card-header:hover {
-            background: var(--primary-dark);
+            background: linear-gradient(135deg, var(--primary-dark) 0%, #1e3a8a 100%);
         }
 
         .variable-card-content {
@@ -300,18 +299,19 @@
             width: 32px;
             height: 32px;
             border: none;
-            background: white;
+            background: #dbeafe;
             border-radius: 6px;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
             transition: all 0.2s;
-            color: var(--gray-600);
+            color: var(--primary);
         }
 
         .variable-btn:hover {
             transform: scale(1.1);
+            background: #bfdbfe;
         }
 
         .variable-card.expanded .variable-btn {
@@ -1697,13 +1697,34 @@
             background: #059669;
         }
 
-        @media (max-width: 1024px) {
-            .main-grid {
-                grid-template-columns: 1fr;
+        @media (max-width: 1400px) {
+            .editor-funciones-container {
+                padding-right: 230px; /* Solo espacio para una paleta */
             }
-            
+        }
+
+        @media (max-width: 1024px) {
             .variable-fields-grid {
                 grid-template-columns: 1fr;
+            }
+
+            .editor-funciones-container {
+                padding-right: 24px;
+            }
+
+            .resources-sidebar,
+            .functions-sidebar {
+                position: relative;
+                right: auto;
+                top: auto;
+                width: 100%;
+                max-height: none;
+                margin-bottom: 20px;
+                border-radius: var(--border-radius);
+            }
+
+            .resources-sidebar.shift-left {
+                right: auto;
             }
         }
 
@@ -2098,12 +2119,12 @@
         /* ===== PANEL LATERAL DE OPERADORES - DISEÑO MODERNO ===== */
         .resources-sidebar {
             position: fixed;
-            right: 20px;
+            right: 12px;
             top: 120px;
-            width: 280px;
+            width: 200px;
             background: #ffffff;
             border: none;
-            border-radius: 20px;
+            border-radius: 16px;
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08), 0 2px 8px rgba(0, 0, 0, 0.04);
             z-index: 99;
             max-height: calc(100vh - 140px);
@@ -2115,16 +2136,16 @@
 
         /* Cuando hay una variable expandida, correrse a la izquierda */
         .resources-sidebar.shift-left {
-            right: 340px;
+            right: 230px; /* 210px (ancho funciones) + 8px gap + 12px posicion */
         }
 
         .resources-sidebar-header {
-            padding: 18px 20px;
+            padding: 12px 14px;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
-            border-radius: 20px 20px 0 0;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            border-radius: 16px 16px 0 0;
         }
 
         .resources-sidebar-header-left {
@@ -2139,7 +2160,7 @@
         }
 
         .resources-sidebar-title {
-            font-size: 16px;
+            font-size: 14px;
             font-weight: 700;
             color: #ffffff;
         }
@@ -2199,7 +2220,7 @@
         }
 
         .resources-section-content {
-            padding: 16px;
+            padding: 10px;
             max-height: 400px;
             overflow-y: auto;
             background: #ffffff;
@@ -2218,43 +2239,43 @@
         /* Panel lateral de funciones - SE MUESTRA/OCULTA A LA DERECHA */
         .functions-sidebar {
             position: fixed;
-            right: 20px;             /* ✅ Siempre en el extremo derecho */
+            right: 12px;             /* Siempre en el extremo derecho */
             top: 120px;              /* Misma altura que operadores */
-            width: 300px;            /* Mismo ancho que operadores */
+            width: 210px;            /* Ancho compacto */
             background: white;
             border: 1px solid var(--gray-200);
-            border-radius: var(--border-radius);
+            border-radius: 16px;
             box-shadow: var(--shadow-lg);
             z-index: 100;
             max-height: calc(100vh - 140px);  /* Altura completa disponible */
             display: none;           /* Oculto por defecto */
             flex-direction: column;
-            overflow: hidden;        /* ✅ Importante para que el contenido tenga altura */
+            overflow: hidden;        /* Importante para que el contenido tenga altura */
         }
 
         .functions-sidebar-header {
-            padding: 16px;
+            padding: 12px 14px;
             border-bottom: 2px solid var(--gray-100);
             display: flex;
             align-items: center;
             gap: 8px;
-            background: var(--gray-50);
-            border-radius: var(--border-radius) var(--border-radius) 0 0;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            border-radius: 16px 16px 0 0;
         }
 
         .functions-sidebar-header i {
-            color: var(--primary);
-            font-size: 18px;
+            color: #ffffff;
+            font-size: 16px;
         }
 
         .functions-sidebar-title {
             font-size: 14px;
             font-weight: 700;
-            color: var(--gray-900);
+            color: #ffffff;
         }
 
         .functions-sidebar-search {
-            padding: 12px 16px;
+            padding: 8px 10px;
             border-bottom: 1px solid var(--gray-200);
         }
 
@@ -2344,7 +2365,7 @@
         .function-category-sidebar-title {
             font-size: 11px;
             font-weight: 700;
-            color: var(--gray-500);
+            color: var(--primary);
             text-transform: uppercase;
             letter-spacing: 0.05em;
             margin-bottom: 8px;
@@ -2353,11 +2374,11 @@
         .draggable-function-item {
             display: flex;
             align-items: center;
-            gap: 10px;
-            padding: 10px 12px;
-            margin-bottom: 6px;
+            gap: 8px;
+            padding: 8px 10px;
+            margin-bottom: 4px;
             background: white;
-            border: 2px solid var(--gray-200);
+            border: 1px solid #dbeafe;
             border-radius: var(--border-radius-sm);
             cursor: grab;
             transition: all 0.2s;
@@ -2369,7 +2390,7 @@
 
         .draggable-function-item:hover {
             border-color: var(--primary);
-            background: var(--primary-light);
+            background: #eff6ff;
             transform: translateX(4px);
         }
 
@@ -2379,15 +2400,15 @@
         }
 
         .draggable-function-icon {
-            width: 32px;
-            height: 32px;
+            width: 26px;
+            height: 26px;
             display: flex;
             align-items: center;
             justify-content: center;
             background: var(--primary-light);
             border-radius: 6px;
             color: var(--primary);
-            font-size: 14px;
+            font-size: 12px;
             flex-shrink: 0;
         }
 
@@ -2396,37 +2417,36 @@
         }
 
         .draggable-function-name {
-            font-size: 13px;
+            font-size: 12px;
             font-weight: 600;
             color: var(--gray-900);
-            margin-bottom: 2px;
+            margin-bottom: 0;
         }
 
         .draggable-function-desc {
-            font-size: 11px;
-            color: var(--gray-600);
-            line-height: 1.3;
+            display: none; /* Ocultar descripcion en paleta compacta */
         }
 
         .drag-handle {
-            color: var(--gray-400);
-            font-size: 16px;
+            color: #93c5fd;
+            font-size: 12px;
         }
 
         /* Hint de arrastre */
         .functions-sidebar-hint {
-            padding: 12px 16px;
-            background: #eff6ff;
-            border-top: 1px solid #dbeafe;
+            padding: 10px 12px;
+            background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+            border-top: 1px solid #bfdbfe;
             font-size: 11px;
             color: #1e40af;
             display: flex;
             align-items: center;
             gap: 8px;
+            border-radius: 0 0 16px 16px;
         }
 
         .functions-sidebar-hint i {
-            color: #3b82f6;
+            color: var(--primary);
         }
 
         /* Panel estático de operadores */
@@ -2442,7 +2462,7 @@
 
         /* Categorías de operadores */
         .op-category {
-            margin-bottom: 16px;
+            margin-bottom: 12px;
         }
 
         .op-category:last-child {
@@ -2467,16 +2487,16 @@
             font-size: 12px;
         }
 
-        .op-category-header.arithmetic i { color: #8b5cf6; }
-        .op-category-header.comparison i { color: #06b6d4; }
-        .op-category-header.logic i { color: #ec4899; }
-        .op-category-header.special i { color: #f59e0b; }
+        .op-category-header.arithmetic i { color: var(--primary); }
+        .op-category-header.comparison i { color: #3b82f6; }
+        .op-category-header.logic i { color: #1d4ed8; }
+        .op-category-header.special i { color: #6366f1; }
 
         /* Grid de operadores */
         .operators-grid {
             display: flex;
             flex-wrap: wrap;
-            gap: 8px;
+            gap: 6px;
         }
 
         /* Operador Pill - Diseño Cuadrado Minimalista */
@@ -2484,15 +2504,15 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            width: 42px;
-            height: 42px;
-            font-size: 18px;
+            width: 32px;
+            height: 32px;
+            font-size: 14px;
             font-weight: 600;
             font-family: 'SF Mono', 'Consolas', monospace;
             color: #ffffff;
             background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
             border: none;
-            border-radius: 10px;
+            border-radius: 8px;
             cursor: grab;
             transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
             box-shadow: 0 2px 8px rgba(139, 92, 246, 0.3);
@@ -2505,7 +2525,7 @@
 
         .op-pill:hover {
             transform: translateY(-3px);
-            box-shadow: 0 6px 16px rgba(139, 92, 246, 0.4);
+            box-shadow: 0 6px 16px rgba(37, 99, 235, 0.4);
         }
 
         .op-pill.dragging {
@@ -2513,94 +2533,94 @@
             transform: scale(1.05);
         }
 
-        /* Operadores Aritméticos - Morado sólido */
+        /* Operadores Aritméticos - Azul primario */
         .op-pill.arithmetic {
-            background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
-            box-shadow: 0 2px 8px rgba(139, 92, 246, 0.3);
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            box-shadow: 0 2px 8px rgba(37, 99, 235, 0.3);
         }
 
         .op-pill.arithmetic:hover {
-            box-shadow: 0 6px 16px rgba(139, 92, 246, 0.4);
+            box-shadow: 0 6px 16px rgba(37, 99, 235, 0.4);
         }
 
-        /* Operadores de Comparación - Cyan sólido */
+        /* Operadores de Comparación - Azul medio */
         .op-pill.comparison {
-            background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);
-            box-shadow: 0 2px 8px rgba(6, 182, 212, 0.3);
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
         }
 
         .op-pill.comparison:hover {
-            box-shadow: 0 6px 16px rgba(6, 182, 212, 0.4);
+            box-shadow: 0 6px 16px rgba(59, 130, 246, 0.4);
         }
 
         /* Operadores de Comparación con borde (>=, <=, !=) */
         .op-pill.comparison-outline {
             background: transparent;
-            color: #06b6d4;
-            border: 2px solid #06b6d4;
+            color: #3b82f6;
+            border: 2px solid #3b82f6;
             box-shadow: none;
         }
 
         .op-pill.comparison-outline:hover {
-            background: rgba(6, 182, 212, 0.1);
-            box-shadow: 0 4px 12px rgba(6, 182, 212, 0.2);
+            background: rgba(59, 130, 246, 0.1);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
         }
 
-        /* Operadores Lógicos - Rosa/Magenta */
+        /* Operadores Lógicos - Azul oscuro */
         .op-pill.logic {
             width: auto;
-            padding: 0 14px;
-            font-size: 13px;
+            padding: 0 10px;
+            font-size: 11px;
             font-weight: 700;
-            background: linear-gradient(135deg, #ec4899 0%, #db2777 100%);
-            box-shadow: 0 2px 8px rgba(236, 72, 153, 0.3);
+            background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%);
+            box-shadow: 0 2px 8px rgba(29, 78, 216, 0.3);
         }
 
         .op-pill.logic:hover {
-            box-shadow: 0 6px 16px rgba(236, 72, 153, 0.4);
+            box-shadow: 0 6px 16px rgba(29, 78, 216, 0.4);
         }
 
         /* Especiales - Valor */
         .op-pill.special-value {
-            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-            box-shadow: 0 2px 8px rgba(245, 158, 11, 0.3);
+            background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+            box-shadow: 0 2px 8px rgba(99, 102, 241, 0.3);
         }
 
         .op-pill.special-value:hover {
-            box-shadow: 0 6px 16px rgba(245, 158, 11, 0.4);
+            box-shadow: 0 6px 16px rgba(99, 102, 241, 0.4);
         }
 
         /* Especiales - Paréntesis */
         .op-pill.special-parenthesis {
-            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-            box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+            background: linear-gradient(135deg, #818cf8 0%, #6366f1 100%);
+            box-shadow: 0 2px 8px rgba(129, 140, 248, 0.3);
         }
 
         .op-pill.special-parenthesis:hover {
-            box-shadow: 0 6px 16px rgba(16, 185, 129, 0.4);
+            box-shadow: 0 6px 16px rgba(129, 140, 248, 0.4);
         }
 
         /* Especiales - Where */
         .op-pill.special-where {
             width: auto;
-            padding: 0 14px;
-            font-size: 13px;
+            padding: 0 10px;
+            font-size: 11px;
             font-weight: 700;
-            background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
-            box-shadow: 0 2px 8px rgba(99, 102, 241, 0.3);
+            background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%);
+            box-shadow: 0 2px 8px rgba(79, 70, 229, 0.3);
         }
 
         .op-pill.special-where:hover {
-            box-shadow: 0 6px 16px rgba(99, 102, 241, 0.4);
+            box-shadow: 0 6px 16px rgba(79, 70, 229, 0.4);
         }
 
         /* Hint del sidebar */
         .operators-sidebar-hint {
-            padding: 12px 16px;
-            background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
-            border-top: 1px solid #bbf7d0;
+            padding: 10px 12px;
+            background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+            border-top: 1px solid #bfdbfe;
             font-size: 11px;
-            color: #166534;
+            color: #1e40af;
             display: flex;
             align-items: center;
             gap: 8px;
@@ -2608,7 +2628,7 @@
         }
 
         .operators-sidebar-hint i {
-            color: #22c55e;
+            color: var(--primary);
             font-size: 12px;
         }
 
@@ -3194,54 +3214,6 @@
                         MaxLength="200" />
                 </div>
 
-                <!-- Función y Origen -->
-                <div class="form-row">
-                    <div class="form-group">
-                        <label class="form-label">Función <span class="required">*</span></label>
-                        <asp:DropDownList ID="ddlFuncion" runat="server" CssClass="form-select">
-                            <asp:ListItem Value="">Seleccione...</asp:ListItem>
-                            <asp:ListItem Value="expresion">Expresión Avanzada Recurrente</asp:ListItem>
-                            <asp:ListItem Value="simple">Expresión Simple</asp:ListItem>
-                            <asp:ListItem Value="lookup">Búsqueda en Tabla</asp:ListItem>
-                        </asp:DropDownList>
-                    </div>
-
-                    <div class="form-group">
-                        <label class="form-label">Origen de Datos</label>
-                        <asp:DropDownList ID="ddlOrigen" runat="server" CssClass="form-select">
-                            <asp:ListItem Value="">Seleccione...</asp:ListItem>
-                            <asp:ListItem Value="producto">Campos del Producto</asp:ListItem>
-                            <asp:ListItem Value="cliente">Campos del Cliente</asp:ListItem>
-                            <asp:ListItem Value="bureau">Datos de Buró</asp:ListItem>
-                        </asp:DropDownList>
-                    </div>
-                </div>
-
-                <!-- Operador Comparativo -->
-                <div class="form-row">
-                    <div class="form-group">
-                        <label class="form-label">Operador Comparativo</label>
-                        <asp:DropDownList ID="ddlOperador" runat="server" CssClass="form-select">
-                            <asp:ListItem Value="">Ninguno</asp:ListItem>
-                            <asp:ListItem Value=">">&gt; Mayor que</asp:ListItem>
-                            <asp:ListItem Value=">=">&gt;= Mayor o igual</asp:ListItem>
-                            <asp:ListItem Value="<">&lt; Menor que</asp:ListItem>
-                            <asp:ListItem Value="<=">&lt;= Menor o igual</asp:ListItem>
-                            <asp:ListItem Value="=">=  Igual</asp:ListItem>
-                            <asp:ListItem Value="!=">!= Diferente</asp:ListItem>
-                        </asp:DropDownList>
-                    </div>
-
-                    <div class="form-group">
-                        <label class="form-label">Valor Comparativo</label>
-                        <asp:TextBox 
-                            ID="txtValorComparativo" 
-                            runat="server" 
-                            CssClass="form-input" 
-                            placeholder="Ingrese valor a comparar" />
-                    </div>
-                </div>
-
                 <!-- Variables Section con Accordion -->
                 <div class="variables-section">
                     <div class="variables-header">
@@ -3418,52 +3390,9 @@
     <!-- Panel lateral de funciones y campos arrastrables -->
     <div class="functions-sidebar">
         <div class="functions-sidebar-header">
-            <i class="fas fa-layer-group"></i>
-            <span class="functions-sidebar-title">Componentes</span>
+            <i class="fas fa-magic"></i>
+            <span class="functions-sidebar-title">Funciones</span>
         </div>
-        
-        <!-- Sección de Campos Disponibles -->
-        <div class="sidebar-section">
-            <div class="sidebar-section-header">
-                <i class="fas fa-database"></i>
-                <span>Campos Disponibles</span>
-                <span class="sidebar-badge">
-                    <asp:Label ID="lblCantidadCampos" runat="server" Text="0" />
-                </span>
-            </div>
-            <div class="sidebar-section-content">
-                <!-- Selector de segmento -->
-                <div class="sidebar-segment-selector">
-                    <asp:DropDownList 
-                        ID="ddlSegmentos" 
-                        runat="server" 
-                        CssClass="form-select form-select-sm"
-                        AutoPostBack="True"
-                        OnSelectedIndexChanged="ddlSegmentos_SelectedIndexChanged">
-                    </asp:DropDownList>
-                </div>
-
-                <!-- Pills de campos -->
-                <div class="fields-grid">
-                    <asp:Repeater ID="rptCampos" runat="server">
-                        <ItemTemplate>
-                            <div class="field-pill draggable-field-item" 
-                                 draggable="true" 
-                                 data-field='<%# Eval("Campo") %>'
-                                 title='<%# Eval("Descripcion") %>'
-                                 ondragstart="dragFieldStart(event)" 
-                                 ondragend="dragFieldEnd(event)">
-                                <span class="field-pill-icon">📊</span>
-                                <span class="field-pill-name"><%# Eval("Campo") %></span>
-                            </div>
-                        </ItemTemplate>
-                    </asp:Repeater>
-                </div>
-            </div>
-        </div>
-
-        <!-- Separador -->
-        <div class="sidebar-separator"></div>
 
         <!-- Búsqueda de funciones -->
         <div class="functions-sidebar-search">

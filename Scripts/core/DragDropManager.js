@@ -233,6 +233,16 @@ const DragDropManager = (() => {
             return;
         }
 
+        // Soporte para variables existentes arrastradas desde Origen de datos
+        if (EF.State.draggedVariable || window.draggedVariable) {
+            const varName = EF.State.draggedVariable || window.draggedVariable;
+            addExprComponent(varId, 'variable', `[${varName}]`, `<i class="fas fa-cube expr-icon" style="color: #2563eb;"></i><span class="expr-value" style="color: #1e40af;">${varName}</span>`);
+            EF.State.draggedVariable = null;
+            window.draggedVariable = null;
+            EF.State.targetVarId = null;
+            return;
+        }
+
         if (EF.State.draggedFunctionName) {
             const builder = document.getElementById('exprBuilder' + varId);
             if (builder) {
