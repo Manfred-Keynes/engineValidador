@@ -145,6 +145,38 @@
             gap: 16px;
         }
 
+        .form-row.acciones-row {
+            grid-template-columns: 1fr 1fr 1fr;
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            padding: 16px;
+            border-radius: 10px;
+            border: 1px solid #e2e8f0;
+            margin-top: 8px;
+        }
+
+        .action-select {
+            background-color: white;
+            border: 2px solid #e2e8f0;
+            transition: all 0.2s ease;
+        }
+
+        .action-select:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .action-select option[value="verde"] {
+            color: #10b981;
+        }
+
+        .action-select option[value="rojo"] {
+            color: #ef4444;
+        }
+
+        .action-select option[value="amarillo"] {
+            color: #f59e0b;
+        }
+
         .form-textarea {
             min-height: 80px;
             resize: vertical;
@@ -1628,6 +1660,186 @@
         .action-bar-left {
             display: flex;
             gap: 12px;
+        }
+
+        /* Contenedor de Factores de Riesgo */
+        .factores-container {
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--gray-200);
+            margin-top: 20px;
+            overflow: hidden;
+        }
+
+        .factores-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 20px;
+            background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+            border-bottom: 1px solid #bfdbfe;
+        }
+
+        .factores-header-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .factores-header i {
+            color: var(--primary);
+            font-size: 18px;
+        }
+
+        .factores-title {
+            font-weight: 600;
+            color: var(--gray-800);
+            font-size: 15px;
+        }
+
+        .factores-count {
+            background: var(--primary);
+            color: white;
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .factores-list {
+            max-height: 300px;
+            overflow-y: auto;
+            padding: 12px;
+        }
+
+        .factores-list::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .factores-list::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 3px;
+        }
+
+        .factores-list::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 3px;
+        }
+
+        .factores-list::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+
+        .factor-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 16px;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .factor-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .factor-item:hover {
+            background: #eff6ff;
+            border-color: #bfdbfe;
+            transform: translateX(4px);
+        }
+
+        .factor-item-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex: 1;
+        }
+
+        .factor-item-icon {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary);
+            font-size: 14px;
+        }
+
+        .factor-item-info {
+            flex: 1;
+        }
+
+        .factor-item-name {
+            font-weight: 600;
+            color: var(--gray-800);
+            font-size: 14px;
+            margin-bottom: 2px;
+        }
+
+        .factor-item-description {
+            font-size: 12px;
+            color: var(--gray-500);
+        }
+
+        .factor-item-actions {
+            display: flex;
+            gap: 6px;
+        }
+
+        .factor-item-btn {
+            width: 30px;
+            height: 30px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            transition: all 0.2s ease;
+        }
+
+        .factor-item-btn.edit {
+            background: #dbeafe;
+            color: var(--primary);
+        }
+
+        .factor-item-btn.edit:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        .factor-item-btn.delete {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+
+        .factor-item-btn.delete:hover {
+            background: #dc2626;
+            color: white;
+        }
+
+        .factores-empty {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--gray-400);
+        }
+
+        .factores-empty i {
+            font-size: 40px;
+            margin-bottom: 12px;
+            display: block;
+        }
+
+        .factores-empty span {
+            font-size: 14px;
         }
 
         .helper-text {
@@ -3206,12 +3418,52 @@
 
                 <div class="form-group">
                     <label class="form-label">Descripción</label>
-                    <asp:TextBox 
-                        ID="txtDescripcion" 
-                        runat="server" 
-                        CssClass="form-input" 
+                    <asp:TextBox
+                        ID="txtDescripcion"
+                        runat="server"
+                        CssClass="form-input"
                         placeholder="Breve descripción del propósito del factor"
                         MaxLength="200" />
+                </div>
+
+                <!-- Acciones -->
+                <div class="form-row acciones-row">
+                    <div class="form-group">
+                        <label class="form-label">
+                            <i class="fas fa-check-circle" style="color: #10b981; margin-right: 6px;"></i>
+                            Acción Aprobado
+                        </label>
+                        <asp:DropDownList ID="ddlAccionAprobado" runat="server" CssClass="form-select action-select">
+                            <asp:ListItem Value="">Seleccione...</asp:ListItem>
+                            <asp:ListItem Value="verde">Verde</asp:ListItem>
+                            <asp:ListItem Value="rojo">Rojo</asp:ListItem>
+                            <asp:ListItem Value="amarillo">Amarillo</asp:ListItem>
+                        </asp:DropDownList>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">
+                            <i class="fas fa-times-circle" style="color: #ef4444; margin-right: 6px;"></i>
+                            Acción Denegado
+                        </label>
+                        <asp:DropDownList ID="ddlAccionDenegado" runat="server" CssClass="form-select action-select">
+                            <asp:ListItem Value="">Seleccione...</asp:ListItem>
+                            <asp:ListItem Value="verde">Verde</asp:ListItem>
+                            <asp:ListItem Value="rojo">Rojo</asp:ListItem>
+                            <asp:ListItem Value="amarillo">Amarillo</asp:ListItem>
+                        </asp:DropDownList>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">
+                            <i class="fas fa-arrow-right" style="color: var(--primary); margin-right: 6px;"></i>
+                            Acción Next
+                        </label>
+                        <asp:DropDownList ID="ddlAccionNext" runat="server" CssClass="form-select action-select">
+                            <asp:ListItem Value="">Seleccione...</asp:ListItem>
+                            <asp:ListItem Value="ir_a">Ir a</asp:ListItem>
+                        </asp:DropDownList>
+                    </div>
                 </div>
 
                 <!-- Variables Section con Accordion -->
@@ -3307,6 +3559,23 @@
                     Text="Validar Expresión" 
                     CssClass="btn btn-primary"
                     OnClick="btnValidar_Click" />
+            </div>
+        </div>
+
+        <!-- Contenedor de Factores de Riesgo -->
+        <div class="factores-container">
+            <div class="factores-header">
+                <div class="factores-header-left">
+                    <i class="fas fa-project-diagram"></i>
+                    <span class="factores-title">Flujo de la Evaluación</span>
+                </div>
+                <span class="factores-count" id="factoresCount">0</span>
+            </div>
+            <div class="factores-list" id="factoresList">
+                <div class="factores-empty">
+                    <i class="fas fa-inbox"></i>
+                    <span>No hay factores en el flujo</span>
+                </div>
             </div>
         </div>
     </div>
@@ -3547,5 +3816,283 @@
 
 <!-- Core del editor (debe ir al final) -->
 <script src="Scripts/EditorFunciones.js"></script>
+
+<script>
+// ==========================================
+// GESTOR DE FACTORES DE RIESGO
+// ==========================================
+const FactoresManager = (() => {
+    'use strict';
+
+    let factoresGuardados = [];
+    let factorIdCounter = 1;
+
+    // Serializar variables antes de enviar el formulario
+    const serializarVariables = () => {
+        const variablesCards = document.querySelectorAll('.variable-card');
+        const variables = [];
+
+        variablesCards.forEach((card, index) => {
+            const varId = card.id.replace('varCard', '');
+            const nameEl = document.getElementById('varName' + varId);
+            const exprBuilder = document.getElementById('exprBuilder' + varId);
+
+            // Obtener la expresión del builder
+            let expresion = '';
+            if (exprBuilder) {
+                const components = exprBuilder.querySelectorAll('.expr-component');
+                components.forEach(comp => {
+                    expresion += comp.getAttribute('data-value') || '';
+                });
+            }
+
+            // Obtener origen de datos seleccionado
+            const origenSelector = card.querySelector('.origen-selector-btn.active');
+            let origen = origenSelector ? origenSelector.getAttribute('data-origen') : '';
+
+            // Obtener buró y segmento seleccionados
+            const buroCard = card.querySelector('.buro-card.selected');
+            const segmentoCard = card.querySelector('.segmento-card.selected');
+
+            variables.push({
+                Orden: index + 1,
+                Variable: nameEl ? nameEl.textContent : 'Variable ' + varId,
+                Funcion: '',
+                Origen: origen,
+                Expresion: expresion,
+                ExpresionCondicional: '',
+                ExpresionWhere: '',
+                MensajeWhere: '',
+                TipoRespuesta: '',
+                Buro: buroCard ? buroCard.getAttribute('data-buro') : '',
+                Bloque: segmentoCard ? segmentoCard.getAttribute('data-segmento') : '',
+                Accion: ''
+            });
+        });
+
+        // Guardar en el hidden field
+        const hfVariablesData = document.getElementById('<%= hfVariablesData.ClientID %>');
+        if (hfVariablesData) {
+            hfVariablesData.value = JSON.stringify(variables);
+        }
+
+        return variables;
+    };
+
+    // Agregar factor a la lista visual
+    const agregarFactorALista = (factor) => {
+        const factoresList = document.getElementById('factoresList');
+        const factoresCount = document.getElementById('factoresCount');
+
+        if (!factoresList) return;
+
+        // Remover mensaje de vacío si existe
+        const emptyMsg = factoresList.querySelector('.factores-empty');
+        if (emptyMsg) emptyMsg.remove();
+
+        const factorHtml = `
+            <div class="factor-item" data-factor-id="${factor.id}">
+                <div class="factor-item-left">
+                    <div class="factor-item-icon">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <div class="factor-item-info">
+                        <div class="factor-item-name">${factor.nombre}</div>
+                        <div class="factor-item-description">${factor.descripcion || 'Sin descripción'} - ${factor.variablesCount} variable(s)</div>
+                    </div>
+                </div>
+                <div class="factor-item-actions">
+                    <button type="button" class="factor-item-btn edit" onclick="FactoresManager.editarFactor(${factor.id})" title="Editar">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button type="button" class="factor-item-btn delete" onclick="FactoresManager.eliminarFactor(${factor.id})" title="Eliminar">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+            </div>
+        `;
+
+        factoresList.insertAdjacentHTML('beforeend', factorHtml);
+
+        // Actualizar contador
+        if (factoresCount) {
+            factoresCount.textContent = factoresGuardados.length;
+        }
+    };
+
+    // Guardar factor (llamado antes del submit)
+    const guardarFactor = () => {
+        const txtNombre = document.getElementById('<%= txtNombre.ClientID %>');
+        const txtDescripcion = document.getElementById('<%= txtDescripcion.ClientID %>');
+        const ddlAccionAprobado = document.getElementById('<%= ddlAccionAprobado.ClientID %>');
+        const ddlAccionDenegado = document.getElementById('<%= ddlAccionDenegado.ClientID %>');
+        const ddlAccionNext = document.getElementById('<%= ddlAccionNext.ClientID %>');
+
+        if (!txtNombre || !txtNombre.value.trim()) {
+            return false;
+        }
+
+        const variables = serializarVariables();
+
+        const factor = {
+            id: factorIdCounter++,
+            nombre: txtNombre.value.trim(),
+            descripcion: txtDescripcion ? txtDescripcion.value.trim() : '',
+            accionAprobado: ddlAccionAprobado ? ddlAccionAprobado.value : '',
+            accionDenegado: ddlAccionDenegado ? ddlAccionDenegado.value : '',
+            accionNext: ddlAccionNext ? ddlAccionNext.value : '',
+            variables: variables,
+            variablesCount: variables.length,
+            expresionLogica: document.getElementById('logicExpressionPreview')?.textContent || '',
+            fechaCreacion: new Date().toISOString()
+        };
+
+        factoresGuardados.push(factor);
+        agregarFactorALista(factor);
+
+        // Limpiar formulario después de guardar
+        limpiarFormulario();
+
+        return true;
+    };
+
+    // Limpiar formulario
+    const limpiarFormulario = () => {
+        const txtNombre = document.getElementById('<%= txtNombre.ClientID %>');
+        const txtDescripcion = document.getElementById('<%= txtDescripcion.ClientID %>');
+        const ddlAccionAprobado = document.getElementById('<%= ddlAccionAprobado.ClientID %>');
+        const ddlAccionDenegado = document.getElementById('<%= ddlAccionDenegado.ClientID %>');
+        const ddlAccionNext = document.getElementById('<%= ddlAccionNext.ClientID %>');
+
+        if (txtNombre) txtNombre.value = '';
+        if (txtDescripcion) txtDescripcion.value = '';
+        if (ddlAccionAprobado) ddlAccionAprobado.selectedIndex = 0;
+        if (ddlAccionDenegado) ddlAccionDenegado.selectedIndex = 0;
+        if (ddlAccionNext) ddlAccionNext.selectedIndex = 0;
+
+        // Limpiar variables
+        const variablesContainer = document.getElementById('variablesContainer');
+        if (variablesContainer) variablesContainer.innerHTML = '';
+
+        // Limpiar expresión lógica
+        const logicBuilder = document.getElementById('logicExprBuilder');
+        if (logicBuilder) {
+            logicBuilder.innerHTML = `
+                <div class="empty">
+                    <i class="fas fa-hand-pointer" style="margin-right: 8px;"></i>
+                    Arrastra variables y operadores para construir la expresión lógica
+                </div>
+            `;
+        }
+
+        const logicPreview = document.getElementById('logicExpressionPreview');
+        if (logicPreview) {
+            logicPreview.innerHTML = '<span class="preview-empty">Sin expresión configurada</span>';
+        }
+
+        // Resetear contador de variables
+        if (typeof resetVariableCounter === 'function') {
+            resetVariableCounter();
+        }
+
+        // Actualizar contador visual
+        const variablesCount = document.getElementById('variablesCount');
+        if (variablesCount) variablesCount.textContent = '0 variables';
+    };
+
+    // Editar factor
+    const editarFactor = (factorId) => {
+        const factor = factoresGuardados.find(f => f.id === factorId);
+        if (!factor) return;
+
+        // Cargar datos del factor en el formulario
+        const txtNombre = document.getElementById('<%= txtNombre.ClientID %>');
+        const txtDescripcion = document.getElementById('<%= txtDescripcion.ClientID %>');
+        const ddlAccionAprobado = document.getElementById('<%= ddlAccionAprobado.ClientID %>');
+        const ddlAccionDenegado = document.getElementById('<%= ddlAccionDenegado.ClientID %>');
+        const ddlAccionNext = document.getElementById('<%= ddlAccionNext.ClientID %>');
+
+        if (txtNombre) txtNombre.value = factor.nombre;
+        if (txtDescripcion) txtDescripcion.value = factor.descripcion;
+        if (ddlAccionAprobado) ddlAccionAprobado.value = factor.accionAprobado || '';
+        if (ddlAccionDenegado) ddlAccionDenegado.value = factor.accionDenegado || '';
+        if (ddlAccionNext) ddlAccionNext.value = factor.accionNext || '';
+
+        // Eliminar el factor de la lista (se volverá a agregar al guardar)
+        eliminarFactor(factorId, false);
+
+        // Scroll al formulario
+        document.querySelector('.card')?.scrollIntoView({ behavior: 'smooth' });
+    };
+
+    // Eliminar factor
+    const eliminarFactor = (factorId, confirmar = true) => {
+        if (confirmar && !confirm('¿Está seguro de eliminar este factor?')) {
+            return;
+        }
+
+        factoresGuardados = factoresGuardados.filter(f => f.id !== factorId);
+
+        // Remover de la UI
+        const factorItem = document.querySelector(`.factor-item[data-factor-id="${factorId}"]`);
+        if (factorItem) factorItem.remove();
+
+        // Actualizar contador
+        const factoresCount = document.getElementById('factoresCount');
+        if (factoresCount) {
+            factoresCount.textContent = factoresGuardados.length;
+        }
+
+        // Mostrar mensaje vacío si no hay factores
+        if (factoresGuardados.length === 0) {
+            const factoresList = document.getElementById('factoresList');
+            if (factoresList) {
+                factoresList.innerHTML = `
+                    <div class="factores-empty">
+                        <i class="fas fa-inbox"></i>
+                        <span>No hay factores en el flujo</span>
+                    </div>
+                `;
+            }
+        }
+    };
+
+    // Obtener todos los factores
+    const obtenerFactores = () => factoresGuardados;
+
+    // API pública
+    return {
+        serializarVariables,
+        guardarFactor,
+        editarFactor,
+        eliminarFactor,
+        obtenerFactores,
+        limpiarFormulario
+    };
+})();
+
+// Interceptar el submit del formulario para serializar variables
+document.addEventListener('DOMContentLoaded', function() {
+    const btnGuardar = document.getElementById('<%= btnGuardar.ClientID %>');
+
+    if (btnGuardar) {
+        btnGuardar.addEventListener('click', function(e) {
+            // Serializar variables antes de enviar
+            FactoresManager.serializarVariables();
+
+            // Guardar factor en la lista visual (solo si hay nombre)
+            const txtNombre = document.getElementById('<%= txtNombre.ClientID %>');
+            if (txtNombre && txtNombre.value.trim()) {
+                e.preventDefault(); // Prevenir el postback
+
+                if (FactoresManager.guardarFactor()) {
+                    // Mostrar mensaje de éxito
+                    alert('Factor guardado exitosamente');
+                }
+            }
+        });
+    }
+});
+</script>
 
 </asp:Content>

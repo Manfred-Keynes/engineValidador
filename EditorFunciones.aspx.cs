@@ -91,7 +91,7 @@ namespace enginevalidator
                     Nombre = txtNombre.Text,
                     Descripcion = txtDescripcion.Text,
                     Variables = variables,
-                    ExpresionLogica = lblExpresionLogica.Text
+                    ExpresionLogica = hdnExpresionLogica.Value
                 };
 
                 // Aquí guardarías en la BD
@@ -117,7 +117,7 @@ namespace enginevalidator
         {
             try
             {
-                string expresion = lblExpresionLogica.Text;
+                string expresion = hdnExpresionLogica.Value;
 
                 if (string.IsNullOrWhiteSpace(expresion))
                 {
